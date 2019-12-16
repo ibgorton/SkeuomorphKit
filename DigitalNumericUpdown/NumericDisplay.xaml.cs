@@ -18,8 +18,12 @@ namespace DigitalNumericUpdown
         private readonly BitArray _decimals = new BitArray(new bool[10]);
         private readonly BitArray _digits = new BitArray(new bool[10]);
         private bool _bool_ShowSelector;
-        private char[] _integerChars = new char[0];
         private readonly List<SevenSegmentModule> _modules = new List<SevenSegmentModule>();
+        private int _integerCount;
+
+        //public
+        public int IntegerCount => _integerCount;
+        public SevenSegmentModule SelectedModule => _modules.FirstOrDefault(m => m.IsSelected);
 
         //events
         public event Action<double> IncrementChanged = delegate { };
@@ -50,6 +54,7 @@ namespace DigitalNumericUpdown
             SetDecimalsVisibility();
         }
 
+
         public void SetNumberDigits(byte value)
         {
             value = Math.Min(value, (byte)10);
@@ -65,8 +70,6 @@ namespace DigitalNumericUpdown
         {
             set => ProcessInput(value);
         }
-
-        public ReadOnlyCollection<char> IntPart => _integerChars.ToList().AsReadOnly();
         
         public double Maximum { get; set; }
 
@@ -84,7 +87,7 @@ namespace DigitalNumericUpdown
 
         internal void DropDecimalPosition()
         {
-            int a = 10 - _integerChars.Length;
+            int a = 10 - _integerCount;
             if (_modules[a].IsSelected)
             {
                 int b = Math.Min(a + 1, 9);
@@ -110,13 +113,14 @@ namespace DigitalNumericUpdown
             ulong integerPart = (ulong)value;
             double fractionalPart = Math.Round(value - integerPart, 10);
 
-            _integerChars = integerPart.ToString().ToCharArray().Reverse().ToArray();
+            char[] integerChars = integerPart.ToString().ToCharArray().Reverse().ToArray();
+            _integerCount = integerChars.Length;
             // Fill Digit Values
             for (int i = 0; i < 10; i++)
             {
                 int p = 9 - i;
-                if (_integerChars.Length > p)
-                    _modules[i].SetDigit(_integerChars[p]);
+                if (integerChars.Length > p)
+                    _modules[i].SetDigit(integerChars[p]);
             }
 
             if (fractionalPart > 0d)
@@ -128,13 +132,13 @@ namespace DigitalNumericUpdown
                 for (int i = 10; i < 20; i++)
                 {
                     int p = i - 10;
-                    if ((new char[0]).Count() > p)
-                        _modules[i].SetDigit((new char[0])[p]);
+                    if (fractionChars.Length > p)
+                        _modules[i].SetDigit(fractionChars[p]);
                 }
             }
 
             // Blank unused digit locations
-            Modules.Take(10 - _integerChars.Length).ToList().ForEach(m => m.BlankModule());
+            Modules.Take(10 - integerChars.Length).ToList().ForEach(m => m.BlankModule());
         }
 
         private void SetDecimalsVisibility()

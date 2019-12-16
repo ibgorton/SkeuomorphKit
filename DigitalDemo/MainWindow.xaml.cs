@@ -34,7 +34,6 @@ namespace DigitalDemo
 
             Loaded += (ob, ev) =>
             {
-                
                 _sw.Start();
                 CompositionTarget.Rendering += (ob, ev) =>
                 {

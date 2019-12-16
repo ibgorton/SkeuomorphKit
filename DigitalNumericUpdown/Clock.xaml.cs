@@ -23,11 +23,10 @@ namespace DigitalNumericUpdown
 
         private void SetTime(object? sender, EventArgs e)
         {
-            /*
             DateTime now = DateTime.Now;
-            byte[] hourDigits = now.Hour.ToString().Select(c => (byte)char.GetNumericValue(c)).ToArray();
-            byte[] minuteDigits = now.Minute.ToString().Select(c => (byte)char.GetNumericValue(c)).ToArray();
-            byte[] secondDigits = now.Second.ToString().Select(c => (byte)char.GetNumericValue(c)).ToArray();
+            char[] hourDigits = now.Hour.ToString().ToCharArray();
+            char[] minuteDigits = now.Minute.ToString().ToCharArray();
+            char[] secondDigits = now.Second.ToString().ToCharArray();
             if (hourDigits.Length == 2)
             {
                 _moduleH_.SetDigit(hourDigits[0]);
@@ -35,7 +34,7 @@ namespace DigitalNumericUpdown
             }
             else
             {
-                _moduleH_.SetDigit(0);
+                _moduleH_.SetDigit(null);
                 _module_H.SetDigit(hourDigits[0]);
             }
             if (minuteDigits.Length == 2)
@@ -45,7 +44,7 @@ namespace DigitalNumericUpdown
             }
             else
             {
-                _moduleM_.SetDigit(0);
+                _moduleM_.SetDigit(null);
                 _module_M.SetDigit(minuteDigits[0]);
             }
             if (secondDigits.Length == 2)
@@ -55,10 +54,9 @@ namespace DigitalNumericUpdown
             }
             else
             {
-                _moduleS_.SetDigit(0);
+                _moduleS_.SetDigit(null);
                 _module_S.SetDigit(secondDigits[0]);
             }
-            */
         }
     }
 }

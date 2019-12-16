@@ -91,9 +91,9 @@ namespace DigitalNumericUpdown
 
         private void Button_IncrementDown_Click(object sender, RoutedEventArgs e)
         {
-            if (_NumericDisplay.IntPart.Count > 0)
+            if (_NumericDisplay.IntegerCount > 0)
             {
-                if (_NumericDisplay.IntPart[_NumericDisplay.IntPart.Count - 1] == 1)
+                if (_NumericDisplay.SelectedModule.CurrentValue == 1)
                     _NumericDisplay.DropDecimalPosition();
             }
             SetValue(_value - _increment);
@@ -133,6 +133,5 @@ namespace DigitalNumericUpdown
             value = Math.Max(value, Minimum);
             return value;
         }
-
     }
 }

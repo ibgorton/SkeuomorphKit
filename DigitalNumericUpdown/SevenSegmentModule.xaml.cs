@@ -43,6 +43,10 @@ namespace DigitalNumericUpdown
         //private
         private bool _selected;
         private bool _showDigitSelector;
+        private int? _currentValue = null;
+
+        //public
+        public int? CurrentValue => _currentValue;
 
         /// <summary>
         /// Class constructor
@@ -114,6 +118,11 @@ namespace DigitalNumericUpdown
         /// </summary>
         private void SetDigit(byte digit)
         {
+            if (digit < 10)
+                _currentValue = digit;
+            else
+                _currentValue = null;
+
             _segment1.Opacity = _bits[digit][0] ? 1.0 : 0.075;
             _segment2.Opacity = _bits[digit][1] ? 1.0 : 0.075;
             _segment3.Opacity = _bits[digit][2] ? 1.0 : 0.075;
@@ -128,9 +137,12 @@ namespace DigitalNumericUpdown
             SetDigit(10);
         }
 
-        public void SetDigit(char digit)
+        public void SetDigit(char? digit)
         {
-            SetDigit((byte)Char.GetNumericValue(digit));
+            if (digit == null)
+                SetDigit(10);
+            else
+                SetDigit((byte)Char.GetNumericValue((char)digit));
         }
 
         /// <summary>
