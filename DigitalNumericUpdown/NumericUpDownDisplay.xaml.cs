@@ -35,12 +35,12 @@ namespace DigitalNumericUpdown
         
         public void SetDecimals(byte value)
         {
-            _NumericDisplay.SetDecimals(value);
+            _NumericDisplay.SetNumberDecimals(value);
         }
 
         public void SetDigits(byte value)
         {
-            _NumericDisplay.SetDigits(value);
+            _NumericDisplay.SetNumberDigits(value);
         }
         
         public double Increment

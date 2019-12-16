@@ -112,7 +112,7 @@ namespace DigitalNumericUpdown
         /// <summary>
         /// Sets the number for display
         /// </summary>
-        public void SetDigit(byte digit)
+        private void SetDigit(byte digit)
         {
             _segment1.Opacity = _bits[digit][0] ? 1.0 : 0.075;
             _segment2.Opacity = _bits[digit][1] ? 1.0 : 0.075;
@@ -121,6 +121,16 @@ namespace DigitalNumericUpdown
             _segment5.Opacity = _bits[digit][4] ? 1.0 : 0.075;
             _segment6.Opacity = _bits[digit][5] ? 1.0 : 0.075;
             _segment7.Opacity = _bits[digit][6] ? 1.0 : 0.075;
+        }
+
+        public void BlankModule()
+        {
+            SetDigit(10);
+        }
+
+        public void SetDigit(char digit)
+        {
+            SetDigit((byte)Char.GetNumericValue(digit));
         }
 
         /// <summary>

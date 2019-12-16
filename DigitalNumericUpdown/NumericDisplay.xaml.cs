@@ -15,10 +15,10 @@ namespace DigitalNumericUpdown
     public partial class NumericDisplay : UserControl
     {
         //private
-        private readonly BitArray _BitArray_decimals = new BitArray(new bool[10]);
-        private readonly BitArray _BitArray_digits = new BitArray(new bool[10]);
+        private readonly BitArray _decimals = new BitArray(new bool[10]);
+        private readonly BitArray _digits = new BitArray(new bool[10]);
         private bool _bool_ShowSelector;
-        private byte[] _intPart = new byte[0];
+        private char[] _integerChars = new char[0];
         private readonly List<SevenSegmentModule> _modules = new List<SevenSegmentModule>();
 
         //events
@@ -39,25 +39,25 @@ namespace DigitalNumericUpdown
             ShowSelector = false;
         }
 
-        public void SetDecimals(byte value)
+        public void SetNumberDecimals(byte value)
         {
             value = Math.Min(value, (byte)10);
             //zero out the array
-            for (int i = 0; i < _BitArray_decimals.Count; i++)
-                _BitArray_decimals[i] = false;
+            for (int i = 0; i < _decimals.Count; i++)
+                _decimals[i] = false;
             for (int i = 0; i < value; i++)
-                _BitArray_decimals[i] = true;
+                _decimals[i] = true;
             SetDecimalsVisibility();
         }
 
-        public void SetDigits(byte value)
+        public void SetNumberDigits(byte value)
         {
             value = Math.Min(value, (byte)10);
             //zero out the array
-            for (int i = 0; i < _BitArray_digits.Count; i++)
-                _BitArray_digits[i] = false;
+            for (int i = 0; i < _digits.Count; i++)
+                _digits[i] = false;
             for (int i = 0; i < value; i++)
-                _BitArray_digits[i] = true;
+                _digits[i] = true;
             SetDigitsVisibility();
         }
         
@@ -66,7 +66,7 @@ namespace DigitalNumericUpdown
             set => ProcessInput(value);
         }
 
-        public ReadOnlyCollection<byte> IntPart => _intPart.ToList().AsReadOnly();
+        public ReadOnlyCollection<char> IntPart => _integerChars.ToList().AsReadOnly();
         
         public double Maximum { get; set; }
 
@@ -84,7 +84,7 @@ namespace DigitalNumericUpdown
 
         internal void DropDecimalPosition()
         {
-            int a = 10 - _intPart.Length;
+            int a = 10 - _integerChars.Length;
             if (_modules[a].IsSelected)
             {
                 int b = Math.Min(a + 1, 9);
@@ -104,52 +104,44 @@ namespace DigitalNumericUpdown
 
         private void ProcessInput(double value)
         {
-            if (ShowSelector)
-            {
-                value = Math.Min(value, Maximum);
-                value = Math.Max(value, Minimum);
-            }
-            ulong intPart = (ulong)value;
-            double fractionalPart = Math.Round(value - intPart, 10);
-            _intPart = intPart.ToString().Select(c => (byte)char.GetNumericValue(c)).Reverse().ToArray();
-            byte[] byteArray_fracPart = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            value = Math.Min(value, Maximum);
+            value = Math.Max(value, Minimum);
             
-            if (fractionalPart > 0d)
-            {
-                byte[] fp = fractionalPart.ToString().Remove(0, 2).Select(c => (byte)char.GetNumericValue(c)).ToArray();
-                {
-                    int count = 0;
-                    foreach (byte i in fp)
-                    {
-                        byteArray_fracPart[count] = i;
-                        count++;
-                    }
-                }
-            }
-            
-            // Blank unused digit locations
-            Modules.Take(10 - _intPart.Length).ToList().ForEach(m => m.SetDigit(10));
+            ulong integerPart = (ulong)value;
+            double fractionalPart = Math.Round(value - integerPart, 10);
+
+            _integerChars = integerPart.ToString().ToCharArray().Reverse().ToArray();
             // Fill Digit Values
             for (int i = 0; i < 10; i++)
             {
                 int p = 9 - i;
-                if (_intPart.Length > p)
-                    _modules[i].SetDigit(_intPart[p]);
+                if (_integerChars.Length > p)
+                    _modules[i].SetDigit(_integerChars[p]);
             }
-            // Fill Decimal Values
-            for (int i = 10; i < 20; i++)
+
+            if (fractionalPart > 0d)
             {
-                int p = i - 10;
-                if (byteArray_fracPart.Count() > p)
-                    _modules[i].SetDigit(byteArray_fracPart[p]);
+                //remove the leading '0.'
+                string trimLeading = fractionalPart.ToString().Remove(0, 2);
+                char[] fractionChars = trimLeading.ToCharArray();
+                // Fill Decimal Values
+                for (int i = 10; i < 20; i++)
+                {
+                    int p = i - 10;
+                    if ((new char[0]).Count() > p)
+                        _modules[i].SetDigit((new char[0])[p]);
+                }
             }
+
+            // Blank unused digit locations
+            Modules.Take(10 - _integerChars.Length).ToList().ForEach(m => m.BlankModule());
         }
 
         private void SetDecimalsVisibility()
         {
             for (int i = 10; i < 20; i++)
             {
-                SetNumberModuleVisibility(_modules[i], _BitArray_decimals[i - 10]);
+                SetNumberModuleVisibility(_modules[i], _decimals[i - 10]);
             }
         }
 
@@ -157,7 +149,7 @@ namespace DigitalNumericUpdown
         {
             for (int i = 0; i < 10; i++)
             {
-                SetNumberModuleVisibility(_modules[i], _BitArray_digits[9 - i]);
+                SetNumberModuleVisibility(_modules[i], _digits[9 - i]);
             }
         }
 

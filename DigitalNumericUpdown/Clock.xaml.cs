@@ -23,6 +23,7 @@ namespace DigitalNumericUpdown
 
         private void SetTime(object? sender, EventArgs e)
         {
+            /*
             DateTime now = DateTime.Now;
             byte[] hourDigits = now.Hour.ToString().Select(c => (byte)char.GetNumericValue(c)).ToArray();
             byte[] minuteDigits = now.Minute.ToString().Select(c => (byte)char.GetNumericValue(c)).ToArray();
@@ -57,6 +58,7 @@ namespace DigitalNumericUpdown
                 _moduleS_.SetDigit(0);
                 _module_S.SetDigit(secondDigits[0]);
             }
+            */
         }
     }
 }
