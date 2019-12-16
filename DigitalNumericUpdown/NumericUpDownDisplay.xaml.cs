@@ -17,6 +17,9 @@ namespace DigitalNumericUpdown
         private double _minimum = 0d;
         private double _value = 0d;
 
+        /// <summary>
+        /// Class Constructor
+        /// </summary>
         public NumericUpDownDisplay()
         {
             InitializeComponent();

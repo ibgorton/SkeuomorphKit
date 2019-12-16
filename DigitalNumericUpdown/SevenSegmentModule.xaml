@@ -208,7 +208,7 @@
                         Fill="Lime"
                         Stroke="Black"
                         StrokeThickness="2" />
-                <Viewbox x:Name="_ViewBox" Canvas.Top="3">
+                <Viewbox x:Name="_viewBox" Canvas.Top="3">
                     <Rectangle
                         x:Name="_Path_SelectedArrow"
                         Width="100"

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace DigitalNumericUpdown
 {
@@ -15,6 +12,9 @@ namespace DigitalNumericUpdown
     /// </summary>
     public partial class SevenSegmentModule : UserControl
     {
+        /// <summary>
+        /// Used for seven segment illumination logic
+        /// </summary>
         private readonly static BitArray[] _bits = {
                 //zero
                 new BitArray(new bool[] { true, true, true, false, true, true, true }),
@@ -40,11 +40,13 @@ namespace DigitalNumericUpdown
                 new BitArray(new bool[] { false, false, false, false, false, false, false })
         };
 
+        //private
         private bool _selected;
-
         private bool _showDigitSelector;
-        private readonly List<Path> _paths = new List<Path>();
 
+        /// <summary>
+        /// Class constructor
+        /// </summary>
         public SevenSegmentModule()
         {
             InitializeComponent();
@@ -52,7 +54,6 @@ namespace DigitalNumericUpdown
             {
                 return;
             }
-            _paths = LogicalTreeHelper.GetChildren(_canvas).OfType<Path>().ToList();
             EnableDecimalPoint(false);
 
             ShowDigitSelector = false;
@@ -67,9 +68,7 @@ namespace DigitalNumericUpdown
         }
 
         public event Action<object> SelectionEvent = delegate { };
-
-        public uint SegmentHeight { get; set; } = 40;
-
+        
         public double Increment { get; set; } = 1.0;
 
         public void ShowColon()
@@ -93,7 +92,7 @@ namespace DigitalNumericUpdown
             set
             {
                 _showDigitSelector = value;
-                _ViewBox.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+                _viewBox.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
@@ -102,11 +101,17 @@ namespace DigitalNumericUpdown
             SelectionEvent?.Invoke(this);
         }
 
+        /// <summary>
+        /// Enables the decimal point indicator
+        /// </summary>
         public void EnableDecimalPoint(bool state)
         {
             _Ellipse_DecimalPlace.Opacity = state ? 1.0 : 0.075;
         }
 
+        /// <summary>
+        /// Sets the number for display
+        /// </summary>
         public void SetDigit(byte digit)
         {
             _segment1.Opacity = _bits[digit][0] ? 1.0 : 0.075;
@@ -118,6 +123,10 @@ namespace DigitalNumericUpdown
             _segment7.Opacity = _bits[digit][6] ? 1.0 : 0.075;
         }
 
+        /// <summary>
+        /// Handles the mousedown (selection) of this digit
+        /// Highlights the module while the mouse is down
+        /// </summary>
         private void ViewBox_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (!ShowDigitSelector)

@@ -50,6 +50,9 @@ namespace DigitalDemo
             };
         }
 
+        /// <summary>
+        /// Handles the button click event to pause and continue the running timer
+        /// </summary>
         private void Toggle_Click(object sender, RoutedEventArgs e)
         {
             if (_sw.IsRunning)
