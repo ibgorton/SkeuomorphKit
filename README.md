@@ -1,5 +1,5 @@
 # DigitalDisplay
-Before I was a software engineer, I was an electronic technician.
+Before I was a software engineer, I was an Electronics Technician.
 
 ![Image of real seven segment display](/docs/leds.jpg)
 
