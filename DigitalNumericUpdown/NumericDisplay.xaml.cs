@@ -14,14 +14,19 @@ namespace DigitalNumericUpdown
     /// </summary>
     public partial class NumericDisplay : UserControl
     {
-        private bool _active;
+        //private
         private readonly BitArray _BitArray_decimals = new BitArray(new bool[10]);
         private readonly BitArray _BitArray_digits = new BitArray(new bool[10]);
         private bool _bool_ShowSelector;
-        private byte _byte_numDecimals;
         private byte[] _intPart = new byte[0];
         private readonly List<SevenSegmentModule> _modules = new List<SevenSegmentModule>();
 
+        //events
+        public event Action<double> IncrementChanged = delegate { };
+
+        /// <summary>
+        /// Class constructor
+        /// </summary>
         public NumericDisplay()
         {
             InitializeComponent();
@@ -34,72 +39,35 @@ namespace DigitalNumericUpdown
             ShowSelector = false;
         }
 
-        public event Action<double> IncrementChanged = delegate { };
-
-        public byte Decimals
+        public void SetDecimals(byte value)
         {
-            set
-            {
-                value = Math.Min(value, (byte)10);
-                _byte_numDecimals = value;
-                //zero out the array
-                for (int i = 0; i < _BitArray_decimals.Count; i++)
-                    _BitArray_decimals[i] = false;
-                for (int i = 0; i < value; i++)
-                    _BitArray_decimals[i] = true;
-                SetDecimalsVisibility();
-            }
+            value = Math.Min(value, (byte)10);
+            //zero out the array
+            for (int i = 0; i < _BitArray_decimals.Count; i++)
+                _BitArray_decimals[i] = false;
+            for (int i = 0; i < value; i++)
+                _BitArray_decimals[i] = true;
+            SetDecimalsVisibility();
         }
 
-        public byte Digits
+        public void SetDigits(byte value)
         {
-            set
-            {
-                value = Math.Min(value, (byte)10);
-                //zero out the array
-                for (int i = 0; i < _BitArray_digits.Count; i++)
-                    _BitArray_digits[i] = false;
-                for (int i = 0; i < value; i++)
-                    _BitArray_digits[i] = true;
-                SetDigitsVisibility();
-            }
+            value = Math.Min(value, (byte)10);
+            //zero out the array
+            for (int i = 0; i < _BitArray_digits.Count; i++)
+                _BitArray_digits[i] = false;
+            for (int i = 0; i < value; i++)
+                _BitArray_digits[i] = true;
+            SetDigitsVisibility();
         }
-
+        
         public double Input
         {
-            set
-            {
-                ProcessInput(value);
-            }
+            set => ProcessInput(value);
         }
 
         public ReadOnlyCollection<byte> IntPart => _intPart.ToList().AsReadOnly();
-
-        public bool IsActive
-        {
-            get => _active;
-            set
-            {
-                _active = value;
-                _modules.ForEach(m => m.IsActive = value);
-            }
-        }
-
-        public bool IsConnected
-        {
-            set
-            {
-                _modules.ForEach(m => m.IsConnected = value);
-                if (value)
-                {
-                    _modules.ForEach(m => m.SetDigit(8));
-                    _modules.ForEach(m => m.SetDigit(10));
-                }
-                else
-                    IsActive = false;
-            }
-        }
-
+        
         public double Maximum { get; set; }
 
         public double Minimum { get; set; }
@@ -113,7 +81,6 @@ namespace DigitalNumericUpdown
                 _bool_ShowSelector = value;
             }
         }
-
 
         internal void DropDecimalPosition()
         {
