@@ -8,59 +8,7 @@
         RelativeSource={RelativeSource Self}}"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <!-- Solarized BackGround Tones -->
-        <SolidColorBrush
-            x:Key="SolarizedBase03"
-            Color="#002b36" />
-        <SolidColorBrush
-            x:Key="SolarizedBase02"
-            Color="#073642" />
-        <SolidColorBrush
-            x:Key="SolarizedBase2"
-            Color="#eee8d5" />
-        <SolidColorBrush
-            x:Key="SolarizedBase3"
-            Color="#fdf6e3" />
-        <!-- Solarized Content Tones -->
-        <SolidColorBrush
-            x:Key="SolarizedBase01"
-            Color="#586e75" />
-        <SolidColorBrush
-            x:Key="SolarizedBase00"
-            Color="#657b83" />
-        <SolidColorBrush
-            x:Key="SolarizedBase0"
-            Color="#839496" />
-        <SolidColorBrush
-            x:Key="SolarizedBase1"
-            Color="#93a1a1" />
-
-        <!-- Solarized Accent Colors -->
-        <SolidColorBrush
-            x:Key="SolarizedYellow"
-            Color="#b58900" />
-        <SolidColorBrush
-            x:Key="SolarizedOrange"
-            Color="#cb4b16" />
-        <SolidColorBrush
-            x:Key="SolarizedRed"
-            Color="#dc322f" />
-        <SolidColorBrush
-            x:Key="SolarizedMagenta"
-            Color="#d33682" />
-        <SolidColorBrush
-            x:Key="SolarizedViolet"
-            Color="#6c71c4" />
-        <SolidColorBrush
-            x:Key="SolarizedBlue"
-            Color="#268bd2" />
-        <SolidColorBrush
-            x:Key="SolarizedCyan"
-            Color="#2aa198" />
-        <SolidColorBrush
-            x:Key="SolarizedGreen"
-            Color="#859900" />
-
+       
         <SolidColorBrush
             x:Key="BlackBrush"
             Color="Black" />
@@ -197,10 +145,7 @@
                                     Property="BorderBrush"
                                     TargetName="border"
                                     Value="Transparent" />
-                                <Setter
-                                    Property="TextElement.Foreground"
-                                    TargetName="contentPresenter"
-                                    Value="{StaticResource SolarizedBase03}" />
+                                
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -209,7 +154,6 @@
         </Style>
     </UserControl.Resources>
     <Grid
-        
         Background="Black"
         >
         <StackPanel 

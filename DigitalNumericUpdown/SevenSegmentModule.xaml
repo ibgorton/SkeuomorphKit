@@ -7,126 +7,25 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     SnapsToDevicePixels="True"
-    
     mc:Ignorable="d"
-    
     >
-    <UserControl.Resources>
-        <!--  Solarized BackGround Tones  -->
-        <SolidColorBrush x:Key="SolarizedBase03" Color="#002b36" />
-        <SolidColorBrush x:Key="SolarizedBase02" Color="#073642" />
-        <SolidColorBrush x:Key="SolarizedBase2" Color="#eee8d5" />
-        <SolidColorBrush x:Key="SolarizedBase3" Color="#fdf6e3" />
-        <!--  Solarized Content Tones  -->
-        <SolidColorBrush x:Key="SolarizedBase01" Color="#586e75" />
-        <SolidColorBrush x:Key="SolarizedBase00" Color="#657b83" />
-        <SolidColorBrush x:Key="SolarizedBase0" Color="#839496" />
-        <SolidColorBrush x:Key="SolarizedBase1" Color="#93a1a1" />
-
-        <!--  Solarized Accent Colors  -->
-        <SolidColorBrush x:Key="SolarizedYellow" Color="#b58900" />
-        <SolidColorBrush x:Key="SolarizedOrange" Color="#cb4b16" />
-        <SolidColorBrush x:Key="SolarizedRed" Color="#dc322f" />
-        <SolidColorBrush x:Key="SolarizedMagenta" Color="#d33682" />
-        <SolidColorBrush x:Key="SolarizedViolet" Color="#6c71c4" />
-        <SolidColorBrush x:Key="SolarizedBlue" Color="#268bd2" />
-        <SolidColorBrush x:Key="SolarizedCyan" Color="#2aa198" />
-        <SolidColorBrush x:Key="SolarizedGreen" Color="#859900" />
-
-        <SolidColorBrush x:Key="BlackBrush" Color="Black" />
-
-        <Style x:Key="FocusVisual2">
-            <Setter Property="Control.Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Rectangle
-                            Margin="2"
-                            SnapsToDevicePixels="true"
-                            Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
-                            StrokeDashArray="1 2"
-                            StrokeThickness="2" />
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD" />
-        <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070" />
-        <Style x:Key="ToggleButtonStyle1" TargetType="{x:Type ToggleButton}">
-            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual2}" />
-            <Setter Property="Background" Value="{StaticResource Button.Static.Background}" />
-            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}" />
-            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Padding" Value="1" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ToggleButton}">
-                        <Border
-                            x:Name="border"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            BorderThickness="1"
-                            SnapsToDevicePixels="true">
-                            <ContentPresenter
-                                x:Name="contentPresenter"
-                                Margin="{TemplateBinding Padding}"
-                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                Focusable="False"
-                                RecognizesAccessKey="True"
-                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="Button.IsDefaulted" Value="true">
-                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource SolarizedBase02}" />
-                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource SolarizedBase02}" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="true">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource SolarizedBase02}" />
-                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource SolarizedBase02}" />
-                                <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="Black" />
-                            </Trigger>
-                            <Trigger Property="IsChecked" Value="true">
-                                <Setter TargetName="border" Property="Background" Value="Transparent" />
-                                <Setter TargetName="border" Property="BorderBrush" Value="Transparent" />
-                                <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="Black" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter TargetName="border" Property="Background" Value="Transparent" />
-                                <Setter TargetName="border" Property="BorderBrush" Value="Transparent" />
-                                <Setter TargetName="contentPresenter" Property="TextElement.Foreground" Value="Transparent" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
     <StackPanel 
         Height="64"
         Orientation="Horizontal"
         Background="Black">
 
         <Viewbox
-                x:Name="_viewBox_eight"
-               
-            
+            x:Name="_viewBox_eight"
             MouseDown="ViewBox_MouseDown"
             MouseLeave="Viewbox_MouseLeave"
             MouseUp="Viewbox_MouseUp">
             <Canvas
-                    Margin="1,26"
+                Margin="1,26"
                 Name="_canvas"
                 Width="132"
                 Height="200">
                 <Path
                     Name="_segment2"
-                    
                     Fill="Lime"
                     Stroke="Black"
                     StrokeThickness="2">
@@ -137,7 +36,6 @@
 
                 <Path
                     Name="_segment5"
-                    
                     Fill="Lime"
                     Stroke="Black"
                     StrokeThickness="2">
@@ -148,7 +46,6 @@
 
                 <Path
                     Name="_segment3"
-                    
                     Fill="Lime"
                     Stroke="Black"
                     StrokeThickness="2">
@@ -159,7 +56,6 @@
 
                 <Path
                     Name="_segment6"
-                    
                     Fill="Lime"
                     Stroke="Black"
                     StrokeThickness="2">
@@ -169,18 +65,15 @@
                 </Path>
                 <Path
                     Name="_segment7"
-                    
                     Fill="Lime"
                     Stroke="Black"
                     StrokeThickness="2">
                     <Path.Data>
-                        <PathGeometry Figures="M20,180L90,180L100,190L90,200L20,200L10,190L20,180Z
-"/>
+                        <PathGeometry Figures="M20,180L90,180L100,190L90,200L20,200L10,190L20,180Z"/>
                     </Path.Data>
                 </Path>
                 <Path
                     Name="_segment4"
-                    
                     Fill="Lime"
                     Stroke="Black"
                     StrokeThickness="2">
@@ -191,7 +84,6 @@
 
                 <Path
                     Name="_segment1"
-                    
                     Fill="Lime"
                     Stroke="Black"
                     StrokeThickness="2">
@@ -224,8 +116,7 @@
         </Viewbox>
         <Viewbox x:Name="_viewBox_Colon">
             <Canvas Width="26"
-                Height="200"
-                    >
+                Height="200">
                 <Ellipse 
                     Margin="8,58,0,0"
                     Fill="Lime" Width="18"
