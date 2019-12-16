@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="DigitalNumericUpdown.Clock"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DigitalNumericUpdown"
+             mc:Ignorable="d" 
+             Background="Black"
+             >
+    <StackPanel Orientation="Horizontal" Margin="5">
+        <local:SevenSegmentModule x:Name="_moduleH_"/>
+        <local:SevenSegmentModule x:Name="_module_H"/>
+        <local:SevenSegmentModule x:Name="_moduleM_"/>
+        <local:SevenSegmentModule x:Name="_module_M"/>
+        <local:SevenSegmentModule x:Name="_moduleS_"/>
+        <local:SevenSegmentModule x:Name="_module_S"/>
+    </StackPanel>
+</UserControl>
