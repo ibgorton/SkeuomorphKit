@@ -13,8 +13,6 @@ namespace DigitalNumericUpdown
     {
         //private
         private double _increment = 0.1;
-        private double _maximum = 9999999999d;
-        private double _minimum = 0d;
         private double _value = 0d;
 
         /// <summary>
@@ -66,14 +64,14 @@ namespace DigitalNumericUpdown
 
         public double Maximum
         {
-            get => _maximum;
-            set => _maximum = _NumericDisplay.Maximum = value;
+            get => _NumericDisplay.Maximum;
+            set => _NumericDisplay.Maximum = value;
         }
 
         public double Minimum
         {
-            get => _minimum;
-            set => _minimum = _NumericDisplay.Minimum = value;
+            get => _NumericDisplay.Minimum;
+            set => _NumericDisplay.Minimum = value;
         }
 
         public void SetValue(double value)
@@ -91,9 +89,10 @@ namespace DigitalNumericUpdown
 
         private void Button_IncrementDown_Click(object sender, RoutedEventArgs e)
         {
-            if (_NumericDisplay.IntegerCount > 0)
+
+            if (_NumericDisplay.IntegerCount > 0 && _value > 0)
             {
-                if (_NumericDisplay.SelectedModule.CurrentValue == 1)
+                if (_NumericDisplay.SelectedModule?.CurrentValue == 1)
                     _NumericDisplay.DropDecimalPosition();
             }
             SetValue(_value - _increment);

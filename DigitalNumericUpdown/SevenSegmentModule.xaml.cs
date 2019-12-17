@@ -37,7 +37,9 @@ namespace DigitalNumericUpdown
                 //nine
                 new BitArray(new bool[] { true, true, true, true, false, true, true }),
                 //null
-                new BitArray(new bool[] { false, false, false, false, false, false, false })
+                new BitArray(new bool[] { false, false, false, false, false, false, false }),
+                //-
+                new BitArray(new bool [] {false, false, false, true, false, false, false })
         };
 
         //private
@@ -118,7 +120,7 @@ namespace DigitalNumericUpdown
         /// </summary>
         private void SetDigit(byte digit)
         {
-            if (digit < 10)
+            if (digit < 11)
                 _currentValue = digit;
             else
                 _currentValue = null;
@@ -141,6 +143,8 @@ namespace DigitalNumericUpdown
         {
             if (digit == null)
                 SetDigit(10);
+            else if (digit == '-')
+                SetDigit(11);
             else
                 SetDigit((byte)Char.GetNumericValue((char)digit));
         }

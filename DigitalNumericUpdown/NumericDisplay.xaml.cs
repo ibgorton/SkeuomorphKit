@@ -20,6 +20,8 @@ namespace DigitalNumericUpdown
         private bool _bool_ShowSelector;
         private readonly List<SevenSegmentModule> _modules = new List<SevenSegmentModule>();
         private int _integerCount;
+        private double _maximum = 9999999999.9999999999;
+        private double _minimum = -999999999.0;
 
         //public
         public int IntegerCount => _integerCount;
@@ -65,15 +67,31 @@ namespace DigitalNumericUpdown
                 _digits[i] = true;
             SetDigitsVisibility();
         }
-        
+
         public double Input
         {
             set => ProcessInput(value);
         }
-        
-        public double Maximum { get; set; }
 
-        public double Minimum { get; set; }
+        public double Maximum
+        {
+            get => _maximum;
+            set
+            {
+                value = Math.Min(value, 9999999999.9999999999);
+                _maximum = value;
+            }
+        }
+
+        public double Minimum
+        {
+            get => _minimum;
+            set
+            {
+                value = Math.Max(value, -999999999.9999999999);
+                _minimum = value;
+            }
+        }
 
         public bool ShowSelector
         {
@@ -109,8 +127,8 @@ namespace DigitalNumericUpdown
         {
             value = Math.Min(value, Maximum);
             value = Math.Max(value, Minimum);
-            
-            ulong integerPart = (ulong)value;
+
+            long integerPart = (long)value;
             double fractionalPart = Math.Round(value - integerPart, 10);
 
             char[] integerChars = integerPart.ToString().ToCharArray().Reverse().ToArray();

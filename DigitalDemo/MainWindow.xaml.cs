@@ -26,8 +26,7 @@ namespace DigitalDemo
             _numbers.Maximum = 9999999;
             _numbers.SetNumberDigits(7);
             _numbers.SetNumberDecimals(3);
-            _upDown.Maximum = 9999999;
-            _upDown.SetDigits(7);
+            _upDown.SetDigits(10);
             _upDown.SetDecimals(3);
 
             _toggle.Click += Toggle_Click;
