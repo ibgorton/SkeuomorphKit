@@ -12,7 +12,7 @@
     <StackPanel 
         Height="64"
         Orientation="Horizontal"
-        Background="Black">
+        Background="{Binding BackgroundFill, FallbackValue=Black}">
 
         <Viewbox
             x:Name="_viewBox_eight"
@@ -26,18 +26,18 @@
                 Height="200">
                 <Path
                     Name="_segment2"
-                    Fill="Lime"
-                    Stroke="Black"
+                    Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                    Stroke="{Binding SegmentStroke, FallbackValue=Black}"
                     StrokeThickness="2">
                     <Path.Data>
-                        <PathGeometry Figures="M12,90L22,22L32,10L42,20L32,90L20,100L12,90Z"/>
+                        <PathGeometry Figures="M12,90L22,22L32,10L42,20L32,91L20,99L12,91Z"/>
                     </Path.Data>
                 </Path>
 
                 <Path
                     Name="_segment5"
-                    Fill="Lime"
-                    Stroke="Black"
+                    Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                    Stroke="{Binding SegmentStroke, FallbackValue=Black}"
                     StrokeThickness="2">
                     <Path.Data>
                         <PathGeometry Figures="M0,180L10,110L20,100L30,110L20,180L10,190L0,180Z"/>
@@ -46,18 +46,19 @@
 
                 <Path
                     Name="_segment3"
-                    Fill="Lime"
-                    Stroke="Black"
+                    Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                    Stroke="{Binding SegmentStroke, FallbackValue=Black}"
                     StrokeThickness="2">
                     <Path.Data>
-                        <PathGeometry Figures="M100,90L112,20L122,10L132,20L122,90L110,100L100,90Z"/>
+                        <PathGeometry Figures="M100,90L112,20L122,9L132,21L121
+                                      ,89L110,100L100,90Z"/>
                     </Path.Data>
                 </Path>
 
                 <Path
                     Name="_segment6"
-                    Fill="Lime"
-                    Stroke="Black"
+                    Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                    Stroke="{Binding SegmentStroke, FallbackValue=Black}"
                     StrokeThickness="2">
                     <Path.Data>
                         <PathGeometry Figures="M90,180L100,110L110,100L120,110L110,180L100,190L90,180Z"/>
@@ -65,8 +66,8 @@
                 </Path>
                 <Path
                     Name="_segment7"
-                    Fill="Lime"
-                    Stroke="Black"
+                    Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                    Stroke="{Binding SegmentStroke, FallbackValue=Black}"
                     StrokeThickness="2">
                     <Path.Data>
                         <PathGeometry Figures="M20,180L90,180L100,190L90,200L20,200L10,190L20,180Z"/>
@@ -74,8 +75,8 @@
                 </Path>
                 <Path
                     Name="_segment4"
-                    Fill="Lime"
-                    Stroke="Black"
+                    Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                    Stroke="{Binding SegmentStroke, FallbackValue=Black}"
                     StrokeThickness="2">
                     <Path.Data>
                         <PathGeometry Figures="M32,90L100,90L110,100L100,110L30,110L20,100L32,90Z"/>
@@ -84,11 +85,11 @@
 
                 <Path
                     Name="_segment1"
-                    Fill="Lime"
-                    Stroke="Black"
+                    Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                    Stroke="{Binding SegmentStroke, FallbackValue=Black}"
                     StrokeThickness="2">
                     <Path.Data>
-                        <PathGeometry Figures="M42,0L112,0L122,10L112,20L42,20L32,10L42,0Z"/>
+                        <PathGeometry Figures="M42,0L114,0L122,10L112,20L42,20L32,10L40,0Z"/>
                     </Path.Data>
                 </Path>
 
@@ -97,17 +98,17 @@
                         Margin="112, 181, 0,0"
                         Width="20"
                         Height="20"
-                        Fill="Lime"
-                        Stroke="Black"
+                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                        Stroke="{Binding SegmentStroke, FallbackValue=Black}"
                         StrokeThickness="2" />
                 <Viewbox x:Name="_viewBox" Canvas.Top="3">
                     <Rectangle
                         x:Name="_Path_SelectedArrow"
                         Width="100"
                         Height="20"
-                        Fill="Lime"
+                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         Margin="5, 202, 0, 0"
-                        Stroke="Black"
+                        Stroke="{Binding SegmentStroke, FallbackValue=Black}"
                         StrokeThickness="2"
                         />
                 </Viewbox>
@@ -119,14 +120,16 @@
                 Height="200">
                 <Ellipse 
                     Margin="8,58,0,0"
-                    Fill="Lime" Width="18"
-                          Stroke="Black"
+                    Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                    Width="18"
+                          Stroke="{Binding SegmentStroke, FallbackValue=Black}"
                         StrokeThickness="2"
                        Height="18"/>
                 <Ellipse 
                     Margin="0,128,0,0"
-                    Fill="Lime" Width="18"
-                          Stroke="Black"
+                    Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                    Width="18"
+                          Stroke="{Binding SegmentStroke, FallbackValue=Black}"
                         StrokeThickness="2"
                        Height="18"/>
             </Canvas>

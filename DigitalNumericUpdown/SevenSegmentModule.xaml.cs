@@ -73,6 +73,45 @@ namespace DigitalNumericUpdown
             };
         }
 
+        public static readonly DependencyProperty SegmentFillProperty =
+        DependencyProperty.Register(
+        "SegmentFill", typeof(SolidColorBrush),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(Brushes.Lime)
+        );
+
+        public SolidColorBrush SegmentFill
+        {
+            get { return (SolidColorBrush)GetValue(SegmentFillProperty); }
+            set { SetValue(SegmentFillProperty, value); }
+        }
+
+        public static readonly DependencyProperty SegmentStrokeProperty =
+        DependencyProperty.Register(
+        "SegmentStroke", typeof(SolidColorBrush),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(Brushes.Black)
+        );
+
+        public SolidColorBrush SegmentStroke
+        {
+            get { return (SolidColorBrush)GetValue(SegmentStrokeProperty); }
+            set { SetValue(SegmentStrokeProperty, value); }
+        }
+
+        public static readonly DependencyProperty BackgroundFillProperty =
+        DependencyProperty.Register(
+        "BackgroundFill", typeof(SolidColorBrush),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(Brushes.Black)
+        );
+
+        public SolidColorBrush BackgroundFill
+        {
+            get { return (SolidColorBrush)GetValue(BackgroundFillProperty); }
+            set { SetValue(BackgroundFillProperty, value); }
+        }
+
         public event Action<object> SelectionEvent = delegate { };
         
         public double Increment { get; set; } = 1.0;
