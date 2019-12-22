@@ -26,14 +26,14 @@ namespace DigitalDemo
             _numbers.Maximum = 9999999;
             _numbers.SetNumberDigits(7);
             _numbers.SetNumberDecimals(3);
-            _upDown.SetDigits(10);
+            _upDown.SetDigits(4);
             _upDown.SetDecimals(3);
             
             _toggle.Click += Toggle_Click;
 
             Loaded += (ob, ev) =>
             {
-                _upDown.SetValue(111111111);
+                _upDown.SetValue(1111);
                 _sw.Start();
                 CompositionTarget.Rendering += (ob, ev) =>
                 {

@@ -6,8 +6,9 @@
     xmlns:local="clr-namespace:DigitalNumericUpdown"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
-    SnapsToDevicePixels="True"
+    SnapsToDevicePixels="False"
     mc:Ignorable="d"
+    Background="White"
     >
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
@@ -85,7 +86,12 @@
         
         
     </UserControl.Resources>
-    <Grid Background="{Binding BackgroundFill, FallbackValue=Black}">
+
+    <Grid x:Name="_grid"
+        Opacity=".95"
+        
+        Background="{Binding BackgroundFill, FallbackValue=Black}">
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -101,14 +107,14 @@
                    Panel.ZIndex="0"
                    Grid.Row="1"/>
         <Rectangle x:Name="_topTouch" 
-                   Panel.ZIndex="5"
+                   Panel.ZIndex="1"
                    Fill="Transparent"      
                    Visibility="{Binding Changeable, Converter={StaticResource VisibleIfTrueConverter}}"
                    Grid.Row="0"/>
         <Rectangle x:Name="_bottomTouch" 
                    Fill="Transparent"
                    Visibility="{Binding Changeable, Converter={StaticResource VisibleIfTrueConverter}}"
-                   Panel.ZIndex="5"
+                   Panel.ZIndex="1"
                    Grid.Row="1"/>
         <StackPanel 
             Panel.ZIndex="1"
@@ -117,244 +123,154 @@
         Orientation="Horizontal"
         >
 
-            <Viewbox
+            <Grid Width="156" Height="224">
+                <Viewbox
             x:Name="_viewBox_eight"
-                Height="112"
                 Margin="0,10"
             >
-                <Canvas
+                    <Canvas
                 
                 Name="_canvas"
                 Width="156"
                 Height="224">
-                    <Canvas.Effect>
-                        <DropShadowEffect BlurRadius="5" 
+                        <!--<Canvas.Effect>
+                            <DropShadowEffect BlurRadius="5" 
                            ShadowDepth="7" 
                            Opacity="0.5"
                            Color="Black"/>
-                    </Canvas.Effect>
-                    
-                    <!--<Rectangle 
-                       Margin="-3,-3"
-                        Width="250"
-                        Opacity="0.5"
-                               Height="24"
-                               Fill="Pink"
-                               StrokeThickness=".25"
-                               Stroke="Black"
-                               >
-                        <Rectangle.LayoutTransform>
-                            <TransformGroup>
-                                
-                                <RotateTransform Angle="98"/>
-                                
-                            </TransformGroup>
-                        </Rectangle.LayoutTransform>
-                    </Rectangle>
-                    <Rectangle 
-                       Margin="99.6,0"
-                        Width="250"
-                        Opacity="0.5"
-                               Height="24"
-                               Fill="Pink"
-                               StrokeThickness=".25"
-                               Stroke="Black"
-                               >
-                        <Rectangle.LayoutTransform>
-                            <TransformGroup>
-
-                                <RotateTransform Angle="98"/>
-
-                            </TransformGroup>
-                        </Rectangle.LayoutTransform>
-                    </Rectangle>
-                    <Rectangle 
-                        Margin="70.5,61.7"
-                        Height="100"
-                        Opacity="0.5"
-                               Width="20"
-                               Fill="Pink"
-                               StrokeThickness=".25"
-                               Stroke="Black">
-                        <Rectangle.LayoutTransform>
-                            <TransformGroup>
-
-                                <RotateTransform Angle="138"/>
-
-                            </TransformGroup>
-                        </Rectangle.LayoutTransform>
-                    </Rectangle>
-                    <Rectangle 
-                        Margin="33.6,120"
-                        Height="190"
-                        Opacity="0.5"
-                               Width="4"
-                               Fill="Pink"
-                               StrokeThickness=".25"
-                               Stroke="Black">
-                        <Rectangle.LayoutTransform>
-                            <TransformGroup>
-
-                                <RotateTransform Angle="138"/>
-
-                            </TransformGroup>
-                        </Rectangle.LayoutTransform>
-                    </Rectangle>
-                    <Rectangle 
-                        Margin="60.5,131.3"
-                        Height="200"
-                        Opacity="0.5"
-                               Width="4"
-                               Fill="Pink"
-                               StrokeThickness=".25"
-                               Stroke="Black">
-                        <Rectangle.LayoutTransform>
-                            <TransformGroup>
-
-                                <RotateTransform Angle="50"/>
-
-                            </TransformGroup>
-                        </Rectangle.LayoutTransform>
-                    </Rectangle>
-                    <Rectangle 
-                        Margin="-26,-50"
-                        Height="180"
-                        Opacity="0.5"
-                               Width="20"
-                               Fill="Pink"
-                               StrokeThickness=".25"
-                               Stroke="Black">
-                        <Rectangle.LayoutTransform>
-                            <TransformGroup>
-
-                                <RotateTransform Angle="50"/>
-
-                            </TransformGroup>
-                        </Rectangle.LayoutTransform>
-                    </Rectangle>-->
-
-                    <Path
+                        </Canvas.Effect>-->
+                        <Path
                     Name="_segmentOneFront"
-                        Panel.ZIndex="2"
+                        Panel.ZIndex="3"
                         Opacity="1"
                         Visibility="{Binding SegmentOneOn, Converter={StaticResource VisibleIfTrueConverter}}"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Data="{StaticResource SegmentOneSlantPathGeometry}"
                         />
-                    <Path
+                        <Path
                         x:Name="_segmentOneBack"
-                        Panel.ZIndex="1"
+                        Panel.ZIndex="2"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Opacity="0.075"
                         Data="{StaticResource SegmentOneSlantPathGeometry}"
                         />
-                    <Path
+                        <Path
                     Name="_segmentTwoFront"
+                            Panel.ZIndex="3"
                         Opacity="1"
                         Visibility="{Binding SegmentTwoOn, Converter={StaticResource VisibleIfTrueConverter}}"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Data="{StaticResource SegmentTwoSlantPathGeometry}"
                         />
-                    <Path x:Name="_segmentTwoBack"
-                        Panel.ZIndex="1"
+                        <Path x:Name="_segmentTwoBack"
+                        Panel.ZIndex="2"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Opacity="0.075"
                         Data="{StaticResource SegmentTwoSlantPathGeometry}"
                         />
-                    <Path
+                        <Path
                     Name="_segmentThreeFront"
-                    Panel.ZIndex="2"
+                    Panel.ZIndex="3"
                         Opacity="1"
                         Visibility="{Binding SegmentThreeOn, Converter={StaticResource VisibleIfTrueConverter}}"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Data="{StaticResource SegmentThreeSlantPathGeometry}"
                         />
-                    <Path x:Name="_segmentThreeBack"
-                        Panel.ZIndex="1"
+                        <Path x:Name="_segmentThreeBack"
+                        Panel.ZIndex="2"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Opacity="0.075"
                         Data="{StaticResource SegmentThreeSlantPathGeometry}"
                         />
-                    <Path
+                        <Path
                     Name="_segmentFourFront"
-                        Opacity="1"
+                        Opacity="3"
                         Visibility="{Binding SegmentFourOn, Converter={StaticResource VisibleIfTrueConverter}}"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Data="{StaticResource SegmentFourSlantPathGeometry}"
                         />
-                    <Path Name="_segmentFourBack"
-                        Panel.ZIndex="1"
+                        <Path Name="_segmentFourBack"
+                        Panel.ZIndex="2"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Opacity="0.075"
                         Data="{StaticResource SegmentFourSlantPathGeometry}"
                         />
-                    <Path
+                        <Path
                     Name="_segmentFiveFront"  
-                        Opacity="1"
+                        Opacity="3"
                         Visibility="{Binding SegmentFiveOn, Converter={StaticResource VisibleIfTrueConverter}}"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Data="{StaticResource SegmentFiveSlantPathGeometry}"
                         />
-                    <Path x:Name="_segmentFiveBack"
-                        Panel.ZIndex="1"
+                        <Path x:Name="_segmentFiveBack"
+                        Panel.ZIndex="2"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Opacity="0.075"
                         Data="{StaticResource SegmentFiveSlantPathGeometry}"
                         />
-                    <Path
+                        <Path
                     Name="_segmentSixFront"
-                        Opacity="1"
+                        Opacity="3"
                         Visibility="{Binding SegmentSixOn, Converter={StaticResource VisibleIfTrueConverter}}"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Data="{StaticResource SegmentSixSlantPathGeometry}"
                         />
-                    <Path x:Name="_segmentSixBack"
-                          Panel.ZIndex="1"
+                        <Path x:Name="_segmentSixBack"
+                          Panel.ZIndex="2"
                           Fill="{Binding SegmentFill, FallbackValue=DarkSlateGray}"
                           Stroke="{Binding BackgroundFill, FallbackValue=LightGray}"
                           StrokeThickness="0"
                           Opacity="0.05"
                           Data="{StaticResource SegmentSixSlantPathGeometry}"
                         />
-                    <Path
+                        <Path
                     Name="_segmentSevenFront"
-                        Opacity="1"
+                        Opacity="3"
                         Visibility="{Binding SegmentSevenOn, Converter={StaticResource VisibleIfTrueConverter}}"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Data="{StaticResource SegmentSevenSlantPathGeometry}"
                         />
 
-                    <Path x:Name="_segmentSevenBack"
-                        Panel.ZIndex="1"
+                        <Path x:Name="_segmentSevenBack"
+                        Panel.ZIndex="2"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0"
                         Opacity="0.075"
                         Data="{StaticResource SegmentSevenSlantPathGeometry}"
                         />
-                    <Ellipse
+                        <Ellipse
                         x:Name="_Ellipse_DecimalPlace"
-                        Margin="130, 200, 0,0"
+                        Margin="135, 200, 0,0"
                         Width="24"
                         Height="24"
                         Opacity="1"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        StrokeThickness="0" />
-                    
+                        StrokeThickness="0" >
+                            <Ellipse.Stroke>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="Black"/>
+                                    <GradientStop Color="White" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Ellipse.Stroke>
+                        </Ellipse>
 
-                </Canvas>
-            </Viewbox>
+
+                    </Canvas>
+                </Viewbox>
+            </Grid>
+            
             <Viewbox x:Name="_viewBox_Colon"
                      Height="112"
                      >
