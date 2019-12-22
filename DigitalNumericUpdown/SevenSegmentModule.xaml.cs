@@ -12,6 +12,24 @@ namespace DigitalNumericUpdown
     /// </summary>
     public partial class SevenSegmentModule : UserControl
     {
+        /* Segment Numbering
+         * 
+         *  |  ONE  |
+         * | |     |T|
+         * |T|     |H|
+         * |W|     |R|
+         * |O|     |E|
+         * | |     |E|
+         *  | FOUR  |
+         * |F|     | | 
+         * |I|     |S|
+         * |V|     |I|
+         * |E|     |X|
+         * | |     | |
+         *  | SEVEN |
+         *  
+         */
+
         /// <summary>
         /// Used for seven segment illumination logic
         /// </summary>
@@ -46,6 +64,7 @@ namespace DigitalNumericUpdown
         private bool _selected;
         private bool _showDigitSelector;
         private int? _currentValue = null;
+        private readonly object _changeValueLock = new object();
 
         //public
         public int? CurrentValue => _currentValue;
@@ -60,10 +79,11 @@ namespace DigitalNumericUpdown
             {
                 return;
             }
+            ConfigureEvents();
             EnableDecimalPoint(false);
 
             ShowDigitSelector = false;
-            _Path_SelectedArrow.Fill = Brushes.Transparent;
+            //_Path_SelectedArrow.Fill = Brushes.Transparent;
             IsSelected = false;
             _viewBox_Colon.Visibility = Visibility.Collapsed;
             Loaded += (o, e) =>
@@ -71,6 +91,176 @@ namespace DigitalNumericUpdown
                 //Clear the display
                 SetDigit(10);
             };
+        }
+
+        private void ConfigureEvents()
+        {
+            _topTouch.MouseDown += TopTouch_MouseDown;
+            _topTouch.MouseUp += TopTouch_MouseUp;
+            _topTouch.MouseLeave += TopTouch_MouseLeave;
+            _bottomTouch.MouseDown += BottomTouch_MouseDown;
+            _bottomTouch.MouseUp += BottomTouch_MouseUp;
+            _bottomTouch.MouseLeave += BottomTouch_MouseLeave;
+        }
+
+        private void BottomTouch_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (Changeable)
+                BottomTouchFill = Brushes.Transparent;
+        }
+
+        private void BottomTouch_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Changeable)
+            {
+                BottomTouchFill = Brushes.Transparent;
+                if (_currentValue != null)
+                {
+                    Byte.TryParse(_currentValue.ToString(), out byte b);
+                    if (b > 0)
+                    {
+                        SetDigit((byte)(b - 1));
+                    }
+                }
+            }
+        }
+
+        private void BottomTouch_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Changeable)
+                BottomTouchFill = Brushes.Red;
+        }
+
+        private void TopTouch_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (Changeable)
+                TopTouchFill = Brushes.Transparent;
+        }
+
+        private void TopTouch_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Changeable)
+            {
+                TopTouchFill = Brushes.Transparent;
+                if (_currentValue != null)
+                {
+                    Byte.TryParse(_currentValue.ToString(), out byte b);
+                    if (b < 9)
+                    {
+                        SetDigit((byte)(b + 1));
+                    }
+                }
+            }
+        }
+
+        private void TopTouch_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Changeable)
+                TopTouchFill = Brushes.Lime;
+        }
+
+        public static readonly DependencyProperty SegmentOneOnProperty =
+        DependencyProperty.Register(
+        "SegmentOneOn", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(true)
+        );
+
+        public bool SegmentOneOn
+        {
+            get { return (bool)GetValue(SegmentOneOnProperty); }
+            set { SetValue(SegmentOneOnProperty, value); }
+        }
+
+        public static readonly DependencyProperty SegmentTwoOnProperty =
+        DependencyProperty.Register(
+        "SegmentTwoOn", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(true)
+        );
+
+        public bool SegmentTwoOn
+        {
+            get { return (bool)GetValue(SegmentTwoOnProperty); }
+            set { SetValue(SegmentTwoOnProperty, value); }
+        }
+
+        public static readonly DependencyProperty SegmentThreeOnProperty =
+        DependencyProperty.Register(
+        "SegmentThreeOn", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(true)
+        );
+
+        public bool SegmentThreeOn
+        {
+            get { return (bool)GetValue(SegmentThreeOnProperty); }
+            set { SetValue(SegmentThreeOnProperty, value); }
+        }
+
+        public static readonly DependencyProperty SegmentFourOnProperty =
+        DependencyProperty.Register(
+        "SegmentFourOn", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(true)
+        );
+
+        public bool SegmentFourOn
+        {
+            get { return (bool)GetValue(SegmentFourOnProperty); }
+            set { SetValue(SegmentFourOnProperty, value); }
+        }
+
+        public static readonly DependencyProperty SegmentFiveOnProperty =
+        DependencyProperty.Register(
+        "SegmentFiveOn", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(true)
+        );
+
+        public bool SegmentFiveOn
+        {
+            get { return (bool)GetValue(SegmentFiveOnProperty); }
+            set { SetValue(SegmentFiveOnProperty, value); }
+        }
+
+        public static readonly DependencyProperty SegmentSixOnProperty =
+        DependencyProperty.Register(
+        "SegmentSixOn", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(true)
+        );
+
+        public bool SegmentSixOn
+        {
+            get { return (bool)GetValue(SegmentSixOnProperty); }
+            set { SetValue(SegmentSixOnProperty, value); }
+        }
+
+        public static readonly DependencyProperty SegmentSevenOnProperty =
+        DependencyProperty.Register(
+        "SegmentSevenOn", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(true)
+        );
+
+        public bool SegmentSevenOn
+        {
+            get { return (bool)GetValue(SegmentSevenOnProperty); }
+            set { SetValue(SegmentSevenOnProperty, value); }
+        }
+
+        public static readonly DependencyProperty ChangeableProperty =
+        DependencyProperty.Register(
+        "ChangeableProperty", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(true)
+        );
+
+        public bool Changeable
+        {
+            get { return (bool)GetValue(ChangeableProperty); }
+            set { SetValue(ChangeableProperty, value); }
         }
 
         public static readonly DependencyProperty SegmentFillProperty =
@@ -86,19 +276,6 @@ namespace DigitalNumericUpdown
             set { SetValue(SegmentFillProperty, value); }
         }
 
-        public static readonly DependencyProperty SegmentStrokeProperty =
-        DependencyProperty.Register(
-        "SegmentStroke", typeof(SolidColorBrush),
-        typeof(SevenSegmentModule),
-        new UIPropertyMetadata(Brushes.Black)
-        );
-
-        public SolidColorBrush SegmentStroke
-        {
-            get { return (SolidColorBrush)GetValue(SegmentStrokeProperty); }
-            set { SetValue(SegmentStrokeProperty, value); }
-        }
-
         public static readonly DependencyProperty BackgroundFillProperty =
         DependencyProperty.Register(
         "BackgroundFill", typeof(SolidColorBrush),
@@ -110,6 +287,32 @@ namespace DigitalNumericUpdown
         {
             get { return (SolidColorBrush)GetValue(BackgroundFillProperty); }
             set { SetValue(BackgroundFillProperty, value); }
+        }
+
+        public static readonly DependencyProperty TopTouchFillProperty =
+        DependencyProperty.Register(
+        "TopTouchFill", typeof(SolidColorBrush),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(Brushes.Transparent)
+        );
+
+        public SolidColorBrush TopTouchFill
+        {
+            get { return (SolidColorBrush)GetValue(TopTouchFillProperty); }
+            set { SetValue(TopTouchFillProperty, value); }
+        }
+
+        public static readonly DependencyProperty BottomTouchFillProperty =
+        DependencyProperty.Register(
+        "BottomTouchFill", typeof(SolidColorBrush),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(Brushes.Transparent)
+        );
+
+        public SolidColorBrush BottomTouchFill
+        {
+            get { return (SolidColorBrush)GetValue(BottomTouchFillProperty); }
+            set { SetValue(BottomTouchFillProperty, value); }
         }
 
         public event Action<object> SelectionEvent = delegate { };
@@ -127,7 +330,7 @@ namespace DigitalNumericUpdown
             set
             {
                 _selected = value;
-                _Path_SelectedArrow.Fill = value ? Brushes.Lime : Brushes.Transparent;
+                //_Path_SelectedArrow.Fill = value ? Brushes.DarkSlateGray : Brushes.Transparent;
             }
         }
                
@@ -137,7 +340,7 @@ namespace DigitalNumericUpdown
             set
             {
                 _showDigitSelector = value;
-                _viewBox.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+                //_viewBox.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
@@ -159,18 +362,21 @@ namespace DigitalNumericUpdown
         /// </summary>
         private void SetDigit(byte digit)
         {
-            if (digit < 11)
-                _currentValue = digit;
-            else
-                _currentValue = null;
+            lock (_changeValueLock)
+            {
+                if (digit < 10)
+                    _currentValue = digit;
+                else
+                    _currentValue = null;
 
-            _segment1.Opacity = _bits[digit][0] ? 1.0 : 0.075;
-            _segment2.Opacity = _bits[digit][1] ? 1.0 : 0.075;
-            _segment3.Opacity = _bits[digit][2] ? 1.0 : 0.075;
-            _segment4.Opacity = _bits[digit][3] ? 1.0 : 0.075;
-            _segment5.Opacity = _bits[digit][4] ? 1.0 : 0.075;
-            _segment6.Opacity = _bits[digit][5] ? 1.0 : 0.075;
-            _segment7.Opacity = _bits[digit][6] ? 1.0 : 0.075;
+                SegmentOneOn= _bits[digit][0];
+                SegmentTwoOn = _bits[digit][1];
+                SegmentThreeOn = _bits[digit][2];
+                SegmentFourOn = _bits[digit][3];
+                SegmentFiveOn = _bits[digit][4];
+                SegmentSixOn = _bits[digit][5];
+                SegmentSevenOn = _bits[digit][6];
+            }
         }
 
         public void BlankModule()
@@ -188,26 +394,5 @@ namespace DigitalNumericUpdown
                 SetDigit((byte)Char.GetNumericValue((char)digit));
         }
 
-        /// <summary>
-        /// Handles the mousedown (selection) of this digit
-        /// Highlights the module while the mouse is down
-        /// </summary>
-        private void ViewBox_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (!ShowDigitSelector)
-                return;
-            _canvas.Background = Brushes.DarkGreen;
-            SelectionEvent?.Invoke(this);
-        }
-
-        private void Viewbox_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            _canvas.Background = Brushes.Black;
-        }
-
-        private void Viewbox_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            _canvas.Background = Brushes.Black;
-        }
     }
 }
