@@ -36,8 +36,7 @@
             <LineSegment Point="149.2,11.3"/>
             <LineSegment Point="156,18.9"/>
             <LineSegment Point="144.4,100.0"/>
-            <LineSegment Point="133.1,109.3
-"/>
+            <LineSegment Point="133.1,109.3"/>
             <LineSegment Point="121,96.1"/>
         </PathFigure>
         <PathGeometry FillRule="Nonzero"  x:Key="SegmentThreeSlantPathGeometry">
@@ -93,21 +92,12 @@
         Background="{Binding BackgroundFill, FallbackValue=Black}">
         
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
+            <RowDefinition Height="56"/>
+            <RowDefinition Height="56"/>
         </Grid.RowDefinitions>
-        <Rectangle x:Name="_topRectBackground" 
-                   Panel.ZIndex="0"
-                   
-                   Opacity=".25"
-                   Grid.Row="0"/>
-        <Rectangle x:Name="_bottomRectBackground" 
-                   
-                   Opacity=".25"
-                   Panel.ZIndex="0"
-                   Grid.Row="1"/>
+        
         <Path x:Name="_topTouch" 
-                   Panel.ZIndex="1"
+                   Panel.ZIndex="6"
               Opacity="0.5"
                    Fill="{Binding TopTouchFill}"  
                    Visibility="{Binding Changeable, Converter={StaticResource VisibleIfTrueConverter}}"
@@ -130,17 +120,17 @@
               Opacity="0.5"
                    Fill="{Binding BottomTouchFill}"
                    Visibility="{Binding Changeable, Converter={StaticResource VisibleIfTrueConverter}}"
-                   Panel.ZIndex="1"
+                   Panel.ZIndex="6"
                    Grid.Row="1">
             <Path.Data>
                 <PathGeometry>
                     <PathGeometry.Figures>
                         <PathFigure IsClosed="True">
-                            <LineSegment Point="24,-8"/>
-                            <LineSegment Point="52,-8"/>
-                            <LineSegment Point="49,18"/>
-                            <LineSegment Point="21,18"/>
-                            <LineSegment Point="24,-8"/>
+                            <LineSegment Point="24,7"/>
+                            <LineSegment Point="52,7"/>
+                            <LineSegment Point="49,33"/>
+                            <LineSegment Point="21,33"/>
+                            <LineSegment Point="24,7"/>
                         </PathFigure>
                     </PathGeometry.Figures>
                 </PathGeometry>
@@ -154,10 +144,103 @@
         >
 
             <Grid Width="78" Height="112">
+                <Viewbox 
+                    Margin="0,10"
+                    Panel.ZIndex="4">
+                    <Canvas 
+                        
+                        Width="156"
+                Height="224">
+                        <Path
+                    Name="_segmentOneMask"
+                       Panel.ZIndex="4"
+                            Fill="Black"
+                        StrokeThickness="0"
+                        >
+                            <Path.Data>
+                                <PathGeometry>
+                                    <PathGeometry.Figures>
+                                        <PathFigure IsClosed="True">
+                                            <LineSegment Point="0,-10"/>
+                                            <LineSegment Point="156,-10"/>
+                                            <LineSegment Point="146.7,8.7"/>
+                                            <LineSegment Point="156,-10"/>
+                                            <LineSegment Point="156,18.9"/>
+                                            <LineSegment Point="149.2,11.3"/>
+                                            <LineSegment Point="130.8,26.8"/>
+                                            <LineSegment Point="128.3,24"/>
+                                            <LineSegment Point="146.7,8.7"/>
+                                            <LineSegment Point="138.9,0"/>
+                                            <LineSegment Point="52.5,0"/>
+                                            <LineSegment Point="41.4,9.4"/>
+                                            <LineSegment Point="54.6,24"/>
+                                            <LineSegment Point="51.8,26.1"/>
+                                            <LineSegment Point="38.5,11.6"/>
+                                            <LineSegment Point="28.6,20.0"/>
+                                            <LineSegment Point="17.6,99.0"/>
+                                            <LineSegment Point="27.3,109.5"/>
+                                            <LineSegment Point="41.9,97.4"/>
+                                            <LineSegment Point="51.8,26.1"/>
+                                            <LineSegment Point="54.6,24"/>
+                                            <LineSegment Point="128.3,24"/>
+                                            <LineSegment Point="130.8,26.8"/>
+                                            <LineSegment Point="121,96.1"/>
+                                            <LineSegment Point="133.1,109.3"/>
+                                            <LineSegment Point="144.5,99.9"/>
+                                            <LineSegment Point="141.1,123.8"/>
+                                            <LineSegment Point="132.8,114.5"/>
+                                            <LineSegment Point="116.6,128"/>
+                                            <LineSegment Point="115.4,124"/>
+                                            <LineSegment Point="130.3,111.7"/>
+                                            <LineSegment Point="119.9,100"/>
+                                            <LineSegment Point="44.5,100"/>
+                                            
+                                            <LineSegment Point="29.7,112"/>
+                                            <LineSegment Point="40.3,124"/>
+                                            <LineSegment Point="37.7,126.5"/>
+                                            <LineSegment Point="26.9,114.5"/>
+                                            <LineSegment Point="13.7,125.7"/>
+                                            <LineSegment Point="3.2,200.8"/>
+                                            <LineSegment Point="12,210.6"/>
+                                            <LineSegment Point="27.8,197.2"/>
+                                            <LineSegment Point="37.7,126.5"/>
+                                            <LineSegment Point="40.3,124"/>
+                                            <LineSegment Point="115.4,124"/>
+                                            <LineSegment Point="116.6,128"/>
+                                            <LineSegment Point="106.5,198"/>
+                                            <LineSegment Point="118.5,211.5"/>
+                                            <LineSegment Point="130.1,201.6"/>
+                                            <LineSegment Point="141.1,123.8"/>
+                                            <LineSegment Point="156,18.9"/>
+                                            <LineSegment Point="156,224"/>
+                                            <LineSegment Point="103.3,224"/>
+                                            <LineSegment Point="115.6,213.6"/>
+                                            <LineSegment Point="103.3,200"/>
+                                            <LineSegment Point="30.3,200"/>
+                                            <LineSegment Point="14.4,213.2"/>
+                                            <LineSegment Point="24,224"/>
+                                            <LineSegment Point="0,224"/>
+
+
+
+
+
+                                        </PathFigure>
+                                    </PathGeometry.Figures>
+                                </PathGeometry>
+                            </Path.Data>
+                            <Path.Effect>
+                                <DropShadowEffect BlurRadius="12" ShadowDepth="4" />
+                            </Path.Effect>
+                        </Path>
+                    </Canvas>
+                </Viewbox>
+                
                 <Viewbox
             x:Name="_viewBox_eight"
                 Margin="0,10"
             >
+                    
                     <Canvas
                 
                 Name="_canvas"
@@ -174,10 +257,17 @@
                         Panel.ZIndex="3"
                         Opacity="1"
                         Visibility="{Binding SegmentOneOn, Converter={StaticResource VisibleIfTrueConverter}}"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                        
                         StrokeThickness="0"
                         Data="{StaticResource SegmentOneSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Fill>
+                                <RadialGradientBrush>
+                                    <GradientStop Color="#FF56F956" Offset="0"/>
+                                    <GradientStop Color="Lime" Offset="1"/>
+                                </RadialGradientBrush>
+                            </Path.Fill>
+                        </Path>
                         <Path
                         x:Name="_segmentOneBack"
                         Panel.ZIndex="2"
@@ -191,10 +281,17 @@
                             Panel.ZIndex="3"
                         Opacity="1"
                         Visibility="{Binding SegmentTwoOn, Converter={StaticResource VisibleIfTrueConverter}}"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                        
                         StrokeThickness="0"
                         Data="{StaticResource SegmentTwoSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Fill>
+                                <RadialGradientBrush>
+                                    <GradientStop Color="#FF56F956" Offset="0"/>
+                                    <GradientStop Color="Lime" Offset="1"/>
+                                </RadialGradientBrush>
+                            </Path.Fill>
+                        </Path>
                         <Path x:Name="_segmentTwoBack"
                         Panel.ZIndex="2"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
@@ -207,10 +304,17 @@
                     Panel.ZIndex="3"
                         Opacity="1"
                         Visibility="{Binding SegmentThreeOn, Converter={StaticResource VisibleIfTrueConverter}}"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                        
                         StrokeThickness="0"
                         Data="{StaticResource SegmentThreeSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Fill>
+                                <RadialGradientBrush>
+                                    <GradientStop Color="#FF56F956" Offset="0"/>
+                                    <GradientStop Color="Lime" Offset="1"/>
+                                </RadialGradientBrush>
+                            </Path.Fill>
+                        </Path>
                         <Path x:Name="_segmentThreeBack"
                         Panel.ZIndex="2"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
@@ -220,12 +324,21 @@
                         />
                         <Path
                     Name="_segmentFourFront"
-                        Opacity="3"
+                            Panel.ZIndex="3"
+                        Opacity="1"
                         Visibility="{Binding SegmentFourOn, Converter={StaticResource VisibleIfTrueConverter}}"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                        
                         StrokeThickness="0"
                         Data="{StaticResource SegmentFourSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Fill>
+                                <RadialGradientBrush>
+                                    <GradientStop Color="#FF56F956" Offset="0"/>
+                                    <GradientStop Color="Lime" Offset="1"/>
+                                </RadialGradientBrush>
+                            </Path.Fill>
+                        </Path>
+                        
                         <Path Name="_segmentFourBack"
                         Panel.ZIndex="2"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
@@ -235,12 +348,20 @@
                         />
                         <Path
                     Name="_segmentFiveFront"  
-                        Opacity="3"
+                            Panel.ZIndex="3"
+                        Opacity="1"
                         Visibility="{Binding SegmentFiveOn, Converter={StaticResource VisibleIfTrueConverter}}"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                        
                         StrokeThickness="0"
                         Data="{StaticResource SegmentFiveSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Fill>
+                                <RadialGradientBrush>
+                                    <GradientStop Color="#FF56F956" Offset="0"/>
+                                    <GradientStop Color="Lime" Offset="1"/>
+                                </RadialGradientBrush>
+                            </Path.Fill>
+                        </Path>
                         <Path x:Name="_segmentFiveBack"
                         Panel.ZIndex="2"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
@@ -250,28 +371,44 @@
                         />
                         <Path
                     Name="_segmentSixFront"
-                        Opacity="3"
+                            Panel.ZIndex="3"
+                        Opacity="1"
                         Visibility="{Binding SegmentSixOn, Converter={StaticResource VisibleIfTrueConverter}}"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                        
                         StrokeThickness="0"
                         Data="{StaticResource SegmentSixSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Fill>
+                                <RadialGradientBrush>
+                                    <GradientStop Color="#FF56F956" Offset="0"/>
+                                    <GradientStop Color="Lime" Offset="1"/>
+                                </RadialGradientBrush>
+                            </Path.Fill>
+                        </Path>
                         <Path x:Name="_segmentSixBack"
                           Panel.ZIndex="2"
                           Fill="{Binding SegmentFill, FallbackValue=DarkSlateGray}"
                           Stroke="{Binding BackgroundFill, FallbackValue=LightGray}"
                           StrokeThickness="0"
-                          Opacity="0.05"
+                          Opacity="0.1"
                           Data="{StaticResource SegmentSixSlantPathGeometry}"
                         />
                         <Path
                     Name="_segmentSevenFront"
-                        Opacity="3"
+                            Panel.ZIndex="3"
+                        Opacity="1"
                         Visibility="{Binding SegmentSevenOn, Converter={StaticResource VisibleIfTrueConverter}}"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                        
                         StrokeThickness="0"
                         Data="{StaticResource SegmentSevenSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Fill>
+                                <RadialGradientBrush>
+                                    <GradientStop Color="#FF56F956" Offset="0"/>
+                                    <GradientStop Color="Lime" Offset="1"/>
+                                </RadialGradientBrush>
+                            </Path.Fill>
+                        </Path>
 
                         <Path x:Name="_segmentSevenBack"
                         Panel.ZIndex="2"
@@ -282,6 +419,7 @@
                         />
                         <Ellipse
                         x:Name="_Ellipse_DecimalPlace"
+                            Panel.ZIndex="6"
                         Margin="135, 200, 0,0"
                         Width="24"
                         Height="24"

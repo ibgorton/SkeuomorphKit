@@ -109,6 +109,7 @@ namespace DigitalNumericUpdown
             {
                 _grid.Opacity = 0.95;
                 _viewBox_eight.Width = 78;
+                _segmentOneMask.Width = 156;
                 _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
                 _Ellipse_DecimalPlace.Height = 24;
                 _Ellipse_DecimalPlace.Width = 24;
@@ -123,6 +124,7 @@ namespace DigitalNumericUpdown
             {
                 _grid.Opacity = 0.95;
                 _viewBox_eight.Width = 78;
+                _segmentOneMask.Width = 156;
                 _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
                 _Ellipse_DecimalPlace.Height = 24;
                 _Ellipse_DecimalPlace.Width = 24;
@@ -144,7 +146,8 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.94;
-                _viewBox_eight.Width = 77;
+                _viewBox_eight.Width = 77; 
+                _segmentOneMask.Width = 155;
                 _viewBox_eight.Margin = new Thickness(0, 11, 0, 11);
                 _Ellipse_DecimalPlace.Height = 23.5;
                 _Ellipse_DecimalPlace.Width = 23.5;
@@ -159,6 +162,8 @@ namespace DigitalNumericUpdown
             {
                 _grid.Opacity = 0.95;
                 _viewBox_eight.Width = 78;
+
+                _segmentOneMask.Width = 156;
                 _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
                 _Ellipse_DecimalPlace.Height = 24;
                 _Ellipse_DecimalPlace.Width = 24;
@@ -173,6 +178,7 @@ namespace DigitalNumericUpdown
             {
                 _grid.Opacity = 0.95;
                 _viewBox_eight.Width = 78;
+                _segmentOneMask.Width = 156;
                 _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
                 _Ellipse_DecimalPlace.Height = 24;
                 _Ellipse_DecimalPlace.Width = 24;
@@ -195,6 +201,7 @@ namespace DigitalNumericUpdown
             {
                 _grid.Opacity = 0.94;
                 _viewBox_eight.Width = 77;
+                _segmentOneMask.Width = 155;
                 _viewBox_eight.Margin = new Thickness(0, 11, 0,11);
                 _Ellipse_DecimalPlace.Height = 23.5;
                 _Ellipse_DecimalPlace.Width = 23.5;
