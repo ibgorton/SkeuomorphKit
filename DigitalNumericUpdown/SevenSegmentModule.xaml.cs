@@ -106,13 +106,27 @@ namespace DigitalNumericUpdown
         private void BottomTouch_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
             if (Changeable)
+            {
+                _grid.Opacity = 0.95;
+                _viewBox_eight.Width = 78;
+                _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
+                _Ellipse_DecimalPlace.Height = 24;
+                _Ellipse_DecimalPlace.Width = 24;
+                _Ellipse_DecimalPlace.Margin = new Thickness(135, 200, 0, 0);
                 BottomTouchFill = Brushes.Transparent;
+            }
         }
 
         private void BottomTouch_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (Changeable)
             {
+                _grid.Opacity = 0.95;
+                _viewBox_eight.Width = 78;
+                _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
+                _Ellipse_DecimalPlace.Height = 24;
+                _Ellipse_DecimalPlace.Width = 24;
+                _Ellipse_DecimalPlace.Margin = new Thickness(135, 200, 0, 0);
                 BottomTouchFill = Brushes.Transparent;
                 if (_currentValue != null)
                 {
@@ -128,7 +142,15 @@ namespace DigitalNumericUpdown
         private void BottomTouch_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (Changeable)
+            {
+                _grid.Opacity = 0.94;
+                _viewBox_eight.Width = 77;
+                _viewBox_eight.Margin = new Thickness(0, 11, 0, 11);
+                _Ellipse_DecimalPlace.Height = 23.5;
+                _Ellipse_DecimalPlace.Width = 23.5;
+                _Ellipse_DecimalPlace.Margin = new Thickness(136, 200, 0, 0);
                 BottomTouchFill = Brushes.Lime;
+            }
         }
 
         private void TopTouch_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
@@ -136,7 +158,7 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.95;
-                _viewBox_eight.Width = 156;
+                _viewBox_eight.Width = 78;
                 _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
                 _Ellipse_DecimalPlace.Height = 24;
                 _Ellipse_DecimalPlace.Width = 24;
@@ -150,7 +172,7 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.95;
-                _viewBox_eight.Width = 156;
+                _viewBox_eight.Width = 78;
                 _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
                 _Ellipse_DecimalPlace.Height = 24;
                 _Ellipse_DecimalPlace.Width = 24;
@@ -172,7 +194,7 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.94;
-                _viewBox_eight.Width = 154;
+                _viewBox_eight.Width = 77;
                 _viewBox_eight.Margin = new Thickness(0, 11, 0,11);
                 _Ellipse_DecimalPlace.Height = 23.5;
                 _Ellipse_DecimalPlace.Width = 23.5;
