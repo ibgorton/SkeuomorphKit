@@ -126,18 +126,18 @@
         <Path x:Name="_topTouch" 
                    Panel.ZIndex="6"
               Opacity="0.5"
-                   Fill="{Binding TopTouchFill}"  
+                   Fill="{Binding TopTouchFill}" 
                    Visibility="{Binding Changeable, Converter={StaticResource VisibleIfTrueConverter}}"
                    Grid.Row="0">
             <Path.Data>
                 <PathGeometry>
                     <PathGeometry.Figures>
                         <PathFigure IsClosed="True">
-                            <LineSegment Point="30,23"/>
-                            <LineSegment Point="58,23"/>
-                            <LineSegment Point="55,49"/>
-                            <LineSegment Point="27,49"/>
-                            <LineSegment Point="30,23"/>
+                            <LineSegment Point="29,21"/>
+                            <LineSegment Point="59.7,21"/>
+                            <LineSegment Point="55.4,50.2"/>
+                            <LineSegment Point="25,50.2"/>
+                            <LineSegment Point="29,21"/>
                         </PathFigure>
                     </PathGeometry.Figures>
                 </PathGeometry>
@@ -153,11 +153,11 @@
                 <PathGeometry>
                     <PathGeometry.Figures>
                         <PathFigure IsClosed="True">
-                            <LineSegment Point="24,7"/>
-                            <LineSegment Point="52,7"/>
-                            <LineSegment Point="49,33"/>
-                            <LineSegment Point="21,33"/>
-                            <LineSegment Point="24,7"/>
+                            <LineSegment Point="23,6"/>
+                            <LineSegment Point="54,6"/>
+                            <LineSegment Point="49.6,35"/>
+                            <LineSegment Point="19,35"/>
+                            <LineSegment Point="23,6"/>
                         </PathFigure>
                     </PathGeometry.Figures>
                 </PathGeometry>
