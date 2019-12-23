@@ -65,6 +65,13 @@ namespace DigitalNumericUpdown
         private bool _showDigitSelector;
         private int? _currentValue = null;
         private readonly object _changeValueLock = new object();
+        private readonly RadialGradientBrush _limeBrush;
+        private readonly RadialGradientBrush _redBrush;
+        private readonly RadialGradientBrush _blueBrush;
+        private readonly RadialGradientBrush _orangeBrush;
+        private readonly RadialGradientBrush _yellowBrush;
+        private readonly RadialGradientBrush _purpleBrush;
+        private readonly RadialGradientBrush _placeHolderBrush = new RadialGradientBrush(Color.FromRgb(0, 255, 0), Color.FromRgb(86, 249, 86));
 
         //public
         public int? CurrentValue => _currentValue;
@@ -75,6 +82,13 @@ namespace DigitalNumericUpdown
         public SevenSegmentModule()
         {
             InitializeComponent();
+            //find brush resources
+            _limeBrush = (RadialGradientBrush)TryFindResource("LimeGlow") ?? _placeHolderBrush;
+            _redBrush = (RadialGradientBrush)TryFindResource("RedGlow") ?? _placeHolderBrush;
+            _blueBrush = (RadialGradientBrush)TryFindResource("BlueGlow") ?? _placeHolderBrush;
+            _orangeBrush = (RadialGradientBrush)TryFindResource("OrangeGlow") ?? _placeHolderBrush;
+            _yellowBrush = (RadialGradientBrush)TryFindResource("YellowGlow") ?? _placeHolderBrush;
+            _purpleBrush = (RadialGradientBrush)TryFindResource("PurpleGlow") ?? _placeHolderBrush;
             if (DesignerProperties.GetIsInDesignMode(this))
             {
                 return;
@@ -82,6 +96,8 @@ namespace DigitalNumericUpdown
             ConfigureEvents();
             EnableDecimalPoint(false);
 
+            
+            
             ShowDigitSelector = false;
             //_Path_SelectedArrow.Fill = Brushes.Transparent;
             IsSelected = false;
@@ -90,9 +106,53 @@ namespace DigitalNumericUpdown
             {
                 //Clear the display
                 SetDigit(10);
+                switch (SegmentColour)
+                {
+                    case SegmentColor.Lime:
+                        SegmentFill = _limeBrush;
+                        break;
+                    case SegmentColor.Red:
+                        SegmentFill = _redBrush;
+                        break;
+                    case SegmentColor.Blue:
+                        SegmentFill = _blueBrush;
+                        break;
+                    case SegmentColor.Orange:
+                        SegmentFill = _orangeBrush;
+                        break;
+                    case SegmentColor.Yellow:
+                        SegmentFill = _yellowBrush;
+                        break;
+                    case SegmentColor.Purple:
+                        SegmentFill = _purpleBrush;
+                        break;
+                }
             };
         }
 
+
+        public static readonly DependencyProperty SegmentColourProperty =
+        DependencyProperty.Register(
+        "SegmentColour", typeof(SegmentColor),
+        typeof(SevenSegmentModule)
+        );
+
+        public SegmentColor SegmentColour
+        {
+            get { return (SegmentColor)GetValue(SegmentColourProperty); }
+            set { SetValue(SegmentColourProperty, value); }
+        }
+
+        public enum SegmentColor
+        {
+            Lime,
+            Red,
+            Blue,
+            Orange,
+            Yellow,
+            Purple
+        }
+        
         private void ConfigureEvents()
         {
             _topTouch.MouseDown += TopTouch_MouseDown;
@@ -152,7 +212,7 @@ namespace DigitalNumericUpdown
                 _Ellipse_DecimalPlace.Height = 23.5;
                 _Ellipse_DecimalPlace.Width = 23.5;
                 _Ellipse_DecimalPlace.Margin = new Thickness(136, 200, 0, 0);
-                BottomTouchFill = Brushes.Lime;
+                BottomTouchFill = SegmentFill;
             }
         }
 
@@ -206,7 +266,7 @@ namespace DigitalNumericUpdown
                 _Ellipse_DecimalPlace.Height = 23.5;
                 _Ellipse_DecimalPlace.Width = 23.5;
                 _Ellipse_DecimalPlace.Margin = new Thickness(136, 200, 0, 0);
-                TopTouchFill = Brushes.Lime;
+                TopTouchFill = SegmentFill;
             }
         }
 
@@ -316,14 +376,14 @@ namespace DigitalNumericUpdown
 
         public static readonly DependencyProperty SegmentFillProperty =
         DependencyProperty.Register(
-        "SegmentFill", typeof(SolidColorBrush),
+        "SegmentFill", typeof(Brush),
         typeof(SevenSegmentModule),
         new UIPropertyMetadata(Brushes.Lime)
         );
 
-        public SolidColorBrush SegmentFill
+        public Brush SegmentFill
         {
-            get { return (SolidColorBrush)GetValue(SegmentFillProperty); }
+            get { return (Brush)GetValue(SegmentFillProperty); }
             set { SetValue(SegmentFillProperty, value); }
         }
 
@@ -342,27 +402,27 @@ namespace DigitalNumericUpdown
 
         public static readonly DependencyProperty TopTouchFillProperty =
         DependencyProperty.Register(
-        "TopTouchFill", typeof(SolidColorBrush),
+        "TopTouchFill", typeof(Brush),
         typeof(SevenSegmentModule),
         new UIPropertyMetadata(Brushes.Transparent)
         );
 
-        public SolidColorBrush TopTouchFill
+        public Brush TopTouchFill
         {
-            get { return (SolidColorBrush)GetValue(TopTouchFillProperty); }
+            get { return (Brush)GetValue(TopTouchFillProperty); }
             set { SetValue(TopTouchFillProperty, value); }
         }
 
         public static readonly DependencyProperty BottomTouchFillProperty =
         DependencyProperty.Register(
-        "BottomTouchFill", typeof(SolidColorBrush),
+        "BottomTouchFill", typeof(Brush),
         typeof(SevenSegmentModule),
         new UIPropertyMetadata(Brushes.Transparent)
         );
 
-        public SolidColorBrush BottomTouchFill
+        public Brush BottomTouchFill
         {
-            get { return (SolidColorBrush)GetValue(BottomTouchFillProperty); }
+            get { return (Brush)GetValue(BottomTouchFillProperty); }
             set { SetValue(BottomTouchFillProperty, value); }
         }
 
