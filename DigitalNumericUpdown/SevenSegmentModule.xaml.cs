@@ -67,13 +67,12 @@ namespace DigitalNumericUpdown
         private bool _showDigitSelector;
         private int? _currentValue = null;
         private readonly object _changeValueLock = new object();
-        private readonly RadialGradientBrush _limeBrush;
-        private readonly RadialGradientBrush _redBrush;
-        private readonly RadialGradientBrush _blueBrush;
-        private readonly RadialGradientBrush _orangeBrush;
-        private readonly RadialGradientBrush _yellowBrush;
-        private readonly RadialGradientBrush _purpleBrush;
-        private readonly RadialGradientBrush _placeHolderBrush = new RadialGradientBrush(Color.FromRgb(0, 255, 0), Color.FromRgb(86, 249, 86));
+        private readonly Brush _limeBrush;
+        private readonly Brush _redBrush;
+        private readonly Brush _blueBrush;
+        private readonly Brush _orangeBrush;
+        private readonly Brush _yellowBrush;
+        private readonly Brush _purpleBrush;
 
         //public
         public int? CurrentValue => _currentValue;
@@ -85,12 +84,12 @@ namespace DigitalNumericUpdown
         {
             InitializeComponent();
             //find brush resources
-            _limeBrush = (RadialGradientBrush)TryFindResource("LimeGlow") ?? _placeHolderBrush;
-            _redBrush = (RadialGradientBrush)TryFindResource("RedGlow") ?? _placeHolderBrush;
-            _blueBrush = (RadialGradientBrush)TryFindResource("BlueGlow") ?? _placeHolderBrush;
-            _orangeBrush = (RadialGradientBrush)TryFindResource("OrangeGlow") ?? _placeHolderBrush;
-            _yellowBrush = (RadialGradientBrush)TryFindResource("YellowGlow") ?? _placeHolderBrush;
-            _purpleBrush = (RadialGradientBrush)TryFindResource("PurpleGlow") ?? _placeHolderBrush;
+            _limeBrush = UseGlow ? CreateGlowBrush(Colors.Lime) : Brushes.Lime;
+            _redBrush = UseGlow ? CreateGlowBrush(Colors.Red) : Brushes.Red;
+            _blueBrush = UseGlow ? CreateGlowBrush(Colors.Blue) : Brushes.Blue;
+            _orangeBrush = UseGlow ? CreateGlowBrush(Colors.Orange) : Brushes.Orange;
+            _yellowBrush = UseGlow ? CreateGlowBrush(Colors.Yellow) : Brushes.Yellow;
+            _purpleBrush = UseGlow ? CreateGlowBrush(Colors.Purple) : Brushes.Purple;
             if (DesignerProperties.GetIsInDesignMode(this))
             {
                 return;
@@ -102,7 +101,7 @@ namespace DigitalNumericUpdown
             ShowDigitSelector = false;
             //_Path_SelectedArrow.Fill = Brushes.Transparent;
             IsSelected = false;
-            _viewBox_Colon.Visibility = Visibility.Collapsed;
+            //_viewBox_Colon.Visibility = Visibility.Collapsed;
             Loaded += (o, e) =>
             {
                 //Clear the display
@@ -140,8 +139,8 @@ namespace DigitalNumericUpdown
 
         public SegmentColor SegmentColour
         {
-            get { return (SegmentColor)GetValue(SegmentColourProperty); }
-            set { SetValue(SegmentColourProperty, value); }
+            get => (SegmentColor)GetValue(SegmentColourProperty);
+            set => SetValue(SegmentColourProperty, value);
         }
 
         public enum SegmentColor
@@ -169,9 +168,8 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.95;
-                _canvasSegments.Width = 156;
-                _canvasSegments.Height = 224;
-                BottomTouchFill = Brushes.Transparent;
+                _segmentMask.Opacity = 0.095;
+                IsPressed = false;
             }
         }
 
@@ -180,10 +178,9 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.95;
-                _canvasSegments.Width = 156;
-                _canvasSegments.Height = 224;
+                _segmentMask.Opacity = 0.095;
 
-                BottomTouchFill = Brushes.Transparent;
+                IsPressed = false;
                 if (_currentValue != null)
                 {
                     Byte.TryParse(_currentValue.ToString(), out byte b);
@@ -199,11 +196,10 @@ namespace DigitalNumericUpdown
         {
             if (Changeable)
             {
-                _grid.Opacity = 0.94;
-                _canvasSegments.Width = 154;
-                _canvasSegments.Height = 222;
+                _grid.Opacity = 0.90;
+                _segmentMask.Opacity = 0.090;
 
-                BottomTouchFill = SegmentFill;
+                IsPressed = true;
             }
         }
 
@@ -212,11 +208,9 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.95;
+                _segmentMask.Opacity = 0.095;
 
-                _canvasSegments.Width = 156;
-                _canvasSegments.Height = 224;
-
-                TopTouchFill = Brushes.Transparent;
+                IsPressed = false;
             }
         }
 
@@ -225,10 +219,9 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.95;
-                _canvasSegments.Width = 156;
-                _canvasSegments.Height = 224;
+                _segmentMask.Opacity = 0.095;
 
-                TopTouchFill = Brushes.Transparent;
+                IsPressed = false;
                 if (_currentValue != null)
                 {
                     Byte.TryParse(_currentValue.ToString(), out byte b);
@@ -244,12 +237,10 @@ namespace DigitalNumericUpdown
         {
             if (Changeable)
             {
-                _grid.Opacity = 0.94;
+                _grid.Opacity = 0.90;
+                _segmentMask.Opacity = 0.090;
 
-                _canvasSegments.Width = 154;
-                _canvasSegments.Height = 222;
-
-                TopTouchFill = SegmentFill;
+                IsPressed = true;
             }
         }
 
@@ -262,8 +253,8 @@ namespace DigitalNumericUpdown
 
         public bool SegmentOneOn
         {
-            get { return (bool)GetValue(SegmentOneOnProperty); }
-            set { SetValue(SegmentOneOnProperty, value); }
+            get => (bool)GetValue(SegmentOneOnProperty);
+            set => SetValue(SegmentOneOnProperty, value);
         }
 
         public static readonly DependencyProperty SegmentTwoOnProperty =
@@ -275,8 +266,8 @@ namespace DigitalNumericUpdown
 
         public bool SegmentTwoOn
         {
-            get { return (bool)GetValue(SegmentTwoOnProperty); }
-            set { SetValue(SegmentTwoOnProperty, value); }
+            get => (bool)GetValue(SegmentTwoOnProperty);
+            set => SetValue(SegmentTwoOnProperty, value);
         }
 
         public static readonly DependencyProperty SegmentThreeOnProperty =
@@ -288,8 +279,8 @@ namespace DigitalNumericUpdown
 
         public bool SegmentThreeOn
         {
-            get { return (bool)GetValue(SegmentThreeOnProperty); }
-            set { SetValue(SegmentThreeOnProperty, value); }
+            get => (bool)GetValue(SegmentThreeOnProperty);
+            set => SetValue(SegmentThreeOnProperty, value);
         }
 
         public static readonly DependencyProperty SegmentFourOnProperty =
@@ -301,8 +292,8 @@ namespace DigitalNumericUpdown
 
         public bool SegmentFourOn
         {
-            get { return (bool)GetValue(SegmentFourOnProperty); }
-            set { SetValue(SegmentFourOnProperty, value); }
+            get => (bool)GetValue(SegmentFourOnProperty);
+            set => SetValue(SegmentFourOnProperty, value);
         }
 
         public static readonly DependencyProperty SegmentFiveOnProperty =
@@ -314,8 +305,8 @@ namespace DigitalNumericUpdown
 
         public bool SegmentFiveOn
         {
-            get { return (bool)GetValue(SegmentFiveOnProperty); }
-            set { SetValue(SegmentFiveOnProperty, value); }
+            get => (bool)GetValue(SegmentFiveOnProperty);
+            set => SetValue(SegmentFiveOnProperty, value);
         }
 
         public static readonly DependencyProperty SegmentSixOnProperty =
@@ -327,8 +318,8 @@ namespace DigitalNumericUpdown
 
         public bool SegmentSixOn
         {
-            get { return (bool)GetValue(SegmentSixOnProperty); }
-            set { SetValue(SegmentSixOnProperty, value); }
+            get => (bool)GetValue(SegmentSixOnProperty);
+            set => SetValue(SegmentSixOnProperty, value);
         }
 
         public static readonly DependencyProperty SegmentSevenOnProperty =
@@ -338,10 +329,11 @@ namespace DigitalNumericUpdown
         new UIPropertyMetadata(true)
         );
 
+
         public bool SegmentSevenOn
         {
-            get { return (bool)GetValue(SegmentSevenOnProperty); }
-            set { SetValue(SegmentSevenOnProperty, value); }
+            get => (bool)GetValue(SegmentSevenOnProperty);
+            set => SetValue(SegmentSevenOnProperty, value);
         }
 
         public static readonly DependencyProperty ChangeableProperty =
@@ -353,8 +345,21 @@ namespace DigitalNumericUpdown
 
         public bool Changeable
         {
-            get { return (bool)GetValue(ChangeableProperty); }
-            set { SetValue(ChangeableProperty, value); }
+            get => (bool)GetValue(ChangeableProperty);
+            set => SetValue(ChangeableProperty, value);
+        }
+
+        public static readonly DependencyProperty UseGlowProperty =
+        DependencyProperty.Register(
+        "UseGlow", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(false)
+        );
+
+        public bool UseGlow
+        {
+            get => (bool)GetValue(UseGlowProperty);
+            set => SetValue(UseGlowProperty, value);
         }
 
         public static readonly DependencyProperty SegmentFillProperty =
@@ -366,8 +371,8 @@ namespace DigitalNumericUpdown
 
         public Brush SegmentFill
         {
-            get { return (Brush)GetValue(SegmentFillProperty); }
-            set { SetValue(SegmentFillProperty, value); }
+            get => (Brush)GetValue(SegmentFillProperty);
+            set => SetValue(SegmentFillProperty, value);
         }
 
         public static readonly DependencyProperty BackgroundFillProperty =
@@ -379,35 +384,10 @@ namespace DigitalNumericUpdown
 
         public Brush BackgroundFill
         {
-            get { return (Brush)GetValue(BackgroundFillProperty); }
-            set { SetValue(BackgroundFillProperty, value); }
+            get => (Brush)GetValue(BackgroundFillProperty);
+            set => SetValue(BackgroundFillProperty, value);
         }
 
-        public static readonly DependencyProperty TopTouchFillProperty =
-        DependencyProperty.Register(
-        "TopTouchFill", typeof(Brush),
-        typeof(SevenSegmentModule),
-        new UIPropertyMetadata(Brushes.Transparent)
-        );
-
-        public Brush TopTouchFill
-        {
-            get { return (Brush)GetValue(TopTouchFillProperty); }
-            set { SetValue(TopTouchFillProperty, value); }
-        }
-
-        public static readonly DependencyProperty BottomTouchFillProperty =
-        DependencyProperty.Register(
-        "BottomTouchFill", typeof(Brush),
-        typeof(SevenSegmentModule),
-        new UIPropertyMetadata(Brushes.Transparent)
-        );
-
-        public Brush BottomTouchFill
-        {
-            get { return (Brush)GetValue(BottomTouchFillProperty); }
-            set { SetValue(BottomTouchFillProperty, value); }
-        }
 
         public event Action<object> SelectionEvent = delegate { };
         
@@ -415,17 +395,13 @@ namespace DigitalNumericUpdown
 
         public void ShowColon()
         {
-            _viewBox_Colon.Visibility = Visibility.Visible;
+            //_viewBox_Colon.Visibility = Visibility.Visible;
         }
 
         public bool IsSelected
         {
             get => _selected;
-            set
-            {
-                _selected = value;
-                //_Path_SelectedArrow.Fill = value ? Brushes.DarkSlateGray : Brushes.Transparent;
-            }
+            set => _selected = value;//_Path_SelectedArrow.Fill = value ? Brushes.DarkSlateGray : Brushes.Transparent;
         }
 
         public static readonly DependencyProperty ShowDecimalPointProperty =
@@ -437,18 +413,98 @@ namespace DigitalNumericUpdown
 
         public bool ShowDecimalPoint
         {
-            get { return (bool)GetValue(ShowDecimalPointProperty); }
-            set { SetValue(ShowDecimalPointProperty, value); }
+            get => (bool)GetValue(ShowDecimalPointProperty);
+            set => SetValue(ShowDecimalPointProperty, value);
+        }
+
+        public static readonly DependencyProperty IsPressedPointProperty =
+        DependencyProperty.Register(
+        "IsPressed", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(false)
+        );
+
+        public bool IsPressed
+        {
+            get => (bool)GetValue(IsPressedPointProperty);
+            set => SetValue(IsPressedPointProperty, value);
         }
 
         public bool ShowDigitSelector
         {
             get => _showDigitSelector;
-            set
+            set => _showDigitSelector = value;//_viewBox.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public Brush CreateGlowBrush(Color color)
+
+        {
+            //< GradientStop Color = "#FF56F956" Offset = "0" />
+   
+            //       < GradientStop Color = "Lime" Offset = "1" />
+                  // Create a radial gradient brush with five stops 
+
+                  RadialGradientBrush fiveColorRGB = new RadialGradientBrush();
+
+            fiveColorRGB.GradientOrigin = new Point(0.5, 0.5);
+
+            fiveColorRGB.Center = new Point(0.5, 0.5);
+
+
+
+            // Create and add Gradient stops
+
+            GradientStop blueGS = new GradientStop();
+            blueGS.Color = ChangeColorBrightness(color, 1d / 3d);
+
+
+            blueGS.Offset = 0.0;
+            
+            fiveColorRGB.GradientStops.Add(blueGS);
+
+
+
+            GradientStop orangeGS = new GradientStop();
+
+            orangeGS.Color = color;
+
+            orangeGS.Offset = 1;
+
+            fiveColorRGB.GradientStops.Add(orangeGS);
+
+            return fiveColorRGB;
+        }
+
+        /// <summary>
+        /// Creates color with corrected brightness.
+        /// </summary>
+        /// <param name="color">Color to correct.</param>
+        /// <param name="correctionFactor">The brightness correction factor. Must be between -1 and 1. 
+        /// Negative values produce darker colors.</param>
+        /// <returns>
+        /// Corrected <see cref="Color"/> structure.
+        /// </returns>
+        public static Color ChangeColorBrightness(Color color, double correctionFactor)
+        {
+            double red = color.R;
+            double green = color.G;
+            double blue = color.B;
+
+            if (correctionFactor < 0)
             {
-                _showDigitSelector = value;
-                //_viewBox.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+                correctionFactor = 1 + correctionFactor;
+                red *= correctionFactor;
+                green *= correctionFactor;
+                blue *= correctionFactor;
             }
+            else
+            {
+                red = (255 - red) * correctionFactor + red;
+                green = (255 - green) * correctionFactor + green;
+                blue = (255 - blue) * correctionFactor + blue;
+            }
+
+            return Color.FromArgb(color.A, Convert.ToByte(red), Convert.ToByte(green), Convert.ToByte(blue));
         }
 
         public void Select()
@@ -493,7 +549,8 @@ namespace DigitalNumericUpdown
                 SetDigit((byte)Char.GetNumericValue((char)digit));
         }
     }
-    public class OpacityConverter : IValueConverter
+
+    public class SegmentOpacityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -511,4 +568,24 @@ namespace DigitalNumericUpdown
             throw new NotImplementedException();
         }
     }
+
+    public class TouchOpacityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value)
+            {
+                {
+                    return 0.5;
+                }
+            }
+            return 0d;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 }

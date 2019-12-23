@@ -12,31 +12,8 @@
     >
     <UserControl.Resources>
         <ResourceDictionary>
-            <local:OpacityConverter x:Key="OConverter"></local:OpacityConverter>
-            <RadialGradientBrush x:Key="LimeGlow">
-                <GradientStop Color="#FF56F956" Offset="0"/>
-                <GradientStop Color="Lime" Offset="1"/>
-            </RadialGradientBrush>
-            <RadialGradientBrush x:Key="RedGlow">
-                <GradientStop Color="#FFF95656" Offset="0"/>
-                <GradientStop Color="Red" Offset="1"/>
-            </RadialGradientBrush>
-            <RadialGradientBrush x:Key="BlueGlow">
-                <GradientStop Color="#FF566CF9" Offset="0"/>
-                <GradientStop Color="#FF2525FF" Offset="1"/>
-            </RadialGradientBrush>
-            <RadialGradientBrush x:Key="YellowGlow">
-                <GradientStop Color="#FFFFFF65" Offset="0"/>
-                <GradientStop Color="Yellow" Offset="1"/>
-            </RadialGradientBrush>
-            <RadialGradientBrush x:Key="OrangeGlow">
-                <GradientStop Color="#FFFBC259" Offset="0"/>
-                <GradientStop Color="Orange" Offset="1"/>
-            </RadialGradientBrush>
-            <RadialGradientBrush x:Key="PurpleGlow">
-                <GradientStop Color="#FF7A397A" Offset="0"/>
-                <GradientStop Color="Purple" Offset="1"/>
-            </RadialGradientBrush>
+            <local:SegmentOpacityConverter x:Key="SegmentConverter"/>
+            <local:TouchOpacityConverter x:Key="TouchConverter"/>
             <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
             
             
@@ -134,13 +111,16 @@
                     Panel.ZIndex="3">
                     <Canvas 
                         x:Name="_canvasSegments"
+                         HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
                         Margin="10,10"
                         Width="156"
                 Height="224">
                         <Path x:Name="_topTouch" 
-                   Panel.ZIndex="5"
-                   Opacity="0.5"
-                   Fill="{Binding TopTouchFill, FallbackValue=Lime}"
+                   Panel.ZIndex="6"
+                   Opacity="{Binding IsPressed, Converter={StaticResource TouchConverter}}"
+
+                   Fill="{Binding SegmentFill, FallbackValue=Lime}"
                    Visibility="{Binding Changeable, Converter={StaticResource VisibleIfTrueConverter}}"
                    Grid.Row="0">
                             <Path.Data>
@@ -159,10 +139,11 @@
                         </Path>
                         <Path x:Name="_bottomTouch" 
               
-                   Opacity="0.5"
-                   Fill="{Binding BottomTouchFill, FallbackValue=Lime}"
+                    Opacity="{Binding IsPressed, Converter={StaticResource TouchConverter}}"
+
+                   Fill="{Binding SegmentFill, FallbackValue=Lime}"
                    Visibility="{Binding Changeable, Converter={StaticResource VisibleIfTrueConverter}}"
-                   Panel.ZIndex="5"
+                   Panel.ZIndex="6"
                    Grid.Row="1">
                             <Path.Data>
                                 <PathGeometry>
@@ -186,7 +167,7 @@
                         Margin="132, 200, 0,0"
                         Width="24"
                         Height="24"
-                        Opacity="{Binding ShowDecimalPoint, Converter={StaticResource OConverter}}"
+                        Opacity="{Binding ShowDecimalPoint, Converter={StaticResource SegmentConverter}}"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
                         StrokeThickness="0" >
                             
@@ -194,10 +175,11 @@
                         <Path
                     Name="_segmentMask"
                             
-                       Panel.ZIndex="4"
-                            Opacity=".99"
-                            Fill="Black"
-                        StrokeThickness="1"
+                       Panel.ZIndex="5"
+                            Opacity=".95"
+        
+                        Fill="{Binding BackgroundFill, FallbackValue=Black}"
+                        
                         >
                             <Path.Data>
                                 
@@ -241,7 +223,7 @@
                         <Path
                     Name="_segmentOneFront"
                         
-                        Opacity="{Binding SegmentOneOn, Converter={StaticResource OConverter}}"
+                        Opacity="{Binding SegmentOneOn, Converter={StaticResource SegmentConverter}}"
                         StrokeThickness="0"
                         
                             Fill="{Binding SegmentFill, FallbackValue=Lime}"
@@ -256,7 +238,7 @@
                         <Path
                     Name="_segmentTwoFront"
                            
-                        Opacity="{Binding SegmentTwoOn, Converter={StaticResource OConverter}}"
+                        Opacity="{Binding SegmentTwoOn, Converter={StaticResource SegmentConverter}}"
                         StrokeThickness="0"
                         
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
@@ -271,7 +253,7 @@
                         <Path
                     Name="_segmentThreeFront"
                     
-                        Opacity="{Binding SegmentThreeOn, Converter={StaticResource OConverter}}"
+                        Opacity="{Binding SegmentThreeOn, Converter={StaticResource SegmentConverter}}"
                         
                         StrokeThickness="0"
                         
@@ -287,7 +269,7 @@
                         <Path
                     Name="_segmentFourFront"
                             
-                        Opacity="{Binding SegmentFourOn, Converter={StaticResource OConverter}}"
+                        Opacity="{Binding SegmentFourOn, Converter={StaticResource SegmentConverter}}"
                          
                         StrokeThickness="0"
                         
@@ -303,7 +285,7 @@
                         <Path
                     Name="_segmentFiveFront"  
                             
-                        Opacity="{Binding SegmentFiveOn, Converter={StaticResource OConverter}}"
+                        Opacity="{Binding SegmentFiveOn, Converter={StaticResource SegmentConverter}}"
                         StrokeThickness="0"
                         
                             Fill="{Binding SegmentFill, FallbackValue=Lime}"
@@ -318,7 +300,7 @@
                         <Path
                     Name="_segmentSixFront"
                             
-                        Opacity="{Binding SegmentSixOn, Converter={StaticResource OConverter}}"
+                        Opacity="{Binding SegmentSixOn, Converter={StaticResource SegmentConverter}}"
                         StrokeThickness="0"
                         
                             Fill="{Binding SegmentFill, FallbackValue=Lime}"
@@ -333,7 +315,7 @@
                         <Path
                     Name="_segmentSevenFront"
                            
-                        Opacity="{Binding SegmentSevenOn, Converter={StaticResource OConverter}}"
+                        Opacity="{Binding SegmentSevenOn, Converter={StaticResource SegmentConverter}}"
                         StrokeThickness="0"
                         
                             Fill="{Binding SegmentFill, FallbackValue=Lime}"
@@ -349,7 +331,7 @@
                 </Viewbox>
             </Grid>
             
-            <Viewbox x:Name="_viewBox_Colon"
+            <!--<Viewbox x:Name="_viewBox_Colon"
                      Height="112"
                      >
                 <Canvas 
@@ -371,7 +353,7 @@
                         StrokeThickness="0"
                         Height="24"/>
                 </Canvas>
-            </Viewbox>
+            </Viewbox>-->
         </StackPanel>
     </Grid>
     
