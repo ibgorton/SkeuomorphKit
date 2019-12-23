@@ -7,7 +7,7 @@ Stock Windows UI elements are boring, and poorly suited for machinery HMIs. So I
 
 ![Gif of action](/docs/display.gif)
 
-
+![Gif of colors](/docs/luminescent.gif)
 ## TODO:
 
 * Add negative value support
