@@ -7,6 +7,7 @@ Stock Windows UI elements are boring, and poorly suited for machinery HMIs. So I
 
 ![Gif of action](/docs/display.gif)
 
+![Gif of colors](/docs/Luminescent.gif)
 
 ## TODO:
 
