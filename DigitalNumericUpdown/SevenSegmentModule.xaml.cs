@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace DigitalNumericUpdown
@@ -389,14 +391,14 @@ namespace DigitalNumericUpdown
 
         public static readonly DependencyProperty BackgroundFillProperty =
         DependencyProperty.Register(
-        "BackgroundFill", typeof(SolidColorBrush),
+        "BackgroundFill", typeof(Brush),
         typeof(SevenSegmentModule),
         new UIPropertyMetadata(Brushes.Black)
         );
 
-        public SolidColorBrush BackgroundFill
+        public Brush BackgroundFill
         {
-            get { return (SolidColorBrush)GetValue(BackgroundFillProperty); }
+            get { return (Brush)GetValue(BackgroundFillProperty); }
             set { SetValue(BackgroundFillProperty, value); }
         }
 
@@ -504,6 +506,23 @@ namespace DigitalNumericUpdown
             else
                 SetDigit((byte)Char.GetNumericValue((char)digit));
         }
+    }
+    public class OpacityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value)
+            {
+                {
+                    return 1.0;
+                }
+            }
+            return 0.075;
+        }
 
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

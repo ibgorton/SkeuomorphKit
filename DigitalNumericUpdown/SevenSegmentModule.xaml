@@ -12,6 +12,7 @@
     >
     <UserControl.Resources>
         <ResourceDictionary>
+            <local:OpacityConverter x:Key="OConverter"></local:OpacityConverter>
             <RadialGradientBrush x:Key="LimeGlow">
                 <GradientStop Color="#FF56F956" Offset="0"/>
                 <GradientStop Color="Lime" Offset="1"/>
@@ -37,6 +38,8 @@
                 <GradientStop Color="Purple" Offset="1"/>
             </RadialGradientBrush>
             <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
+            
+            
             <PathFigure IsClosed="True" StartPoint="52.5,0" x:Key="SegmentOneSlantPathFigure">
                 <LineSegment Point="138.9,0"/>
                 <LineSegment Point="146.7,8.7"/>
@@ -44,9 +47,6 @@
                 <LineSegment Point="54.6,24"/>
                 <LineSegment Point="41.4,9.4"/>
             </PathFigure>
-            <PathGeometry FillRule="Nonzero"  x:Key="SegmentOneSlantPathGeometry">
-                <StaticResource ResourceKey="SegmentOneSlantPathFigure" />
-            </PathGeometry>
             <PathFigure IsClosed="True" StartPoint="38.5,11.6" x:Key="SegmentTwoSlantPathFigure">
                 <LineSegment Point="51.8,26.1"/>
                 <LineSegment Point="41.9,97.4"/>
@@ -54,9 +54,6 @@
                 <LineSegment Point="17.6,99.0"/>
                 <LineSegment Point="28.6,20.0"/>
             </PathFigure>
-            <PathGeometry FillRule="Nonzero"  x:Key="SegmentTwoSlantPathGeometry">
-                <StaticResource ResourceKey="SegmentTwoSlantPathFigure" />
-            </PathGeometry>
             <PathFigure IsClosed="True" StartPoint="130.8,26.8" x:Key="SegmentThreeSlantPathFigure">
                 <LineSegment Point="149.2,11.3"/>
                 <LineSegment Point="156,18.9"/>
@@ -64,9 +61,6 @@
                 <LineSegment Point="133.1,109.3"/>
                 <LineSegment Point="121,96.1"/>
             </PathFigure>
-            <PathGeometry FillRule="Nonzero"  x:Key="SegmentThreeSlantPathGeometry">
-                <StaticResource ResourceKey="SegmentThreeSlantPathFigure" />
-            </PathGeometry>
             <PathFigure IsClosed="True" StartPoint="44.5,100" x:Key="SegmentFourSlantPathFigure">
                 <LineSegment Point="119.9,100"/>
                 <LineSegment Point="130.3,111.7"/>
@@ -74,9 +68,6 @@
                 <LineSegment Point="40.3,124"/>
                 <LineSegment Point="29.7,112"/>
             </PathFigure>
-            <PathGeometry FillRule="Nonzero"  x:Key="SegmentFourSlantPathGeometry">
-                <StaticResource ResourceKey="SegmentFourSlantPathFigure" />
-            </PathGeometry>
             <PathFigure IsClosed="True" StartPoint="3.2,200.8" x:Key="SegmentFiveSlantPathFigure">
                 <LineSegment Point="13.7,125.7"/>
                 <LineSegment Point="26.9,114.5"/>
@@ -84,9 +75,6 @@
                 <LineSegment Point="27.8,197.2"/>
                 <LineSegment Point="12,210.6"/>
             </PathFigure>
-            <PathGeometry FillRule="Nonzero"  x:Key="SegmentFiveSlantPathGeometry">
-                <StaticResource ResourceKey="SegmentFiveSlantPathFigure" />
-            </PathGeometry>
             <PathFigure IsClosed="True" StartPoint="106.5,198" x:Key="SegmentSixSlantPathFigure">
                 <LineSegment Point="116.6,128"/>
                 <LineSegment Point="132.8,114.5"/>
@@ -94,9 +82,6 @@
                 <LineSegment Point="130.1,201.6"/>
                 <LineSegment Point="118.5,211.5"/>
             </PathFigure>
-            <PathGeometry FillRule="Nonzero"  x:Key="SegmentSixSlantPathGeometry">
-                <StaticResource ResourceKey="SegmentSixSlantPathFigure" />
-            </PathGeometry>
             <PathFigure IsClosed="True" StartPoint="30.3,200" x:Key="SegmentSevenSlantPathFigure">
                 <LineSegment Point="103.3,200"/>
                 <LineSegment Point="115.6,213.6"/>
@@ -104,9 +89,15 @@
                 <LineSegment Point="24,224"/>
                 <LineSegment Point="14.4,213.2"/>
             </PathFigure>
-            <PathGeometry FillRule="Nonzero"  x:Key="SegmentSevenSlantPathGeometry">
+            <PathFigureCollection x:Key="Segments">
+                <StaticResource ResourceKey="SegmentOneSlantPathFigure" />
+                <StaticResource ResourceKey="SegmentTwoSlantPathFigure" />
+                <StaticResource ResourceKey="SegmentThreeSlantPathFigure" />
+                <StaticResource ResourceKey="SegmentFourSlantPathFigure" />
+                <StaticResource ResourceKey="SegmentFiveSlantPathFigure" />
+                <StaticResource ResourceKey="SegmentSixSlantPathFigure" />
                 <StaticResource ResourceKey="SegmentSevenSlantPathFigure" />
-            </PathGeometry>
+            </PathFigureCollection>
 
 
         </ResourceDictionary>
@@ -178,6 +169,38 @@
                         
                         Width="156"
                 Height="224">
+
+                        <Path Fill="Black" StrokeThickness="0" Panel.ZIndex="6">
+                            <Path.Effect>
+                                <DropShadowEffect BlurRadius="12" ShadowDepth="3" />
+                            </Path.Effect>
+                            <Path.Data>
+                                <CombinedGeometry GeometryCombineMode="Xor">
+                                    <CombinedGeometry.Geometry1>
+                                        <EllipseGeometry RadiusX="18" RadiusY="18" Center="146.5,212.5" />
+                                    </CombinedGeometry.Geometry1>
+                                    <CombinedGeometry.Geometry2>
+                                        <EllipseGeometry RadiusX="12" RadiusY="12" Center="146.5,212.5" />
+                                    </CombinedGeometry.Geometry2>
+                                </CombinedGeometry>
+                            </Path.Data>
+                        </Path>
+                        <Ellipse
+                        x:Name="_Ellipse_DecimalPlace"
+                            Panel.ZIndex="5"
+                        Margin="132, 199, 0,0"
+                        Width="30"
+                        Height="30"
+                        Opacity="1"
+                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
+                        StrokeThickness="1" >
+                            <Ellipse.Stroke>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="Black"/>
+                                    <GradientStop Color="White" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Ellipse.Stroke>
+                        </Ellipse>
                         <Path
                     Name="_segmentOneMask"
                        Panel.ZIndex="4"
@@ -186,70 +209,15 @@
                         StrokeThickness="0"
                         >
                             <Path.Data>
-                                <PathGeometry>
-                                    <PathGeometry.Figures>
-                                        <PathFigure IsClosed="True">
-                                            <LineSegment Point="0,-10"/>
-                                            <LineSegment Point="156,-10"/>
-                                            <LineSegment Point="146.7,8.7"/>
-                                            <LineSegment Point="156,-10"/>
-                                            <LineSegment Point="156,18.9"/>
-                                            <LineSegment Point="149.2,11.3"/>
-                                            <LineSegment Point="130.8,26.8"/>
-                                            <LineSegment Point="128.3,24"/>
-                                            <LineSegment Point="146.7,8.7"/>
-                                            <LineSegment Point="138.9,0"/>
-                                            <LineSegment Point="52.5,0"/>
-                                            <LineSegment Point="41.4,9.4"/>
-                                            <LineSegment Point="54.6,24"/>
-                                            <LineSegment Point="51.8,26.1"/>
-                                            <LineSegment Point="38.5,11.6"/>
-                                            <LineSegment Point="28.6,20.0"/>
-                                            <LineSegment Point="17.6,99.0"/>
-                                            <LineSegment Point="27.3,109.5"/>
-                                            <LineSegment Point="41.9,97.4"/>
-                                            <LineSegment Point="51.8,26.1"/>
-                                            <LineSegment Point="54.6,24"/>
-                                            <LineSegment Point="128.3,24"/>
-                                            <LineSegment Point="130.8,26.8"/>
-                                            <LineSegment Point="121,96.1"/>
-                                            <LineSegment Point="133.1,109.3"/>
-                                            <LineSegment Point="144.5,99.9"/>
-                                            <LineSegment Point="141.1,123.8"/>
-                                            <LineSegment Point="132.8,114.5"/>
-                                            <LineSegment Point="116.6,128"/>
-                                            <LineSegment Point="115.4,124"/>
-                                            <LineSegment Point="130.3,111.7"/>
-                                            <LineSegment Point="119.9,100"/>
-                                            <LineSegment Point="44.5,100"/>
-                                            <LineSegment Point="29.7,112"/>
-                                            <LineSegment Point="40.3,124"/>
-                                            <LineSegment Point="37.7,126.5"/>
-                                            <LineSegment Point="26.9,114.5"/>
-                                            <LineSegment Point="13.7,125.7"/>
-                                            <LineSegment Point="3.2,200.8"/>
-                                            <LineSegment Point="12,210.6"/>
-                                            <LineSegment Point="27.8,197.2"/>
-                                            <LineSegment Point="37.7,126.5"/>
-                                            <LineSegment Point="40.3,124"/>
-                                            <LineSegment Point="115.4,124"/>
-                                            <LineSegment Point="116.6,128"/>
-                                            <LineSegment Point="106.5,198"/>
-                                            <LineSegment Point="118.5,211.5"/>
-                                            <LineSegment Point="130.1,201.6"/>
-                                            <LineSegment Point="141.1,123.8"/>
-                                            <LineSegment Point="156,18.9"/>
-                                            <LineSegment Point="156,224"/>
-                                            <LineSegment Point="103.3,224"/>
-                                            <LineSegment Point="115.6,213.6"/>
-                                            <LineSegment Point="103.3,200"/>
-                                            <LineSegment Point="30.3,200"/>
-                                            <LineSegment Point="14.4,213.2"/>
-                                            <LineSegment Point="24,224"/>
-                                            <LineSegment Point="0,224"/>
-                                        </PathFigure>
-                                    </PathGeometry.Figures>
-                                </PathGeometry>
+                                <CombinedGeometry GeometryCombineMode="Xor">
+                                    <CombinedGeometry.Geometry1>
+                                        <RectangleGeometry Rect="0,-10,156,234"/>
+                                    </CombinedGeometry.Geometry1>
+                                    <CombinedGeometry.Geometry2>
+                                        <PathGeometry Figures="{StaticResource Segments}"/>
+                                    </CombinedGeometry.Geometry2>
+
+                                </CombinedGeometry>
                             </Path.Data>
                             <Path.Effect>
                                 <DropShadowEffect BlurRadius="12" ShadowDepth="3" />
@@ -277,142 +245,109 @@
                         <Path
                     Name="_segmentOneFront"
                         Panel.ZIndex="3"
-                        Opacity="1"
-                        Visibility="{Binding SegmentOneOn, Converter={StaticResource VisibleIfTrueConverter}}"
+                        Opacity="{Binding SegmentOneOn, Converter={StaticResource OConverter}}"
+                        StrokeThickness="0"
                         
-                        StrokeThickness="0"
-                        Data="{StaticResource SegmentOneSlantPathGeometry}"
                             Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        />
-                        <Path
-                        x:Name="_segmentOneBack"
-                        Panel.ZIndex="2"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        StrokeThickness="0"
-                        Opacity="0.075"
-                        Data="{StaticResource SegmentOneSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Data>
+                                <PathGeometry>
+                                    <StaticResource ResourceKey="SegmentOneSlantPathFigure" />
+                                </PathGeometry>
+                            </Path.Data>
+                        </Path>
+                        
                         <Path
                     Name="_segmentTwoFront"
                             Panel.ZIndex="3"
-                        Opacity="1"
-                        Visibility="{Binding SegmentTwoOn, Converter={StaticResource VisibleIfTrueConverter}}"
+                        Opacity="{Binding SegmentTwoOn, Converter={StaticResource OConverter}}"
+                        StrokeThickness="0"
                         
-                        StrokeThickness="0"
-                        Data="{StaticResource SegmentTwoSlantPathGeometry}"
                         Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        />
-                        <Path x:Name="_segmentTwoBack"
-                        Panel.ZIndex="2"
-                        Fill="{Binding SegmentFill}"
-                        StrokeThickness="0"
-                        Opacity="0.075"
-                        Data="{StaticResource SegmentTwoSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Data>
+                                <PathGeometry>
+                                    <StaticResource ResourceKey="SegmentTwoSlantPathFigure" />
+                                </PathGeometry>
+                            </Path.Data>
+                        </Path>
+                        
                         <Path
                     Name="_segmentThreeFront"
                     Panel.ZIndex="3"
-                        Opacity="1"
-                        Visibility="{Binding SegmentThreeOn, Converter={StaticResource VisibleIfTrueConverter}}"
+                        Opacity="{Binding SegmentThreeOn, Converter={StaticResource OConverter}}"
                         
                         StrokeThickness="0"
-                        Data="{StaticResource SegmentThreeSlantPathGeometry}"
+                        
                             Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        />
-                        <Path x:Name="_segmentThreeBack"
-                        Panel.ZIndex="2"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        StrokeThickness="0"
-                        Opacity="0.075"
-                        Data="{StaticResource SegmentThreeSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Data>
+                                <PathGeometry>
+                                    <StaticResource ResourceKey="SegmentThreeSlantPathFigure" />
+                                </PathGeometry>
+                            </Path.Data>
+                        </Path>
+                        
                         <Path
                     Name="_segmentFourFront"
                             Panel.ZIndex="3"
-                        Opacity="1"
-                        Visibility="{Binding SegmentFourOn, Converter={StaticResource VisibleIfTrueConverter}}"
+                        Opacity="{Binding SegmentFourOn, Converter={StaticResource OConverter}}"
+                         
+                        StrokeThickness="0"
                         
-                        StrokeThickness="0"
-                        Data="{StaticResource SegmentFourSlantPathGeometry}"
                             Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        />
+                        >
+                            <Path.Data>
+                                <PathGeometry>
+                                    <StaticResource ResourceKey="SegmentFourSlantPathFigure" />
+                                </PathGeometry>
+                            </Path.Data>
+                        </Path>
 
-                        <Path Name="_segmentFourBack"
-                        Panel.ZIndex="2"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        StrokeThickness="0"
-                        Opacity="0.075"
-                        Data="{StaticResource SegmentFourSlantPathGeometry}"
-                        />
                         <Path
                     Name="_segmentFiveFront"  
                             Panel.ZIndex="3"
-                        Opacity="1"
-                        Visibility="{Binding SegmentFiveOn, Converter={StaticResource VisibleIfTrueConverter}}"
+                        Opacity="{Binding SegmentFiveOn, Converter={StaticResource OConverter}}"
+                        StrokeThickness="0"
                         
-                        StrokeThickness="0"
-                        Data="{StaticResource SegmentFiveSlantPathGeometry}"
                             Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        />
-                        <Path x:Name="_segmentFiveBack"
-                        Panel.ZIndex="2"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        StrokeThickness="0"
-                        Opacity="0.075"
-                        Data="{StaticResource SegmentFiveSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Data>
+                                <PathGeometry>
+                                    <StaticResource ResourceKey="SegmentFiveSlantPathFigure" />
+                                </PathGeometry>
+                            </Path.Data>
+                        </Path>
+                        
                         <Path
                     Name="_segmentSixFront"
                             Panel.ZIndex="3"
-                        Opacity="1"
-                        Visibility="{Binding SegmentSixOn, Converter={StaticResource VisibleIfTrueConverter}}"
-                        
+                        Opacity="{Binding SegmentSixOn, Converter={StaticResource OConverter}}"
                         StrokeThickness="0"
-                        Data="{StaticResource SegmentSixSlantPathGeometry}"
+                        
                             Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        />
-                        <Path x:Name="_segmentSixBack"
-                          Panel.ZIndex="2"
-                          Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                          StrokeThickness="0"
-                          Opacity="0.1"
-                          Data="{StaticResource SegmentSixSlantPathGeometry}"
-                        />
+                        >
+                            <Path.Data>
+                                <PathGeometry>
+                                    <StaticResource ResourceKey="SegmentSixSlantPathFigure" />
+                                </PathGeometry>
+                            </Path.Data>
+                        </Path>
+                        
                         <Path
                     Name="_segmentSevenFront"
                             Panel.ZIndex="3"
-                        Opacity="1"
-                        Visibility="{Binding SegmentSevenOn, Converter={StaticResource VisibleIfTrueConverter}}"
+                        Opacity="{Binding SegmentSevenOn, Converter={StaticResource OConverter}}"
+                        StrokeThickness="0"
                         
-                        StrokeThickness="0"
-                        Data="{StaticResource SegmentSevenSlantPathGeometry}"
                             Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        />
-
-                        <Path x:Name="_segmentSevenBack"
-                        Panel.ZIndex="2"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        StrokeThickness="0"
-                        Opacity="0.075"
-                        Data="{StaticResource SegmentSevenSlantPathGeometry}"
-                        />
-                        <Ellipse
-                        x:Name="_Ellipse_DecimalPlace"
-                            Panel.ZIndex="6"
-                        Margin="135, 200, 0,0"
-                        Width="24"
-                        Height="24"
-                        Opacity="1"
-                        Fill="{Binding SegmentFill, FallbackValue=Lime}"
-                        StrokeThickness="0" >
-                            <Ellipse.Stroke>
-                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                    <GradientStop Color="Black"/>
-                                    <GradientStop Color="White" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Ellipse.Stroke>
-                        </Ellipse>
-
+                        >
+                            <Path.Data>
+                                <PathGeometry>
+                                    <StaticResource ResourceKey="SegmentSevenSlantPathFigure" />
+                                </PathGeometry>
+                            </Path.Data>
+                        </Path>
 
                     </Canvas>
                 </Viewbox>
