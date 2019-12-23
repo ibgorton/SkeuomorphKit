@@ -41,7 +41,6 @@ namespace DigitalNumericUpdown
 
             _modules = LogicalTreeHelper.GetChildren(_StackPanel).OfType<SevenSegmentModule>().ToList();
             HookupSelectionEvents();
-            _Module_1.EnableDecimalPoint(true);
             ShowSelector = false;
         }
 

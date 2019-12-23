@@ -35,6 +35,7 @@
                                       Increment="10.0" />
             <local:SevenSegmentModule x:Name="_Module_1" 
                                       SegmentColour="Blue"
+                                      ShowDecimalPoint="True"
                                       Increment="1.0" />
             <local:SevenSegmentModule x:Name="_Module_0" Increment="0.1" />
             <local:SevenSegmentModule x:Name="_Module_01" Increment="0.01" />

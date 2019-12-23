@@ -96,7 +96,6 @@ namespace DigitalNumericUpdown
                 return;
             }
             ConfigureEvents();
-            EnableDecimalPoint(false);
 
             
             
@@ -170,12 +169,8 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.95;
-                _viewBox_eight.Width = 78;
-                _segmentOneMask.Width = 156;
-                _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
-                _Ellipse_DecimalPlace.Height = 24;
-                _Ellipse_DecimalPlace.Width = 24;
-                _Ellipse_DecimalPlace.Margin = new Thickness(135, 200, 0, 0);
+                _canvasSegments.Width = 156;
+                _canvasSegments.Height = 224;
                 BottomTouchFill = Brushes.Transparent;
             }
         }
@@ -185,12 +180,9 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.95;
-                _viewBox_eight.Width = 78;
-                _segmentOneMask.Width = 156;
-                _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
-                _Ellipse_DecimalPlace.Height = 24;
-                _Ellipse_DecimalPlace.Width = 24;
-                _Ellipse_DecimalPlace.Margin = new Thickness(135, 200, 0, 0);
+                _canvasSegments.Width = 156;
+                _canvasSegments.Height = 224;
+
                 BottomTouchFill = Brushes.Transparent;
                 if (_currentValue != null)
                 {
@@ -208,12 +200,9 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.94;
-                _viewBox_eight.Width = 77; 
-                _segmentOneMask.Width = 155;
-                _viewBox_eight.Margin = new Thickness(0, 11, 0, 11);
-                _Ellipse_DecimalPlace.Height = 23.5;
-                _Ellipse_DecimalPlace.Width = 23.5;
-                _Ellipse_DecimalPlace.Margin = new Thickness(136, 200, 0, 0);
+                _canvasSegments.Width = 154;
+                _canvasSegments.Height = 222;
+
                 BottomTouchFill = SegmentFill;
             }
         }
@@ -223,13 +212,10 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.95;
-                _viewBox_eight.Width = 78;
 
-                _segmentOneMask.Width = 156;
-                _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
-                _Ellipse_DecimalPlace.Height = 24;
-                _Ellipse_DecimalPlace.Width = 24;
-                _Ellipse_DecimalPlace.Margin = new Thickness(135, 200, 0, 0);
+                _canvasSegments.Width = 156;
+                _canvasSegments.Height = 224;
+
                 TopTouchFill = Brushes.Transparent;
             }
         }
@@ -239,12 +225,9 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.95;
-                _viewBox_eight.Width = 78;
-                _segmentOneMask.Width = 156;
-                _viewBox_eight.Margin = new Thickness(0, 10, 0, 10);
-                _Ellipse_DecimalPlace.Height = 24;
-                _Ellipse_DecimalPlace.Width = 24;
-                _Ellipse_DecimalPlace.Margin = new Thickness(135, 200, 0, 0);
+                _canvasSegments.Width = 156;
+                _canvasSegments.Height = 224;
+
                 TopTouchFill = Brushes.Transparent;
                 if (_currentValue != null)
                 {
@@ -262,12 +245,10 @@ namespace DigitalNumericUpdown
             if (Changeable)
             {
                 _grid.Opacity = 0.94;
-                _viewBox_eight.Width = 77;
-                _segmentOneMask.Width = 155;
-                _viewBox_eight.Margin = new Thickness(0, 11, 0,11);
-                _Ellipse_DecimalPlace.Height = 23.5;
-                _Ellipse_DecimalPlace.Width = 23.5;
-                _Ellipse_DecimalPlace.Margin = new Thickness(136, 200, 0, 0);
+
+                _canvasSegments.Width = 154;
+                _canvasSegments.Height = 222;
+
                 TopTouchFill = SegmentFill;
             }
         }
@@ -446,7 +427,20 @@ namespace DigitalNumericUpdown
                 //_Path_SelectedArrow.Fill = value ? Brushes.DarkSlateGray : Brushes.Transparent;
             }
         }
-               
+
+        public static readonly DependencyProperty ShowDecimalPointProperty =
+        DependencyProperty.Register(
+        "ShowDecimalPoint", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(false)
+        );
+
+        public bool ShowDecimalPoint
+        {
+            get { return (bool)GetValue(ShowDecimalPointProperty); }
+            set { SetValue(ShowDecimalPointProperty, value); }
+        }
+
         public bool ShowDigitSelector
         {
             get => _showDigitSelector;
@@ -461,15 +455,7 @@ namespace DigitalNumericUpdown
         {
             SelectionEvent?.Invoke(this);
         }
-
-        /// <summary>
-        /// Enables the decimal point indicator
-        /// </summary>
-        public void EnableDecimalPoint(bool state)
-        {
-            _Ellipse_DecimalPlace.Opacity = state ? 1.0 : 0.075;
-        }
-
+        
         /// <summary>
         /// Sets the number for display
         /// </summary>
