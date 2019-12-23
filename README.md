@@ -7,9 +7,11 @@ Stock Windows UI elements are boring, and poorly suited for machinery HMIs. So I
 
 ![Gif of action](/docs/display.gif)
 
+![Gif of different colors](/docs/Luminescent.gif)
+
 ## TODO:
 
-* ~~Add negative value support~~
+* Add negative value support
 * Add other numeric input support besides double
 * Color changing
 * Dependency properties and other goodness so the usercontrols play nicely
