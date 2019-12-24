@@ -22,19 +22,19 @@
             <local:SevenSegmentModule x:Name="_Module_1000000" Increment="1000000.0" />
             <local:SevenSegmentModule x:Name="_Module_100000" Increment="100000.0" />
             <local:SevenSegmentModule x:Name="_Module_10000" 
-                                      SegmentColour="Yellow"
+                                      SegmentColor="Yellow"
                                       Increment="10000.0" />
             <local:SevenSegmentModule x:Name="_Module_1000" 
-                                      SegmentColour="Red"
+                                      SegmentColor="Red"
                                       Increment="1000.0" />
             <local:SevenSegmentModule x:Name="_Module_100" 
-                                      SegmentColour="Purple"
+                                      SegmentColor="Purple"
                                       Increment="100.0" />
             <local:SevenSegmentModule x:Name="_Module_10" 
-                                      SegmentColour="Orange"
+                                      SegmentColor="Orange"
                                       Increment="10.0" />
             <local:SevenSegmentModule x:Name="_Module_1" 
-                                      SegmentColour="Blue"
+                                      SegmentColor="Blue"
                                       ShowDecimalPoint="True"
                                       Increment="1.0" />
             <local:SevenSegmentModule x:Name="_Module_0" Increment="0.1" />
