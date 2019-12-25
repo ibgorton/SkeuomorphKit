@@ -406,17 +406,30 @@ namespace DigitalNumericUpdown
             set => SetValue(DisplayScaleProperty, value);
         }
 
-        public static readonly DependencyProperty DisplayAngleProperty =
+        public static readonly DependencyProperty DecimalDisplayAngleProperty =
+        DependencyProperty.Register(
+        "DecimalDisplayAngle", typeof(double),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(8d)
+        );
+
+        public double DecimalDisplayAngle
+        {
+            get => (double)GetValue(DecimalDisplayAngleProperty);
+            set => SetValue(DecimalDisplayAngleProperty, value);
+        }
+
+        public static readonly DependencyProperty SegmentDisplayAngleProperty =
         DependencyProperty.Register(
         "DisplayAngle", typeof(double),
         typeof(SevenSegmentModule),
         new UIPropertyMetadata(-8d)
         );
 
-        public double DisplayAngle
+        public double SegmentDisplayAngle
         {
-            get => (double)GetValue(DisplayAngleProperty);
-            set => SetValue(DisplayAngleProperty, value);
+            get => (double)GetValue(SegmentDisplayAngleProperty);
+            set => SetValue(SegmentDisplayAngleProperty, value);
         }
 
         public static readonly DependencyProperty IsSelectedProperty =
@@ -445,6 +458,24 @@ namespace DigitalNumericUpdown
             set => SetValue(ShowDecimalPointProperty, value);
         }
 
+        public static readonly DependencyProperty PressedProperty =
+        DependencyProperty.Register(
+        "Pressed", typeof(bool),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(false)
+        );
+
+        public bool Pressed
+        {
+            get => (bool)GetValue(PressedProperty);
+            set
+            {
+                SetValue(PressedProperty, value);
+                DisplayScale = value ? 0.495 : 0.5;
+
+            }
+        }
+
         public static readonly DependencyProperty TopPressedProperty =
         DependencyProperty.Register(
         "TopPressed", typeof(bool),
@@ -455,7 +486,11 @@ namespace DigitalNumericUpdown
         public bool TopPressed
         {
             get => (bool)GetValue(TopPressedProperty);
-            set => SetValue(TopPressedProperty, value);
+            set
+            {
+                SetValue(TopPressedProperty, value);
+                Pressed = value;
+            }
         }
 
         public static readonly DependencyProperty BottomPressedProperty =
@@ -468,7 +503,11 @@ namespace DigitalNumericUpdown
         public bool BottomPressed
         {
             get => (bool)GetValue(BottomPressedProperty);
-            set => SetValue(BottomPressedProperty, value);
+            set
+            {
+                SetValue(BottomPressedProperty, value);
+                Pressed = value;
+            }
         }
 
         public bool ShowDigitSelector
@@ -635,6 +674,24 @@ namespace DigitalNumericUpdown
                 }
             }
             return 0.95;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class PressedConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value)
+            {
+                {
+                    return 0.99;
+                }
+            }
+            return 1d;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -10,10 +10,11 @@
     Background="Black"
     >
     <Grid >
-        <StackPanel
+        <UniformGrid
             x:Name="_StackPanel"
+            Rows="1"
             Margin="4,0,4,4"
-            Orientation="Horizontal">
+            >
             <local:SevenSegmentModule x:Name="_Module_1000000000" 
                                       
                                       Increment="1000000000.0" />
@@ -47,6 +48,6 @@
             <local:SevenSegmentModule x:Name="_Module_00000001" Increment="0.00000001" />
             <local:SevenSegmentModule x:Name="_Module_000000001" Increment="0.000000001" />
             <local:SevenSegmentModule x:Name="_Module_0000000001" Increment="0.0000000001" />
-        </StackPanel>
+        </UniformGrid>
     </Grid>
 </UserControl>
