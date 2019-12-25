@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,7 +28,7 @@ namespace DigitalNumericUpdown
          * |V|         |I|
          * |E|         |X|
          * | |         | |
-         *  |   SEVEN   |
+         *  |   SEVEN   |  ( ) <- DECIMAL POINT
          *  
          */
 
@@ -91,22 +90,22 @@ namespace DigitalNumericUpdown
                 switch (SegmentColor)
                 {
                     case SegmentColorType.Lime:
-                        SegmentFill = UseGlow ? CreateGlowBrush(Colors.Lime) : Brushes.Lime;
+                        SegmentFill = CreateGlowBrush(Colors.Lime);
                         break;
                     case SegmentColorType.Red:
-                        SegmentFill = UseGlow ? CreateGlowBrush(Colors.Red) : Brushes.Red;
+                        SegmentFill = CreateGlowBrush(Colors.Red);
                         break;
                     case SegmentColorType.Blue:
-                        SegmentFill = UseGlow ? CreateGlowBrush(Colors.Blue) : Brushes.Blue;
+                        SegmentFill = CreateGlowBrush(Colors.Blue);
                         break;
                     case SegmentColorType.Orange:
-                        SegmentFill = UseGlow ? CreateGlowBrush(Colors.Orange) : Brushes.Orange;
+                        SegmentFill = CreateGlowBrush(Colors.Orange);
                         break;
                     case SegmentColorType.Yellow:
-                        SegmentFill = UseGlow ? CreateGlowBrush(Colors.Yellow) : Brushes.Yellow;
+                        SegmentFill = CreateGlowBrush(Colors.Yellow);
                         break;
                     case SegmentColorType.Purple:
-                        SegmentFill = UseGlow ? CreateGlowBrush(Colors.Purple) : Brushes.Purple;
+                        SegmentFill = CreateGlowBrush(Colors.Purple);
                         break;
                 }
             };
@@ -139,7 +138,7 @@ namespace DigitalNumericUpdown
         DependencyProperty.Register(
         "Brightness", typeof(BrightnessType),
         typeof(SevenSegmentModule),
-        new UIPropertyMetadata(BrightnessType.Neutral)
+        new UIPropertyMetadata(BrightnessType.Positive2)
         );
 
         public BrightnessType Brightness
@@ -159,7 +158,7 @@ namespace DigitalNumericUpdown
             Negative3 = -3,
             Negative2 = -2,
             Negative1 = -1,
-            Neutral = 0,
+            Normal = 0,
             Positive1 = 1,
             Positive2 = 2,
             Positive3 = 3,
@@ -169,8 +168,6 @@ namespace DigitalNumericUpdown
             Positive7 = 7,
             Positive8 = 8,
             Positive9 = 9
-
-
         }
         
         private void ConfigureEvents()
@@ -360,19 +357,6 @@ namespace DigitalNumericUpdown
             set => SetValue(ChangeableProperty, value);
         }
 
-        public static readonly DependencyProperty UseGlowProperty =
-        DependencyProperty.Register(
-        "UseGlow", typeof(bool),
-        typeof(SevenSegmentModule),
-        new UIPropertyMetadata(true)
-        );
-
-        public bool UseGlow
-        {
-            get => (bool)GetValue(UseGlowProperty);
-            set => SetValue(UseGlowProperty, value);
-        }
-
         public static readonly DependencyProperty SegmentFillProperty =
         DependencyProperty.Register(
         "SegmentFill", typeof(Brush),
@@ -407,6 +391,32 @@ namespace DigitalNumericUpdown
         public void ShowColon()
         {
             //_viewBox_Colon.Visibility = Visibility.Visible;
+        }
+
+        public static readonly DependencyProperty DisplayScaleProperty =
+        DependencyProperty.Register(
+        "DisplayScale", typeof(double),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(0.5)
+        );
+
+        public double DisplayScale
+        {
+            get => (double)GetValue(DisplayScaleProperty);
+            set => SetValue(DisplayScaleProperty, value);
+        }
+
+        public static readonly DependencyProperty DisplayAngleProperty =
+        DependencyProperty.Register(
+        "DisplayAngle", typeof(double),
+        typeof(SevenSegmentModule),
+        new UIPropertyMetadata(-8d)
+        );
+
+        public double DisplayAngle
+        {
+            get => (double)GetValue(DisplayAngleProperty);
+            set => SetValue(DisplayAngleProperty, value);
         }
 
         public static readonly DependencyProperty IsSelectedProperty =
