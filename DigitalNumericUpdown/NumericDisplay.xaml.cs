@@ -18,14 +18,14 @@ namespace DigitalNumericUpdown
         private readonly BitArray _decimals = new BitArray(new bool[10]);
         private readonly BitArray _digits = new BitArray(new bool[10]);
         private bool _bool_ShowSelector;
-        private readonly List<SevenSegmentModule> _modules = new List<SevenSegmentModule>();
+        private readonly List<SevenSegmentBase> _modules = new List<SevenSegmentBase>();
         private int _integerCount;
         private double _maximum = 9999999999.9999999999;
         private double _minimum = -999999999.0;
 
         //public
         public int IntegerCount => _integerCount;
-        public SevenSegmentModule SelectedModule => _modules.FirstOrDefault(m => m.IsSelected);
+        public SevenSegmentBase SelectedModule => _modules.FirstOrDefault(m => m.IsSelected);
 
         //events
         public event Action<double> IncrementChanged = delegate { };
@@ -39,7 +39,7 @@ namespace DigitalNumericUpdown
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
 
-            _modules = LogicalTreeHelper.GetChildren(_StackPanel).OfType<SevenSegmentModule>().ToList();
+            _modules = LogicalTreeHelper.GetChildren(_StackPanel).OfType<SevenSegmentBase>().ToList();
             HookupSelectionEvents();
             ShowSelector = false;
         }
@@ -97,7 +97,7 @@ namespace DigitalNumericUpdown
             get => _bool_ShowSelector;
             set
             {
-                _modules.ForEach(m => m.ShowDigitSelector = value);
+                //_modules.ForEach(m => m.ShowDigitSelector = value);
                 _bool_ShowSelector = value;
             }
         }
@@ -108,19 +108,19 @@ namespace DigitalNumericUpdown
             if (_modules[a].IsSelected)
             {
                 int b = Math.Min(a + 1, 9);
-                _modules[b].Select();
+                //_modules[b].Select();
             }
         }
 
         private void HookupSelectionEvents()
         {
-            foreach (SevenSegmentModule m in Modules)
+            foreach (SevenSegmentLED m in Modules)
             {
                 m.SelectionEvent += SevenSegmentDisplayModule_SelectionEvent;
             };
         }
 
-        public ReadOnlyCollection<SevenSegmentModule> Modules => _modules.AsReadOnly();
+        public ReadOnlyCollection<SevenSegmentBase> Modules => _modules.AsReadOnly();
 
         private void ProcessInput(double value)
         {
@@ -137,7 +137,7 @@ namespace DigitalNumericUpdown
             {
                 int p = 9 - i;
                 if (integerChars.Length > p)
-                    _modules[i].SetDigit(integerChars[p]);
+                    _modules[i].SetChar(integerChars[p]);
             }
 
             if (fractionalPart > 0d)
@@ -150,7 +150,7 @@ namespace DigitalNumericUpdown
                 {
                     int p = i - 10;
                     if (fractionChars.Length > p)
-                        _modules[i].SetDigit(fractionChars[p]);
+                        _modules[i].SetChar(fractionChars[p]);
                 }
             }
 
@@ -182,10 +182,10 @@ namespace DigitalNumericUpdown
         private void SevenSegmentDisplayModule_SelectionEvent(object sender)
         {
             _modules.ForEach(m => m.IsSelected = false);
-            if (sender is SevenSegmentModule s)
+            if (sender is SevenSegmentLED s)
             {
                 s.IsSelected = true;
-                IncrementChanged?.Invoke(s.Increment);
+                IncrementChanged?.Invoke(s.IncrementFactor);
             }
         }
     }

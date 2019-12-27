@@ -50,13 +50,13 @@ namespace DigitalNumericUpdown
                 switch (value.ToString())
                 {
                     case "0.1":
-                        _NumericDisplay._Module_0.IsSelected = true;
+                        //_NumericDisplay._Module_0.IsSelected = true;
                         break;
                     case "0.01":
-                        _NumericDisplay._Module_01.IsSelected = true;
+                        //_NumericDisplay._Module_01.IsSelected = true;
                         break;
                     case "0.001":
-                        _NumericDisplay._Module_001.IsSelected = true;
+                        //_NumericDisplay._Module_001.IsSelected = true;
                         break;
                 }
             }
@@ -92,8 +92,8 @@ namespace DigitalNumericUpdown
 
             if (_NumericDisplay.IntegerCount > 0 && _value > 0)
             {
-                if (_NumericDisplay.SelectedModule?.CurrentValue == 1)
-                    _NumericDisplay.DropDecimalPosition();
+                //if (_NumericDisplay.SelectedModule?.CurrentValue == 1)
+                //    _NumericDisplay.DropDecimalPosition();
             }
             SetValue(_value - _increment);
         }

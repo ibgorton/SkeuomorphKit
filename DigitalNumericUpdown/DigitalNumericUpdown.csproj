@@ -7,8 +7,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
-  </ItemGroup>
-
 </Project>

@@ -15,39 +15,39 @@
             Rows="1"
             Margin="4,0,4,4"
             >
-            <local:SevenSegmentModule x:Name="_Module_1000000000" 
+            <local:SevenSegmentLED x:Name="_Module_1000000000" 
                                       
-                                      Increment="1000000000.0" />
-            <local:SevenSegmentModule x:Name="_Module_100000000" Increment="100000000.0" />
-            <local:SevenSegmentModule x:Name="_Module_10000000" Increment="10000000.0" />
-            <local:SevenSegmentModule x:Name="_Module_1000000" Increment="1000000.0" />
-            <local:SevenSegmentModule x:Name="_Module_100000" Increment="100000.0" />
-            <local:SevenSegmentModule x:Name="_Module_10000" 
-                                      SegmentColor="Yellow"
-                                      Increment="10000.0" />
-            <local:SevenSegmentModule x:Name="_Module_1000" 
-                                      SegmentColor="Red"
-                                      Increment="1000.0" />
-            <local:SevenSegmentModule x:Name="_Module_100" 
-                                      SegmentColor="Purple"
-                                      Increment="100.0" />
-            <local:SevenSegmentModule x:Name="_Module_10" 
-                                      SegmentColor="Orange"
-                                      Increment="10.0" />
-            <local:SevenSegmentModule x:Name="_Module_1" 
-                                      SegmentColor="Blue"
+                                      IncrementFactor="1000000000.0" />
+            <local:SevenSegmentLED x:Name="_Module_100000000" IncrementFactor="100000000.0" />
+            <local:SevenSegmentLED x:Name="_Module_10000000" IncrementFactor="10000000.0" />
+            <local:SevenSegmentLED x:Name="_Module_1000000" IncrementFactor="1000000.0" />
+            <local:SevenSegmentLED x:Name="_Module_100000" IncrementFactor="100000.0" />
+            <local:SevenSegmentLED x:Name="_Module_10000" 
+                                      LedColor="Yellow"
+                                      IncrementFactor="10000.0" />
+            <local:SevenSegmentLED x:Name="_Module_1000" 
+                                      LedColor="Red"
+                                      IncrementFactor="1000.0" />
+            <local:SevenSegmentLED x:Name="_Module_100" 
+                                      LedColor="Purple"
+                                      IncrementFactor="100.0" />
+            <local:SevenSegmentLED x:Name="_Module_10" 
+                                      LedColor="Orange"
+                                      IncrementFactor="10.0" />
+            <local:SevenSegmentLED x:Name="_Module_1" 
+                                      LedColor="Blue"
                                       ShowDecimalPoint="True"
-                                      Increment="1.0" />
-            <local:SevenSegmentModule x:Name="_Module_0" Increment="0.1" />
-            <local:SevenSegmentModule x:Name="_Module_01" Increment="0.01" />
-            <local:SevenSegmentModule x:Name="_Module_001" Increment="0.001" />
-            <local:SevenSegmentModule x:Name="_Module_0001" Increment="0.0001" />
-            <local:SevenSegmentModule x:Name="_Module_00001" Increment="0.00001" />
-            <local:SevenSegmentModule x:Name="_Module_000001" Increment="0.000001" />
-            <local:SevenSegmentModule x:Name="_Module_0000001" Increment="0.0000001" />
-            <local:SevenSegmentModule x:Name="_Module_00000001" Increment="0.00000001" />
-            <local:SevenSegmentModule x:Name="_Module_000000001" Increment="0.000000001" />
-            <local:SevenSegmentModule x:Name="_Module_0000000001" Increment="0.0000000001" />
+                                      IncrementFactor="1.0" />
+            <local:SevenSegmentLED x:Name="_Module_0" IncrementFactor="0.1" />
+            <local:SevenSegmentLED x:Name="_Module_01" IncrementFactor="0.01" />
+            <local:SevenSegmentLED x:Name="_Module_001" IncrementFactor="0.001" />
+            <local:SevenSegmentLED x:Name="_Module_0001" IncrementFactor="0.0001" />
+            <local:SevenSegmentLED x:Name="_Module_00001" IncrementFactor="0.00001" />
+            <local:SevenSegmentLED x:Name="_Module_000001" IncrementFactor="0.000001" />
+            <local:SevenSegmentLED x:Name="_Module_0000001" IncrementFactor="0.0000001" />
+            <local:SevenSegmentLED x:Name="_Module_00000001" IncrementFactor="0.00000001" />
+            <local:SevenSegmentLED x:Name="_Module_000000001" IncrementFactor="0.000000001" />
+            <local:SevenSegmentLED x:Name="_Module_0000000001" IncrementFactor="0.0000000001" />
         </UniformGrid>
     </Grid>
 </UserControl>

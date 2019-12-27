@@ -16,8 +16,8 @@ namespace DigitalNumericUpdown
             InitializeComponent();
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
-            _module_H.ShowColon();
-            _module_M.ShowColon();
+            //_module_H.ShowColon();
+            //_module_M.ShowColon();
             CompositionTarget.Rendering += SetTime;
         }
 
@@ -29,33 +29,33 @@ namespace DigitalNumericUpdown
             char[] secondDigits = now.Second.ToString().ToCharArray();
             if (hourDigits.Length == 2)
             {
-                _moduleH_.SetDigit(hourDigits[0]);
-                _module_H.SetDigit(hourDigits[1]);
+                _moduleH_.SetChar(hourDigits[0]);
+                _module_H.SetChar(hourDigits[1]);
             }
             else
             {
-                _moduleH_.SetDigit(null);
-                _module_H.SetDigit(hourDigits[0]);
+                _moduleH_.BlankModule();
+                _module_H.SetChar(hourDigits[0]);
             }
             if (minuteDigits.Length == 2)
             {
-                _moduleM_.SetDigit(minuteDigits[0]);
-                _module_M.SetDigit(minuteDigits[1]);
+                _moduleM_.SetChar(minuteDigits[0]);
+                _module_M.SetChar(minuteDigits[1]);
             }
             else
             {
-                _moduleM_.SetDigit(null);
-                _module_M.SetDigit(minuteDigits[0]);
+                _moduleM_.BlankModule();
+                _module_M.SetChar(minuteDigits[0]);
             }
             if (secondDigits.Length == 2)
             {
-                _moduleS_.SetDigit(secondDigits[0]);
-                _module_S.SetDigit(secondDigits[1]);
+                _moduleS_.SetChar(secondDigits[0]);
+                _module_S.SetChar(secondDigits[1]);
             }
             else
             {
-                _moduleS_.SetDigit(null);
-                _module_S.SetDigit(secondDigits[0]);
+                _module_S.BlankModule();
+                _module_S.SetChar(secondDigits[0]);
             }
         }
     }

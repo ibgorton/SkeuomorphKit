@@ -8,11 +8,11 @@
              Background="Black"
              >
     <StackPanel Orientation="Horizontal" Margin="5">
-        <local:SevenSegmentModule x:Name="_moduleH_"/>
-        <local:SevenSegmentModule x:Name="_module_H"/>
-        <local:SevenSegmentModule x:Name="_moduleM_"/>
-        <local:SevenSegmentModule x:Name="_module_M"/>
-        <local:SevenSegmentModule x:Name="_moduleS_"/>
-        <local:SevenSegmentModule x:Name="_module_S"/>
+        <local:SevenSegmentLED x:Name="_moduleH_"/>
+        <local:SevenSegmentLED x:Name="_module_H"/>
+        <local:SevenSegmentLED x:Name="_moduleM_"/>
+        <local:SevenSegmentLED x:Name="_module_M"/>
+        <local:SevenSegmentLED x:Name="_moduleS_"/>
+        <local:SevenSegmentLED x:Name="_module_S"/>
     </StackPanel>
 </UserControl>
