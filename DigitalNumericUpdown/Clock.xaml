@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              Background="Black"
              >
-    <StackPanel Orientation="Horizontal" Margin="5">
+    <StackPanel Orientation="Horizontal" Margin="5" Height="96">
         <local:SevenSegmentLED x:Name="_moduleH_"/>
         <local:SevenSegmentLED x:Name="_module_H"/>
         <local:SevenSegmentLED x:Name="_moduleM_"/>

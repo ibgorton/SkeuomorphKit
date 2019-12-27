@@ -77,7 +77,7 @@ namespace DigitalNumericUpdown
             set
             {
                 SetValue(PressedProperty, value);
-                DisplayScale = value ? 0.495 : 0.5;
+                DisplayScale = value ? 0.99 : 1.0;
             }
         }
 
@@ -91,7 +91,7 @@ namespace DigitalNumericUpdown
                 DependencyProperty.Register(
                 "DisplayScale", typeof(double),
                 typeof(DisplayControlBase),
-                new UIPropertyMetadata(0.5)
+                new UIPropertyMetadata(1.0)
                 );
 
         protected enum BrightnessType

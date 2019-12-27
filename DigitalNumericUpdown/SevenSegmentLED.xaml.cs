@@ -241,7 +241,7 @@ namespace DigitalNumericUpdown
             _bottomTouch.MouseDown += BottomTouch_MouseDown;
             _bottomTouch.MouseUp += BottomTouch_MouseUp;
             _bottomTouch.MouseLeave += BottomTouch_MouseLeave;
-            _segmentFourFront.MouseUp += SegmentFourFront_MouseUp;
+            _segmentSeven.MouseUp += SegmentFourFront_MouseUp;
         }
 
         private void SegmentFourFront_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)

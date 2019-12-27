@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -44,7 +43,7 @@ namespace DigitalNumericUpdown
             }
             else
             {
-                _moduleM_.BlankModule();
+                _moduleM_.SetChar('0');
                 _module_M.SetChar(minuteDigits[0]);
             }
             if (secondDigits.Length == 2)
@@ -54,7 +53,7 @@ namespace DigitalNumericUpdown
             }
             else
             {
-                _module_S.BlankModule();
+                _module_S.SetChar('0');
                 _module_S.SetChar(secondDigits[0]);
             }
         }

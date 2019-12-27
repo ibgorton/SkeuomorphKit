@@ -9,11 +9,12 @@
     mc:Ignorable="d"
     Background="Black"
     >
-    <Grid >
+    <Grid Height="96">
         <UniformGrid
             x:Name="_StackPanel"
             Rows="1"
             Margin="4,0,4,4"
+            
             >
             <local:SevenSegmentLED x:Name="_Module_1000000000" 
                                       

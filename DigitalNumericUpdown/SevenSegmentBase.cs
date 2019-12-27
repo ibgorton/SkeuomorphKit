@@ -5,23 +5,23 @@ using System.Windows.Media;
 
 namespace DigitalNumericUpdown
 {
-    /* Segment Numbering
+    /*     SEGMENT NUMBERING
     * 
-    *        _________
-    *      | ___ONE___ |
-    *     | |         | |
-    *     |S|         |T|
-    *     |I|         |W|
-    *     |X|         |O|
-    *     | |_________|E|
-    *      | __SEVEN__ |
-    *     |F|         |T|
-    *     |I|         |H|
-    *     |V|         |R|
-    *     |E|         |E|
-    *     | |_________|E|
-    *      | ___FOUR___|  ( ) <- DECIMAL POINT
-    *
+    *          __________
+    *        _/   ONE    \_
+    *       / \__________/ \
+    *      | S |        | T |
+    *      | I |        | W |
+    *      | X |        | O |
+    *      |   |________|   |
+    *       \_/  SEVEN   \_/
+    *       / \__________/T\
+    *      | F |        | H |
+    *      | I |        | R |
+    *      | V |        | E |
+    *      | E |________| E |
+    *       \_/   FOUR   \_/    /--\ <- DECIMAL POINT
+    *         \__________/      \__/
     */
 
     public abstract class SevenSegmentBase : DisplayControlBase
@@ -31,21 +31,21 @@ namespace DigitalNumericUpdown
 
         }
 
-        public static readonly DependencyProperty BackgroundFillProperty =
+        protected static readonly DependencyProperty BackgroundFillProperty =
                DependencyProperty.Register(
                "BackgroundFill", typeof(Brush),
                typeof(SevenSegmentBase),
                new UIPropertyMetadata(Brushes.Black)
                );
 
-        public static readonly DependencyProperty BottomPressedProperty =
+        protected static readonly DependencyProperty BottomPressedProperty =
                 DependencyProperty.Register(
                 "BottomPressed", typeof(bool),
                 typeof(SevenSegmentBase),
                 new UIPropertyMetadata(false)
                 );
 
-        public static readonly DependencyProperty DecimalDisplayAngleProperty =
+        protected static readonly DependencyProperty DecimalDisplayAngleProperty =
                 DependencyProperty.Register(
                 "DecimalDisplayAngle", typeof(double),
                 typeof(SevenSegmentBase),
@@ -53,7 +53,7 @@ namespace DigitalNumericUpdown
                 );
 
 
-        public static readonly DependencyProperty SegmentDisplayAngleProperty =
+        protected static readonly DependencyProperty SegmentDisplayAngleProperty =
                 DependencyProperty.Register(
                 "DisplayAngle", typeof(double),
                 typeof(SevenSegmentBase),
@@ -62,14 +62,14 @@ namespace DigitalNumericUpdown
 
 
 
-        public static readonly DependencyProperty ShowDecimalPointProperty =
+        protected static readonly DependencyProperty ShowDecimalPointProperty =
                 DependencyProperty.Register(
                 "ShowDecimalPoint", typeof(bool),
                 typeof(SevenSegmentBase),
                 new UIPropertyMetadata(false)
                 );
 
-        public static readonly DependencyProperty TopPressedProperty =
+        protected static readonly DependencyProperty TopPressedProperty =
                 DependencyProperty.Register(
                 "TopPressed", typeof(bool),
                 typeof(SevenSegmentBase),
