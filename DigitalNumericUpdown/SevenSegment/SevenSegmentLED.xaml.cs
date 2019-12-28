@@ -1,71 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
 namespace DigitalNumericUpdown
 {
-    public class PressedConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if ((bool)value)
-            {
-                {
-                    return 0.99;
-                }
-            }
-            return 1d;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class SegmentOpacityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if ((bool)value)
-            {
-                {
-                    return 1.0;
-                }
-            }
-            return 0.075;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class SelectedOpacityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if ((bool)value)
-            {
-                {
-                    return 0.93;
-                }
-            }
-            return 0.95;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     /// <summary>
     /// Interaction logic for SevenSegmentModule.xaml
     /// </summary>
@@ -87,47 +27,12 @@ namespace DigitalNumericUpdown
 
         }
 
-        /// <summary>
-        /// Used for seven segment illumination logic
-        /// </summary>
-        private readonly static BitArray[] _bits = {
-                //zero
-                new BitArray(new bool[] { true, true, true, false, true, true, true }),
-                //one
-                new BitArray(new bool[] { false, false, true, false, false, true, false }),
-                //two
-                new BitArray(new bool[] { true, false, true, true, true, false, true }),
-                //three
-                new BitArray(new bool[] { true, false, true, true, false, true, true }),
-                //four
-                new BitArray(new bool[] { false, true, true, true, false, true, false }),
-                //five
-                new BitArray(new bool[] { true, true, false, true, false, true, true }),
-                //six
-                new BitArray(new bool[] { true, true, false, true, true, true, true }),
-                //seven
-                new BitArray(new bool[] { true, false, true, false, false, true, false }),
-                //eight
-                new BitArray(new bool[] { true, true, true, true, true, true, true }),
-                //nine
-                new BitArray(new bool[] { true, true, true, true, false, true, true }),
-                //null
-                new BitArray(new bool[] { false, false, false, false, false, false, false }),
-                //-
-                new BitArray(new bool [] {false, false, false, true, false, false, false })
-        };
-
-        
-
         private int? _currentValue = null;
 
         //private
         private bool _showDigitSelector;
-        
 
         public event Action<object> SelectionEvent = delegate { };
-
-        
 
         public Brush BackgroundFill
         {
@@ -147,11 +52,7 @@ namespace DigitalNumericUpdown
 
         //public
         public int? CurrentValue => _currentValue;
-        public double DecimalDisplayAngle
-        {
-            get => (double)GetValue(DecimalDisplayAngleProperty);
-            set => SetValue(DecimalDisplayAngleProperty, value);
-        }
+        
 
         //public double Increment { get; set; } = 1.0;
 

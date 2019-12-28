@@ -1,14 +1,14 @@
 ﻿<local:SevenSegmentBase
     xmlns:local="clr-namespace:DigitalNumericUpdown"
-    x:Class="DigitalNumericUpdown.SevenSegmentLED"
+    x:Class="DigitalNumericUpdown.SevenSegmentLCD"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    mc:Ignorable="d" 
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     SnapsToDevicePixels="False"
-    mc:Ignorable="d"
-    Background="Black"
+    Background="Silver"
     >
     <UserControl.Resources>
         <ResourceDictionary>
@@ -25,40 +25,47 @@
             Height="245">
             <Canvas.LayoutTransform>
                 <TransformGroup>
-                    <SkewTransform AngleX="{Binding DisplayAngle, FallbackValue=-8.0}" />
+                    <SkewTransform AngleX="{Binding DisplayAngle, FallbackValue=0}" />
                     <ScaleTransform ScaleX="{Binding DisplayScale, FallbackValue=2.0}"
                                     ScaleY="{Binding DisplayScale, FallbackValue=2.0}" />
                 </TransformGroup>
             </Canvas.LayoutTransform>
             <Path
                 Opacity="{Binding Segment1On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
-                Data="{StaticResource ResourceKey=Segment1}"/>
+                Fill="{Binding LedFill, FallbackValue=Black}"
+                Data="{StaticResource ResourceKey=Segment1}"
+                Effect="{StaticResource ResourceKey=SegmentDropShadow}"/>
             <Path
                 Opacity="{Binding Segment2On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
-                Data="{StaticResource ResourceKey=Segment2}"/>
+                Fill="{Binding LedFill, FallbackValue=Black}"
+                Data="{StaticResource ResourceKey=Segment2}"
+                Effect="{StaticResource ResourceKey=SegmentDropShadow}"/>
             <Path
                 Opacity="{Binding Segment3On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
-                Data="{StaticResource ResourceKey=Segment3}"/>
+                Fill="{Binding LedFill, FallbackValue=Black}"
+                Data="{StaticResource ResourceKey=Segment3}"
+                Effect="{StaticResource ResourceKey=SegmentDropShadow}"/>
             <Path
                 Opacity="{Binding Segment4On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
-                Data="{StaticResource ResourceKey=Segment4}"/>
+                Fill="{Binding LedFill, FallbackValue=Black}"
+                Data="{StaticResource ResourceKey=Segment4}"
+                Effect="{StaticResource ResourceKey=SegmentDropShadow}"/>
             <Path
                 Opacity="{Binding Segment5On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
-                Data="{StaticResource ResourceKey=Segment5}"/>
+                Fill="{Binding LedFill, FallbackValue=Black}"
+                Data="{StaticResource ResourceKey=Segment5}"
+                Effect="{StaticResource ResourceKey=SegmentDropShadow}"/>
             <Path
                 Opacity="{Binding Segment6On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
-                Data="{StaticResource ResourceKey=Segment6}"/>
+                Fill="{Binding LedFill, FallbackValue=Black}"
+                Data="{StaticResource ResourceKey=Segment6}"
+                Effect="{StaticResource ResourceKey=SegmentDropShadow}"/>
             <Path
                 x:Name="_segmentSeven"
                 Opacity="{Binding Segment7On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
-                Data="{StaticResource ResourceKey=Segment7}"/>
+                Fill="{Binding LedFill, FallbackValue=Black}"
+                Data="{StaticResource ResourceKey=Segment7}"
+                Effect="{StaticResource ResourceKey=SegmentDropShadow}"/>
             <Rectangle x:Name="_topTouch"
                 Panel.ZIndex="7"
                 RadiusX="4" RadiusY="4"
@@ -66,11 +73,11 @@
                 Width="74"
                 Height="74"
             Opacity="{Binding TopPressed, Converter={StaticResource TouchConverter}, FallbackValue=0.15}"
-            Fill="{Binding LedFill, FallbackValue=Lime}"
+            Fill="{Binding LedFill, FallbackValue=Black}"
             Visibility="{Binding Changeable, Converter={StaticResource VisibleIfTrueConverter}}" />
             <Rectangle x:Name="_bottomTouch"
                 Opacity="{Binding BottomPressed, Converter={StaticResource TouchConverter}, FallbackValue=0.15}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Black}"
                 Visibility="{Binding Changeable, Converter={StaticResource VisibleIfTrueConverter}}"
                 Panel.ZIndex="7"
                 RadiusX="4" RadiusY="4"
@@ -78,9 +85,8 @@
                 Width="74"
                 Height="74" />
             <Path x:Name="_Ellipse_DecimalPlace"
-                  
                 Opacity="{Binding ShowDecimalPoint, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Black}"
                 Data="{StaticResource ResourceKey=DecimalPoint}">
                 <Path.LayoutTransform>
                     <TransformGroup>
@@ -90,10 +96,10 @@
             </Path>
             <Path x:Name="_segmentMask"
                 Panel.ZIndex="6"
-                Fill="Black"
-                Data="{StaticResource ResourceKey=SegmentGeometry}"
-                Effect="{StaticResource ResourceKey=SegmentDropShadow}"
-                />
+                Fill="Transparent"
+                Data="{StaticResource ResourceKey=SegmentGeometry}">
+                
+            </Path>
         </Canvas>
     </Viewbox>
 </local:SevenSegmentBase>

@@ -69,13 +69,16 @@
         </PathGeometry.Transform>
         <StaticResource ResourceKey="HorizontalSegment"/>
     </PathGeometry>
-    <EllipseGeometry x:Key="DecimalPoint" RadiusX="12.5" RadiusY="12.5" Center="115.5,229">
+    <EllipseGeometry x:Key="DecimalPoint" RadiusX="12.5" RadiusY="12.5" Center="115.5,225">
         <EllipseGeometry.Transform>
             <TransformGroup>
                 <SkewTransform AngleX="{Binding DecimalDisplayAngle, FallbackValue=8}" />
             </TransformGroup>
         </EllipseGeometry.Transform>
     </EllipseGeometry>
+    <DropShadowEffect x:Key="SegmentDropShadow" BlurRadius="12" ShadowDepth="3"/>
+    <RectangleGeometry x:Key="TouchSquare">
+    </RectangleGeometry>
     <CombinedGeometry x:Key="SegmentGeometry" GeometryCombineMode="Xor">
         <CombinedGeometry.Geometry1>
             <RectangleGeometry Rect="0,0,160,245" />

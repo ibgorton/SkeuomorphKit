@@ -30,6 +30,11 @@ namespace DigitalNumericUpdown
         {
 
         }
+        public double DecimalDisplayAngle
+        {
+            get => (double)GetValue(DecimalDisplayAngleProperty);
+            set => SetValue(DecimalDisplayAngleProperty, value);
+        }
 
         protected static readonly DependencyProperty BackgroundFillProperty =
                DependencyProperty.Register(

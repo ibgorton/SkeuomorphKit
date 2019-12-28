@@ -57,20 +57,19 @@ namespace DigitalNumericUpdown
                 typeof(DisplayControlBase),
                 new UIPropertyMetadata(false)
                 );
-
-
-
         public static readonly DependencyProperty IsSelectedProperty =
                 DependencyProperty.Register(
                 "IsSelected", typeof(bool),
                 typeof(SevenSegmentBase),
                 new UIPropertyMetadata(true)
                 );
+
         public bool IsSelected
         {
             get => (bool)GetValue(IsSelectedProperty);
             set => SetValue(IsSelectedProperty, value);
         }
+
         protected bool Pressed
         {
             get => (bool)GetValue(PressedProperty);
@@ -126,6 +125,13 @@ namespace DigitalNumericUpdown
             Yellow,
             Purple
         }
+
+        public enum LcdColorType 
+        { 
+            Black,
+            Inverted
+        }
+
 
         private static readonly DependencyProperty LedFillProperty =
                 DependencyProperty.Register(
