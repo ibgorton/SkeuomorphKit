@@ -70,7 +70,7 @@
                 Panel.ZIndex="7"
                 RadiusX="4" RadiusY="4"
                 Margin="33,33,0,0"
-                Width="74"
+                Width="76"
                 Height="74"
             Opacity="{Binding TopPressed, Converter={StaticResource TouchConverter}, FallbackValue=0.15}"
             Fill="{Binding LedFill, FallbackValue=Black}"
@@ -82,7 +82,7 @@
                 Panel.ZIndex="7"
                 RadiusX="4" RadiusY="4"
                 Margin="33,138,0,0"
-                Width="74"
+                Width="76"
                 Height="74" />
             <Path x:Name="_Ellipse_DecimalPlace"
                 Opacity="{Binding ShowDecimalPoint, Converter={StaticResource SegmentConverter}}"

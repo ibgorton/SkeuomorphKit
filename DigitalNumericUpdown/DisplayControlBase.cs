@@ -1,6 +1,4 @@
-﻿
-using System.Collections;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -55,14 +53,13 @@ namespace DigitalNumericUpdown
                 DependencyProperty.Register(
                 "Pressed", typeof(bool),
                 typeof(DisplayControlBase),
-                new UIPropertyMetadata(false)
-                );
+                new UIPropertyMetadata(false));
+
         public static readonly DependencyProperty IsSelectedProperty =
                 DependencyProperty.Register(
                 "IsSelected", typeof(bool),
-                typeof(SevenSegmentBase),
-                new UIPropertyMetadata(true)
-                );
+                typeof(DisplayControlBase),
+                new UIPropertyMetadata(true));
 
         public bool IsSelected
         {
@@ -90,8 +87,7 @@ namespace DigitalNumericUpdown
                 DependencyProperty.Register(
                 "DisplayScale", typeof(double),
                 typeof(DisplayControlBase),
-                new UIPropertyMetadata(1.0)
-                );
+                new UIPropertyMetadata(1.0));
 
         protected enum BrightnessType
         {
@@ -137,8 +133,7 @@ namespace DigitalNumericUpdown
                 DependencyProperty.Register(
                 "LedFill", typeof(Brush),
                 typeof(DisplayControlBase),
-                new UIPropertyMetadata(Brushes.Lime)
-                );
+                new UIPropertyMetadata(Brushes.Lime));
 
         public Brush LedFill
         {
@@ -150,8 +145,7 @@ namespace DigitalNumericUpdown
                 DependencyProperty.Register(
                 "Brightness", typeof(BrightnessType),
                 typeof(DisplayControlBase),
-                new UIPropertyMetadata(BrightnessType.Positive2)
-                );
+                new UIPropertyMetadata(BrightnessType.Positive2));
 
         private BrightnessType Brightness
         {
@@ -159,12 +153,10 @@ namespace DigitalNumericUpdown
             set => SetValue(BrightnessProperty, value);
         }
 
-
         protected static readonly DependencyProperty LedColorProperty =
                 DependencyProperty.Register(
                 "LedColor", typeof(LedColorType),
-                typeof(DisplayControlBase)
-                );
+                typeof(DisplayControlBase));
 
         public LedColorType LedColor
         {
@@ -176,8 +168,7 @@ namespace DigitalNumericUpdown
                 DependencyProperty.Register(
                 "ChangeableProperty", typeof(bool),
                 typeof(DisplayControlBase),
-                new UIPropertyMetadata(true)
-                );
+                new UIPropertyMetadata(true));
 
         protected bool Changeable
         {

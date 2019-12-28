@@ -60,11 +60,11 @@
                 Fill="{Binding LedFill, FallbackValue=Lime}"
                 Data="{StaticResource ResourceKey=Segment7}"/>
             <Rectangle x:Name="_topTouch"
-                Panel.ZIndex="7"
+                Panel.ZIndex="2"
                 RadiusX="4" RadiusY="4"
                 Margin="33,33,0,0"
-                Width="74"
-                Height="74"
+                Width="75"
+                Height="73"
             Opacity="{Binding TopPressed, Converter={StaticResource TouchConverter}, FallbackValue=0.15}"
             Fill="{Binding LedFill, FallbackValue=Lime}"
             Visibility="{Binding Changeable, Converter={StaticResource VisibleIfTrueConverter}}" />
@@ -72,13 +72,12 @@
                 Opacity="{Binding BottomPressed, Converter={StaticResource TouchConverter}, FallbackValue=0.15}"
                 Fill="{Binding LedFill, FallbackValue=Lime}"
                 Visibility="{Binding Changeable, Converter={StaticResource VisibleIfTrueConverter}}"
-                Panel.ZIndex="7"
+                Panel.ZIndex="2"
                 RadiusX="4" RadiusY="4"
                 Margin="33,138,0,0"
-                Width="74"
-                Height="74" />
+                Width="75"
+                Height="73" />
             <Path x:Name="_Ellipse_DecimalPlace"
-                  
                 Opacity="{Binding ShowDecimalPoint, Converter={StaticResource SegmentConverter}}"
                 Fill="{Binding LedFill, FallbackValue=Lime}"
                 Data="{StaticResource ResourceKey=DecimalPoint}">
@@ -89,11 +88,10 @@
                 </Path.LayoutTransform>
             </Path>
             <Path x:Name="_segmentMask"
-                Panel.ZIndex="6"
+                Panel.ZIndex="1"
                 Fill="Black"
                 Data="{StaticResource ResourceKey=SegmentGeometry}"
-                Effect="{StaticResource ResourceKey=SegmentDropShadow}"
-                />
+                Effect="{StaticResource ResourceKey=SegmentDropShadow}"/>
         </Canvas>
     </Viewbox>
 </local:SevenSegmentBase>

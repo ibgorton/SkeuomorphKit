@@ -1,7 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Globalization;
-using System.Windows.Data;
 using System.Windows.Media;
 
 namespace DigitalNumericUpdown
@@ -24,7 +22,6 @@ namespace DigitalNumericUpdown
             ConfigureEvents();
             ShowDigitSelector = false;
             IsSelected = false;
-
         }
 
         private int? _currentValue = null;
@@ -52,19 +49,12 @@ namespace DigitalNumericUpdown
 
         //public
         public int? CurrentValue => _currentValue;
-        
-
-        //public double Increment { get; set; } = 1.0;
-
-        
 
         public double SegmentDisplayAngle
         {
             get => (double)GetValue(SegmentDisplayAngleProperty);
             set => SetValue(SegmentDisplayAngleProperty, value);
         }
-
-        
 
         public bool ShowDecimalPoint
         {
@@ -87,8 +77,6 @@ namespace DigitalNumericUpdown
                 Pressed = value;
             }
         }
-
-        
 
         public void Select()
         {
@@ -150,8 +138,6 @@ namespace DigitalNumericUpdown
             Select();
         }
 
-        
-
         private void TopTouch_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (Changeable)
@@ -185,33 +171,12 @@ namespace DigitalNumericUpdown
             }
         }
 
-        
-
-
         public override void Decrement()
         {
             throw new NotImplementedException();
         }
 
         public override void Increment()
-        {
-            throw new NotImplementedException();
-        }
-    }
-    public class TouchOpacityConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if ((bool)value)
-            {
-                {
-                    return 0.5;
-                }
-            }
-            return 0d;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

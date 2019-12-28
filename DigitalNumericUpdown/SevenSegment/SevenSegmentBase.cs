@@ -26,10 +26,7 @@ namespace DigitalNumericUpdown
 
     public abstract class SevenSegmentBase : DisplayControlBase
     {
-        public SevenSegmentBase() : base()
-        {
-
-        }
+        public SevenSegmentBase() : base() { }
         public double DecimalDisplayAngle
         {
             get => (double)GetValue(DecimalDisplayAngleProperty);
@@ -40,78 +37,66 @@ namespace DigitalNumericUpdown
                DependencyProperty.Register(
                "BackgroundFill", typeof(Brush),
                typeof(SevenSegmentBase),
-               new UIPropertyMetadata(Brushes.Black)
-               );
+               new UIPropertyMetadata(Brushes.Black));
 
         protected static readonly DependencyProperty BottomPressedProperty =
                 DependencyProperty.Register(
                 "BottomPressed", typeof(bool),
                 typeof(SevenSegmentBase),
-                new UIPropertyMetadata(false)
-                );
+                new UIPropertyMetadata(false));
 
         protected static readonly DependencyProperty DecimalDisplayAngleProperty =
                 DependencyProperty.Register(
                 "DecimalDisplayAngle", typeof(double),
                 typeof(SevenSegmentBase),
-                new UIPropertyMetadata(8d)
-                );
+                new UIPropertyMetadata(8d));
 
 
         protected static readonly DependencyProperty SegmentDisplayAngleProperty =
                 DependencyProperty.Register(
                 "DisplayAngle", typeof(double),
                 typeof(SevenSegmentBase),
-                new UIPropertyMetadata(-8d)
-                );
-
-
+                new UIPropertyMetadata(-8d));
 
         protected static readonly DependencyProperty ShowDecimalPointProperty =
                 DependencyProperty.Register(
                 "ShowDecimalPoint", typeof(bool),
                 typeof(SevenSegmentBase),
-                new UIPropertyMetadata(false)
-                );
+                new UIPropertyMetadata(false));
 
         protected static readonly DependencyProperty TopPressedProperty =
                 DependencyProperty.Register(
                 "TopPressed", typeof(bool),
                 typeof(SevenSegmentBase),
-                new UIPropertyMetadata(false)
-                );
+                new UIPropertyMetadata(false));
 
         private static readonly DependencyProperty SegmentFiveOnProperty =
             DependencyProperty.Register(
             "Segment5On", 
             typeof(bool),
             typeof(SevenSegmentBase),
-            new UIPropertyMetadata(true)
-            );
+            new UIPropertyMetadata(true));
 
         private static readonly DependencyProperty SegmentFourOnProperty =
             DependencyProperty.Register(
             "Segment4On", 
             typeof(bool),
             typeof(SevenSegmentBase),
-            new UIPropertyMetadata(true)
-            );
+            new UIPropertyMetadata(true));
 
         private static readonly DependencyProperty SegmentOneOnProperty =
             DependencyProperty.Register(
             "Segment1On", 
             typeof(bool),
             typeof(SevenSegmentBase),
-            new UIPropertyMetadata(true)
-            );
+            new UIPropertyMetadata(true));
 
         private static readonly DependencyProperty SegmentSevenOnProperty =
             DependencyProperty.Register(
             "Segment7On", 
             typeof(bool),
             typeof(SevenSegmentBase),
-            new UIPropertyMetadata(true)
-            );
+            new UIPropertyMetadata(true));
 
         private static readonly DependencyProperty SegmentSixOnProperty =
             DependencyProperty.Register(
@@ -126,16 +111,14 @@ namespace DigitalNumericUpdown
             "Segment3On", 
             typeof(bool),
             typeof(SevenSegmentBase),
-            new UIPropertyMetadata(true)
-            );
+            new UIPropertyMetadata(true));
 
         private static readonly DependencyProperty SegmentTwoOnProperty =
             DependencyProperty.Register(
             "Segment2On", 
             typeof(bool),
             typeof(SevenSegmentBase),
-            new UIPropertyMetadata(true)
-            );
+            new UIPropertyMetadata(true));
 
         public override void SetChar(char c)
         {
