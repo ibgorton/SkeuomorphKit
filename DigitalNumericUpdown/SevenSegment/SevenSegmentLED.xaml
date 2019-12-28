@@ -32,71 +32,33 @@
             </Canvas.LayoutTransform>
             <Path
                 Opacity="{Binding Segment1On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}">
-                <Path.Data>
-                    <PathGeometry>
-                        <StaticResource ResourceKey="SegmentOnePathFigure" />
-                    </PathGeometry>
-                </Path.Data>
-            </Path>
-            <Path
-                Opacity="{Binding Segment6On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}">
-                <Path.Data>
-                    <PathGeometry>
-                        <StaticResource ResourceKey="SegmentSixPathFigure" />
-                    </PathGeometry>
-                </Path.Data>
-            </Path>
-
+                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Data="{StaticResource ResourceKey=Segment1}"/>
             <Path
                 Opacity="{Binding Segment2On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}">
-                <Path.Data>
-                    <PathGeometry>
-                        <StaticResource ResourceKey="SegmentTwoPathFigure" />
-                    </PathGeometry>
-                </Path.Data>
-            </Path>
+                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Data="{StaticResource ResourceKey=Segment2}"/>
+            <Path
+                Opacity="{Binding Segment3On, Converter={StaticResource SegmentConverter}}"
+                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Data="{StaticResource ResourceKey=Segment3}"/>
+            <Path
+                Opacity="{Binding Segment4On, Converter={StaticResource SegmentConverter}}"
+                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Data="{StaticResource ResourceKey=Segment4}"/>
+            <Path
+                Opacity="{Binding Segment5On, Converter={StaticResource SegmentConverter}}"
+                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Data="{StaticResource ResourceKey=Segment5}"/>
+            <Path
+                Opacity="{Binding Segment6On, Converter={StaticResource SegmentConverter}}"
+                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Data="{StaticResource ResourceKey=Segment6}"/>
             <Path
                 x:Name="_segmentSeven"
                 Opacity="{Binding Segment7On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}">
-                <Path.Data>
-                    <PathGeometry>
-                        <StaticResource ResourceKey="SegmentSevenPathFigure" />
-                    </PathGeometry>
-                </Path.Data>
-            </Path>
-            <Path
-                Opacity="{Binding Segment5On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}">
-                <Path.Data>
-                    <PathGeometry>
-                        <StaticResource ResourceKey="SegmentFivePathFigure" />
-                    </PathGeometry>
-                </Path.Data>
-            </Path>
-
-            <Path
-                Opacity="{Binding Segment3On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}">
-                <Path.Data>
-                    <PathGeometry>
-                        <StaticResource ResourceKey="SegmentThreePathFigure" />
-                    </PathGeometry>
-                </Path.Data>
-            </Path>
-
-            <Path
-                Opacity="{Binding Segment4On, Converter={StaticResource SegmentConverter}}"
-                Fill="{Binding LedFill, FallbackValue=Lime}">
-                <Path.Data>
-                    <PathGeometry>
-                        <StaticResource ResourceKey="SegmentFourPathFigure" />
-                    </PathGeometry>
-                </Path.Data>
-            </Path>
+                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Data="{StaticResource ResourceKey=Segment7}"/>
             <Rectangle x:Name="_topTouch"
                 Panel.ZIndex="7"
                 RadiusX="4" RadiusY="4"
@@ -129,8 +91,8 @@
                     </TransformGroup>
                 </Ellipse.LayoutTransform>
             </Ellipse>
-
             <Path
+                x:Name="_segmentMask"
                 Panel.ZIndex="6"
                 Fill="Black"
                 Data="{StaticResource ResourceKey=SegmentGeometry}"

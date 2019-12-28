@@ -5,107 +5,92 @@
     <local:TouchOpacityConverter x:Key="TouchConverter" />
     <local:SelectedOpacityConverter x:Key="SelectedConverter" />
     <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
-    <PathFigure IsClosed="True" StartPoint="21.5,16" x:Key="SegmentOnePathFigure">
-        <LineSegment Point="31,6" />
-        <LineSegment Point="33,5" />
-        <LineSegment Point="106,5" />
-        <LineSegment Point="109,6" />
-        <LineSegment Point="118.5,16" />
-        <LineSegment Point="118.5,19" />
-        <LineSegment Point="109,29" />
-        <LineSegment Point="106,30" />
-        <LineSegment Point="33,30" />
-        <LineSegment Point="31,29" />
-        <LineSegment Point="21.5,19" />
+    <PathFigure IsClosed="True" StartPoint="0,11" x:Key="HorizontalSegment">
+        <LineSegment Point="9.5,1" />
+        <LineSegment Point="11.5,0" />
+        <LineSegment Point="84.5,0" />
+        <LineSegment Point="87.5,1" />
+        <LineSegment Point="97,11" />
+        <LineSegment Point="97,14" />
+        <LineSegment Point="87.5,24" />
+        <LineSegment Point="84.5,25" />
+        <LineSegment Point="11.5,25" />
+        <LineSegment Point="9.5,24" />
+        <LineSegment Point="0,14" />
     </PathFigure>
-    <PathFigure IsClosed="True" StartPoint="19,21.5" x:Key="SegmentSixPathFigure">
-        <LineSegment Point="16,21.5" />
-        <LineSegment Point="5,32.5" />
-        <LineSegment Point="5,107.5" />
-        <LineSegment Point="16,118.5" />
-        <LineSegment Point="19,118.5" />
-        <LineSegment Point="30,107.5" />
-        <LineSegment Point="30,32.5" />
+    <PathFigure IsClosed="True" StartPoint="14,0" x:Key="VerticalSegment">
+        <LineSegment Point="11,0" />
+        <LineSegment Point="0,11" />
+        <LineSegment Point="0,86" />
+        <LineSegment Point="11,97" />
+        <LineSegment Point="14,97" />
+        <LineSegment Point="25,86" />
+        <LineSegment Point="25,11" />
     </PathFigure>
-    <PathFigure IsClosed="True" StartPoint="124,21.5" x:Key="SegmentTwoPathFigure">
-        <LineSegment Point="121,21.5" />
-        <LineSegment Point="110,32.5" />
-        <LineSegment Point="110,107.5" />
-        <LineSegment Point="121,118.5" />
-        <LineSegment Point="124,118.5" />
-        <LineSegment Point="135,107.5" />
-        <LineSegment Point="135,32.5" />
-    </PathFigure>
-    <PathFigure IsClosed="True" StartPoint="21.5,121" x:Key="SegmentSevenPathFigure">
-        <LineSegment Point="31,111" />
-        <LineSegment Point="33,110" />
-        <LineSegment Point="106,110" />
-        <LineSegment Point="109,111" />
-        <LineSegment Point="118.5,121" />
-        <LineSegment Point="118.5,123" />
-        <LineSegment Point="109,134" />
-        <LineSegment Point="106,135" />
-        <LineSegment Point="33,135" />
-        <LineSegment Point="31,134" />
-        <LineSegment Point="21.5,124" />
-    </PathFigure>
-    <PathFigure IsClosed="True" StartPoint="19,126.5" x:Key="SegmentFivePathFigure">
-        <LineSegment Point="16,126.5" />
-        <LineSegment Point="5,137.5" />
-        <LineSegment Point="5,212.5" />
-        <LineSegment Point="16,223.5" />
-        <LineSegment Point="19,223.5" />
-        <LineSegment Point="30,212.5" />
-        <LineSegment Point="30,137.5" />
-    </PathFigure>
-    <PathFigure IsClosed="True" StartPoint="124,126.5" x:Key="SegmentThreePathFigure">
-        <LineSegment Point="121,126.5" />
-        <LineSegment Point="110,137.5" />
-        <LineSegment Point="110,212.5" />
-        <LineSegment Point="121,223.5" />
-        <LineSegment Point="124,223.5" />
-        <LineSegment Point="135,212.5" />
-        <LineSegment Point="135,137.5" />
-    </PathFigure>
-    <PathFigure IsClosed="True" StartPoint="21.5,226" x:Key="SegmentFourPathFigure">
-        <LineSegment Point="31,216" />
-        <LineSegment Point="33,215" />
-        <LineSegment Point="106,215" />
-        <LineSegment Point="109,216" />
-        <LineSegment Point="118.5,226" />
-        <LineSegment Point="118.5,229" />
-        <LineSegment Point="109,239" />
-        <LineSegment Point="106,240" />
-        <LineSegment Point="33,240" />
-        <LineSegment Point="31,239" />
-        <LineSegment Point="21.5,229" />
-    </PathFigure>
-    <PathFigureCollection x:Key="Segments">
-        <StaticResource ResourceKey="SegmentOnePathFigure" />
-        <StaticResource ResourceKey="SegmentTwoPathFigure" />
-        <StaticResource ResourceKey="SegmentThreePathFigure" />
-        <StaticResource ResourceKey="SegmentFourPathFigure" />
-        <StaticResource ResourceKey="SegmentFivePathFigure" />
-        <StaticResource ResourceKey="SegmentSixPathFigure" />
-        <StaticResource ResourceKey="SegmentSevenPathFigure" />
-    </PathFigureCollection>
+    <PathGeometry x:Key="Segment1">
+        <PathGeometry.Transform>
+            <TranslateTransform X="22" Y="5"/>
+        </PathGeometry.Transform>
+        <StaticResource ResourceKey="HorizontalSegment"/>
+    </PathGeometry>
+    <PathGeometry x:Key="Segment2">
+        <PathGeometry.Transform>
+            <TranslateTransform X="111" Y="21"/>
+        </PathGeometry.Transform>
+        <StaticResource ResourceKey="VerticalSegment"/>
+    </PathGeometry>
+    <PathGeometry x:Key="Segment3">
+        <PathGeometry.Transform>
+            <TranslateTransform X="111" Y="125"/>
+        </PathGeometry.Transform>
+        <StaticResource ResourceKey="VerticalSegment"/>
+    </PathGeometry>
+    <PathGeometry x:Key="Segment4">
+        <PathGeometry.Transform>
+            <TranslateTransform X="22" Y="213"/>
+        </PathGeometry.Transform>
+        <StaticResource ResourceKey="HorizontalSegment"/>
+    </PathGeometry>
+    <PathGeometry x:Key="Segment6">
+        <PathGeometry.Transform>
+            <TranslateTransform X="5" Y="21"/>
+        </PathGeometry.Transform>
+        <StaticResource ResourceKey="VerticalSegment"/>
+    </PathGeometry>
+    <PathGeometry x:Key="Segment5">
+        <PathGeometry.Transform>
+            <TranslateTransform X="5" Y="125"/>
+        </PathGeometry.Transform>
+        <StaticResource ResourceKey="VerticalSegment"/>
+    </PathGeometry>
+    <PathGeometry x:Key="Segment7">
+        <PathGeometry.Transform>
+            <TranslateTransform X="22" Y="109"/>
+        </PathGeometry.Transform>
+        <StaticResource ResourceKey="HorizontalSegment"/>
+    </PathGeometry>
+    <EllipseGeometry x:Key="DecimalPoint" RadiusX="12.5" RadiusY="12.5" Center="115.5,229">
+        <EllipseGeometry.Transform>
+            <TransformGroup>
+                <SkewTransform AngleX="{Binding DecimalDisplayAngle, FallbackValue=8}" />
+            </TransformGroup>
+        </EllipseGeometry.Transform>
+    </EllipseGeometry>
     <CombinedGeometry x:Key="SegmentGeometry" GeometryCombineMode="Xor">
         <CombinedGeometry.Geometry1>
             <RectangleGeometry Rect="0,0,160,245" />
         </CombinedGeometry.Geometry1>
         <CombinedGeometry.Geometry2>
             <GeometryGroup>
-                <PathGeometry Figures="{StaticResource Segments}" />
-                <EllipseGeometry RadiusX="12.5" RadiusY="12.5" Center="115.5,229">
-                    <EllipseGeometry.Transform>
-                        <TransformGroup>
-                            <SkewTransform AngleX="{Binding DecimalDisplayAngle, FallbackValue=8}" />
-                        </TransformGroup>
-                    </EllipseGeometry.Transform>
-                </EllipseGeometry>
+                <StaticResource ResourceKey="Segment1"/>
+                <StaticResource ResourceKey="Segment2"/>
+                <StaticResource ResourceKey="Segment3"/>
+                <StaticResource ResourceKey="Segment4"/>
+                <StaticResource ResourceKey="Segment5"/>
+                <StaticResource ResourceKey="Segment6"/>
+                <StaticResource ResourceKey="Segment7"/>
+                <StaticResource ResourceKey="DecimalPoint"/>
             </GeometryGroup>
         </CombinedGeometry.Geometry2>
     </CombinedGeometry>
-    
-
 </ResourceDictionary>
