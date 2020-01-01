@@ -82,9 +82,7 @@
                 Fill="{Binding LedFill, FallbackValue=Lime}"
                 Data="{StaticResource ResourceKey=DecimalPoint}">
                 <Path.LayoutTransform>
-                    <TransformGroup>
-                        <SkewTransform AngleX="{Binding DecimalDisplayAngle, FallbackValue=0}" />
-                    </TransformGroup>
+                    <SkewTransform AngleX="{Binding DecimalDisplayAngle, FallbackValue=0}" />
                 </Path.LayoutTransform>
             </Path>
             <Path x:Name="_segmentMask"

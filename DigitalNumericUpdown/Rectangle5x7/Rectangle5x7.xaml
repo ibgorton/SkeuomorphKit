@@ -38,211 +38,211 @@
             Grid.Row="0"
             Grid.Column="0"
             Opacity="{Binding Segment1On, Converter={StaticResource SegmentConverter}}"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_02"
             Grid.Row="0"
             Grid.Column="1"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_03"
             Grid.Row="0"
             Grid.Column="2"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_04"
             Grid.Row="0"
             Grid.Column="3"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_05"
             Grid.Row="0"
             Grid.Column="4"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_06"
             Grid.Row="1"
             Grid.Column="0"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_07"
             Grid.Row="1"
             Grid.Column="1"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_08"
             Grid.Row="1"
             Grid.Column="2"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_09"
             Grid.Row="1"
             Grid.Column="3"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_10"
             Grid.Row="1"
             Grid.Column="4"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_11"
             Grid.Row="2"
             Grid.Column="0"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_12"
             Grid.Row="2"
             Grid.Column="1"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_13"
             Grid.Row="2"
             Grid.Column="2"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_14"
             Grid.Row="2"
             Grid.Column="3"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_15"
             Grid.Row="2"
             Grid.Column="4"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_16"
             Grid.Row="3"
             Grid.Column="0"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_17"
             Grid.Row="3"
             Grid.Column="1"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_18"
             Grid.Row="3"
             Grid.Column="2"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_19"
             Grid.Row="3"
             Grid.Column="3"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_20"
             Grid.Row="3"
             Grid.Column="4"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_21"
             Grid.Row="4"
             Grid.Column="0"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_22"
             Grid.Row="4"
             Grid.Column="1"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_23"
             Grid.Row="4"
             Grid.Column="2"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_24"
             Grid.Row="4"
             Grid.Column="3"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_25"
             Grid.Row="4"
             Grid.Column="5"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_26"
             Grid.Row="5"
             Grid.Column="0"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_27"
             Grid.Row="5"
             Grid.Column="1"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_28"
             Grid.Row="5"
             Grid.Column="2"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_29"
             Grid.Row="5"
             Grid.Column="3"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_30"
             Grid.Row="5"
             Grid.Column="4"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_31"
             Grid.Row="6"
             Grid.Column="0"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_32"
             Grid.Row="6"
             Grid.Column="1"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_33"
             Grid.Row="6"
             Grid.Column="2"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_34"
             Grid.Row="6"
             Grid.Column="3"
-            Fill="{Binding LedFill, FallbackValue=Blue}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
             x:Name="Pixel_35"
             Grid.Row="6"
             Grid.Column="4"
-            Fill="{Binding LedFill, FallbackValue=Black}"
+            Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
 
     </Grid>

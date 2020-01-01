@@ -72,9 +72,7 @@
     </PathGeometry>
     <EllipseGeometry x:Key="DecimalPoint" RadiusX="12.5" RadiusY="12.5" Center="115.5,225">
         <EllipseGeometry.Transform>
-            <TransformGroup>
-                <SkewTransform AngleX="{Binding DecimalDisplayAngle, FallbackValue=8}" />
-            </TransformGroup>
+            <SkewTransform AngleX="{Binding DecimalDisplayAngle, FallbackValue=8}" />
         </EllipseGeometry.Transform>
     </EllipseGeometry>
     <DropShadowEffect x:Key="SegmentDropShadow" BlurRadius="12" ShadowDepth="3"/>
