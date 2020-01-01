@@ -13,7 +13,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/DigitalNumericUpdown;component/Resources/resources.xaml" />
+                <ResourceDictionary Source="/SkeuomorphDisplay;component/Resources/resources.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
