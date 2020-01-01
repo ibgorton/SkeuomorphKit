@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkeuomorphDemo", "DigitalDemo\SkeuomorphDemo.csproj", "{DDDE7FB4-772F-47A7-A790-D36F2DCBDFC6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkeuomorphDemo", "SkeuomorphDemo\SkeuomorphDemo.csproj", "{DDDE7FB4-772F-47A7-A790-D36F2DCBDFC6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkeuomorphDisplay", "DigitalNumericUpdown\SkeuomorphDisplay.csproj", "{EDE53AD2-BB26-44B5-8FAA-61B41B99ED7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkeuomorphDisplay", "SkeuomorphDisplay\SkeuomorphDisplay.csproj", "{EDE53AD2-BB26-44B5-8FAA-61B41B99ED7B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
