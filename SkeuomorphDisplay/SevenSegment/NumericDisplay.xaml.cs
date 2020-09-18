@@ -25,7 +25,7 @@ namespace DigitalNumericUpdown
 
         //public
         public int IntegerCount => _integerCount;
-        public SevenSegmentBase SelectedModule => _modules.FirstOrDefault(m => m.IsSelected);
+        public SevenSegmentBase? SelectedModule => _modules.FirstOrDefault(m => m.IsSelected);
 
         //events
         public event Action<double> IncrementChanged = delegate { };
