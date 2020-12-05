@@ -181,7 +181,7 @@
         <Ellipse 
             x:Name="Pixel_25"
             Grid.Row="4"
-            Grid.Column="5"
+            Grid.Column="4"
             Fill="{Binding LedFill, FallbackValue=Red}"
             Margin="2.5" />
         <Ellipse 
