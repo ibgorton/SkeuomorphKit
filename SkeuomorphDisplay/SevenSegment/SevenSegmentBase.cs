@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Windows;
 using System.Windows.Media;
+using static SkeuomorphCommon.MapUtils;
 
 namespace DigitalNumericUpdown
 {

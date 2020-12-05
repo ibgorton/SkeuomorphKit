@@ -6,7 +6,7 @@ namespace DigitalNumericUpdown
 {
     public abstract class DisplayControlBase : UserControl
     {
-        protected readonly object _changeValueLock = new object();
+        protected readonly object _changeValueLock = new();
         public double IncrementFactor { get; set; }
         public DisplayControlBase()
         {

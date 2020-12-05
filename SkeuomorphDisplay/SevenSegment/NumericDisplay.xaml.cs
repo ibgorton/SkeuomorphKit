@@ -15,10 +15,10 @@ namespace DigitalNumericUpdown
     public partial class NumericDisplay : UserControl
     {
         //private
-        private readonly BitArray _decimals = new BitArray(new bool[10]);
-        private readonly BitArray _digits = new BitArray(new bool[10]);
+        private readonly BitArray _decimals = new(new bool[10]);
+        private readonly BitArray _digits = new(new bool[10]);
         private bool _bool_ShowSelector;
-        private readonly List<SevenSegmentBase> _modules = new List<SevenSegmentBase>();
+        private readonly List<SevenSegmentBase> _modules = new();
         private int _integerCount;
         private double _maximum = 9999999999.9999999999;
         private double _minimum = -999999999.0;

@@ -12,7 +12,7 @@ namespace DigitalDemo
     public partial class MainWindow : Window
     {
         //private
-        private readonly Stopwatch _sw = new Stopwatch();
+        private readonly Stopwatch _sw = new();
 
         /// <summary>
         /// Class constructor

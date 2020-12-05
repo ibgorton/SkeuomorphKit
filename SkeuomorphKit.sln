@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkeuomorphDemo", "Skeuomorp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkeuomorphDisplay", "SkeuomorphDisplay\SkeuomorphDisplay.csproj", "{EDE53AD2-BB26-44B5-8FAA-61B41B99ED7B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkeuomorphCommon", "SkeuomorphCommon\SkeuomorphCommon.csproj", "{1DA29E44-FFB1-4C6C-8E74-243C408E7499}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{EDE53AD2-BB26-44B5-8FAA-61B41B99ED7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDE53AD2-BB26-44B5-8FAA-61B41B99ED7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDE53AD2-BB26-44B5-8FAA-61B41B99ED7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DA29E44-FFB1-4C6C-8E74-243C408E7499}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DA29E44-FFB1-4C6C-8E74-243C408E7499}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DA29E44-FFB1-4C6C-8E74-243C408E7499}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DA29E44-FFB1-4C6C-8E74-243C408E7499}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
