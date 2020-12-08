@@ -164,13 +164,13 @@ namespace DigitalNumericUpdown
             set => SetValue(LedColorProperty, value);
         }
 
-        private static readonly DependencyProperty ChangeableProperty =
+        public static readonly DependencyProperty ChangeableProperty =
                 DependencyProperty.Register(
                 "ChangeableProperty", typeof(bool),
                 typeof(DisplayControlBase),
                 new UIPropertyMetadata(true));
 
-        protected bool Changeable
+        public bool Changeable
         {
             get => (bool)GetValue(ChangeableProperty);
             set => SetValue(ChangeableProperty, value);

@@ -93,7 +93,7 @@
                 Opacity="{Binding ShowDecimalPoint, Converter={StaticResource SegmentConverter}}">
                 <Path.LayoutTransform>
                     <TransformGroup>
-                        <SkewTransform AngleX="{Binding DecimalDisplayAngle, FallbackValue=0}" />
+                        <SkewTransform AngleX="{Binding DecimalDisplayAngle, FallbackValue=-8}" />
                     </TransformGroup>
                 </Path.LayoutTransform>
             </Path>

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Media;
-using static SkeuomorphCommon.MapUtils;
+using static SkeuomorphCommon.SevenMap;
 
 namespace DigitalNumericUpdown
 {
@@ -20,18 +21,27 @@ namespace DigitalNumericUpdown
     *      | F |        | H |
     *      | I |        | R |
     *      | V |        | E |
-    *      | E |________| E |
-    *       \_/   FOUR   \_/    /--\ <- DECIMAL POINT
+    *      | E |________| E |    __
+    *       \_/   FOUR   \_/    /  \ <- DECIMAL POINT
     *         \__________/      \__/
     */
 
     public abstract class SevenSegmentBase : DisplayControlBase
     {
+        private BitArray _bits = new(7);
+
         public SevenSegmentBase() : base() { }
+        
         public double DecimalDisplayAngle
         {
             get => (double)GetValue(DecimalDisplayAngleProperty);
             set => SetValue(DecimalDisplayAngleProperty, value);
+        }
+
+        public double DisplayAngle
+        {
+            get => (double)GetValue(SegmentDisplayAngleProperty);
+            set => SetValue(SegmentDisplayAngleProperty, value);
         }
 
         protected static readonly DependencyProperty BackgroundFillProperty =
@@ -125,7 +135,7 @@ namespace DigitalNumericUpdown
         {
             lock (_changeValueLock)
             {
-                BitArray bits = c.SevenSegmentBits();
+                BitArray bits = c.GetBitsSeven();
                 Segment1On = bits[0];
                 Segment2On = bits[1];
                 Segment3On = bits[2];
@@ -135,6 +145,7 @@ namespace DigitalNumericUpdown
                 Segment7On = bits[6];
             }
         }
+
 
         public override void BlankModule()
         {
