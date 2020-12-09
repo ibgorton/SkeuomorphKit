@@ -12,32 +12,16 @@ namespace DigitalNumericUpdown
         {
             Loaded += (o, e) =>
             {
-                switch (LedColor)
+                LedFill = LedColor switch
                 {
-                    case LedColorType.Lime:
-                        LedFill = Colors.Lime.CreateLEDBrush((int)Brightness);
-                        break;
-
-                    case LedColorType.Red:
-                        LedFill = Colors.Red.CreateLEDBrush((int)Brightness);
-                        break;
-
-                    case LedColorType.Blue:
-                        LedFill = Colors.Blue.CreateLEDBrush((int)Brightness);
-                        break;
-
-                    case LedColorType.Orange:
-                        LedFill = Colors.Orange.CreateLEDBrush((int)Brightness);
-                        break;
-
-                    case LedColorType.Yellow:
-                        LedFill = Colors.Yellow.CreateLEDBrush((int)Brightness);
-                        break;
-
-                    case LedColorType.Purple:
-                        LedFill = Colors.Purple.CreateLEDBrush((int)Brightness);
-                        break;
-                }
+                    LedColorType.Lime => Colors.Lime.CreateLEDBrush(brightness: (int)Brightness),
+                    LedColorType.Red => Colors.Red.CreateLEDBrush(brightness: (int)Brightness),
+                    LedColorType.Blue => Colors.Blue.CreateLEDBrush(brightness: (int)Brightness),
+                    LedColorType.Orange => Colors.Orange.CreateLEDBrush(brightness: (int)Brightness),
+                    LedColorType.Yellow => Colors.Yellow.CreateLEDBrush(brightness: (int)Brightness),
+                    LedColorType.Purple => Colors.Purple.CreateLEDBrush(brightness: (int)Brightness),
+                    _ => Colors.Lime.CreateLEDBrush(brightness: (int)Brightness),
+                };
             };
         }
 
@@ -51,43 +35,44 @@ namespace DigitalNumericUpdown
 
         protected static readonly DependencyProperty PressedProperty =
                 DependencyProperty.Register(
-                "Pressed", typeof(bool),
-                typeof(DisplayControlBase),
-                new UIPropertyMetadata(false));
+                    name: "Pressed", propertyType: typeof(bool),
+                    ownerType: typeof(DisplayControlBase),
+                    typeMetadata: new PropertyMetadata(defaultValue: false));
 
         public static readonly DependencyProperty IsSelectedProperty =
                 DependencyProperty.Register(
-                "IsSelected", typeof(bool),
-                typeof(DisplayControlBase),
-                new UIPropertyMetadata(true));
+                    name: "IsSelected", 
+                    propertyType: typeof(bool), 
+                    ownerType: typeof(DisplayControlBase), 
+                    typeMetadata: new PropertyMetadata(defaultValue: true));
 
         public bool IsSelected
         {
-            get => (bool)GetValue(IsSelectedProperty);
-            set => SetValue(IsSelectedProperty, value);
+            get => (bool)GetValue(dp: IsSelectedProperty);
+            set => SetValue(dp: IsSelectedProperty, value: value);
         }
 
         protected bool Pressed
         {
-            get => (bool)GetValue(PressedProperty);
+            get => (bool)GetValue(dp: PressedProperty);
             set
             {
-                SetValue(PressedProperty, value);
+                SetValue(dp: PressedProperty, value: value);
                 DisplayScale = value ? 0.99 : 1.0;
             }
         }
 
         protected double DisplayScale
         {
-            get => (double)GetValue(DisplayScaleProperty);
-            set => SetValue(DisplayScaleProperty, value);
+            get => (double)GetValue(dp: DisplayScaleProperty);
+            set => SetValue(dp: DisplayScaleProperty, value: value);
         }
 
         protected static readonly DependencyProperty DisplayScaleProperty =
                 DependencyProperty.Register(
-                "DisplayScale", typeof(double),
-                typeof(DisplayControlBase),
-                new UIPropertyMetadata(1.0));
+                name: "DisplayScale", propertyType: typeof(double),
+                ownerType: typeof(DisplayControlBase),
+                typeMetadata: new PropertyMetadata(defaultValue: 1.0));
 
         protected enum BrightnessType
         {
@@ -131,49 +116,52 @@ namespace DigitalNumericUpdown
 
         private static readonly DependencyProperty LedFillProperty =
                 DependencyProperty.Register(
-                "LedFill", typeof(Brush),
-                typeof(DisplayControlBase),
-                new UIPropertyMetadata(Brushes.Lime));
+                name: "LedFill", propertyType: typeof(Brush),
+                ownerType: typeof(DisplayControlBase),
+                typeMetadata: new PropertyMetadata(defaultValue: Brushes.Lime));
 
         public Brush LedFill
         {
-            get => (Brush)GetValue(LedFillProperty);
-            set => SetValue(LedFillProperty, value);
+            get => (Brush)GetValue(dp: LedFillProperty);
+            set => SetValue(dp: LedFillProperty, value: value);
         }
 
         private static readonly DependencyProperty BrightnessProperty =
                 DependencyProperty.Register(
-                "Brightness", typeof(BrightnessType),
-                typeof(DisplayControlBase),
-                new UIPropertyMetadata(BrightnessType.Positive2));
+                    name: "Brightness", 
+                    propertyType: typeof(BrightnessType), 
+                    ownerType: typeof(DisplayControlBase), 
+                    typeMetadata: new PropertyMetadata(defaultValue: BrightnessType.Positive2));
 
         private BrightnessType Brightness
         {
-            get => (BrightnessType)GetValue(BrightnessProperty);
-            set => SetValue(BrightnessProperty, value);
+            get => (BrightnessType)GetValue(dp: BrightnessProperty);
+            set => SetValue(dp: BrightnessProperty, value: value);
         }
 
         protected static readonly DependencyProperty LedColorProperty =
                 DependencyProperty.Register(
-                "LedColor", typeof(LedColorType),
-                typeof(DisplayControlBase));
+                name: "LedColor", propertyType: typeof(LedColorType),
+                ownerType: typeof(DisplayControlBase),
+                typeMetadata: new PropertyMetadata(defaultValue: LedColorType.Lime));
 
         public LedColorType LedColor
         {
-            get => (LedColorType)GetValue(LedColorProperty);
-            set => SetValue(LedColorProperty, value);
+            get => (LedColorType)GetValue(dp: LedColorProperty);
+            set => SetValue(dp: LedColorProperty, value: value);
         }
 
         public static readonly DependencyProperty ChangeableProperty =
                 DependencyProperty.Register(
-                "ChangeableProperty", typeof(bool),
-                typeof(DisplayControlBase),
-                new UIPropertyMetadata(true));
+                    name: "ChangeableProperty", 
+                    propertyType: typeof(bool), 
+                    ownerType: typeof(DisplayControlBase), 
+                    typeMetadata: new PropertyMetadata(defaultValue: true));
 
         public bool Changeable
         {
-            get => (bool)GetValue(ChangeableProperty);
-            set => SetValue(ChangeableProperty, value);
+            get => (bool)GetValue(dp: ChangeableProperty);
+            set => SetValue(dp: ChangeableProperty, value: value);
         }
     }
 }

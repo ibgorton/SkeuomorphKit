@@ -7,7 +7,7 @@ namespace DigitalNumericUpdown
     /// <summary>
     /// Interaction logic for SevenSegmentModule.xaml
     /// </summary>
-    public partial class SevenSegmentLED : SevenSegmentBase
+    public sealed partial class SevenSegmentLED : SevenSegmentBase
     {
         /// <summary>
         /// Class constructor
@@ -15,7 +15,7 @@ namespace DigitalNumericUpdown
         public SevenSegmentLED() : base()
         {
             InitializeComponent();
-            if (DesignerProperties.GetIsInDesignMode(this))
+            if (DesignerProperties.GetIsInDesignMode(element: this))
             {
                 return;
             }
@@ -113,10 +113,12 @@ namespace DigitalNumericUpdown
                 BottomPressed = false;
                 if (_currentValue != null)
                 {
-                    Byte.TryParse(_currentValue.ToString(), out byte b);
-                    if (b > 0)
+                    if (Byte.TryParse(_currentValue.ToString(), out byte b))
                     {
-                        //SetDigit((byte)(b - 1));
+                        if (b > 0)
+                        {
+                            //SetDigit((byte)(b - 1));
+                        }
                     }
                 }
             }
@@ -162,10 +164,12 @@ namespace DigitalNumericUpdown
                 TopPressed = false;
                 if (_currentValue != null)
                 {
-                    Byte.TryParse(_currentValue.ToString(), out byte b);
-                    if (b < 9)
+                    if (Byte.TryParse(_currentValue.ToString(), out byte b))
                     {
-                        //SetDigit((byte)(b + 1));
+                        if (b < 9)
+                        {
+                            //SetDigit((byte)(b + 1));
+                        }
                     }
                 }
             }

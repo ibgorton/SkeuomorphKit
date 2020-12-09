@@ -101,7 +101,7 @@ namespace SkeuomorphCommon
             { '}', new BitArray(values: new int[] { 10785 }) { Length = 16 } }
         };
 
-        public static BitArray GetBitsSixteen(this char c) => SixteenBits.ContainsKey(c) ? SixteenBits[c] : new BitArray(16);
+        public static BitArray GetBitsSixteen(this char c) => SixteenBits.ContainsKey(key: c) ? SixteenBits[key: c] : new BitArray(length: 16);
     }
     public static class SevenMap
     {
@@ -132,7 +132,7 @@ namespace SkeuomorphCommon
             { 'o', new BitArray(bytes: new byte[] { 92 }) { Length = 7 } }
         };
 
-        public static BitArray GetBitsSeven(this char c) => SevenBits.ContainsKey(c) ? SevenBits[c] : new BitArray(7);
+        public static BitArray GetBitsSeven(this char c) => SevenBits.ContainsKey(key: c) ? SevenBits[key: c] : new BitArray(7);
 
     }
 }
