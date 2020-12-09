@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay
 {
     public abstract class DisplayControlBase : UserControl
     {

@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using static SkeuomorphCommon.SevenMap;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay.SevenSegment
 {
     /*     SEGMENT NUMBERING
     * 

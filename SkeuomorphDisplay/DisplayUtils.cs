@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Media;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay
 {
     static class DisplayUtils
     {

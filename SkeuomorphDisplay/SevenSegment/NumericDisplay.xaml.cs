@@ -7,7 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay.SevenSegment
 {
     /// <summary>
     /// Interaction logic for UserControl1.xaml

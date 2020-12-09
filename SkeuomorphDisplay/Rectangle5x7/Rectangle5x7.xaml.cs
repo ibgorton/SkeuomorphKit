@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay.Rectangle5x7
 {
     /// <summary>
     /// Interaction logic for Rectangle5x7.xaml

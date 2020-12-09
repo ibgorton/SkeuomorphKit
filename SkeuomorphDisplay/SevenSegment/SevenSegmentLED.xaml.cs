@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Windows.Media;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay.SevenSegment
 {
     /// <summary>
     /// Interaction logic for SevenSegmentModule.xaml

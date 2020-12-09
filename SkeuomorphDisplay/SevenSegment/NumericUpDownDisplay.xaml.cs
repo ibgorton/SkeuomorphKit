@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay.SevenSegment
 {
     /// <summary>
     /// Interaction logic for NumericUpDownDisplay.xaml

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay.SixteenSegment
 {
     public class SixteenSegmentLCD : SixteenSegmentBase
     {

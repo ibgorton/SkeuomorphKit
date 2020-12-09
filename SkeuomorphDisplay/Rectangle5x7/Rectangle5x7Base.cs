@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay.Rectangle5x7
 {
     /*
      * 

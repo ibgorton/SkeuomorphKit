@@ -2,19 +2,19 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay
 {
-    public class TouchOpacityConverter : IValueConverter
+    public class PressedConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if ((bool)value)
             {
                 {
-                    return 0.5;
+                    return 0.99;
                 }
             }
-            return 0d;
+            return 1d;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

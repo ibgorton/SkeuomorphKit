@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay
 {
     /// <summary>
     /// Interaction logic for Clock.xaml

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay.SixteenSegment
 {
     /*              SEGMENT NUMBERING
     *         _____________   _____________

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DigitalNumericUpdown
+namespace SkeuomorphDisplay.Rectangle5x7
 {
     public sealed partial class Rectangle5x7LED : Rectangle5x7Base
     {
