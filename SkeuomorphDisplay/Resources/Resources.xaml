@@ -1,78 +1,82 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:p="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options" 
+
     xmlns:local="clr-namespace:SkeuomorphDisplay">
     <local:SegmentOpacityConverter x:Key="SegmentConverter" />
     <local:TouchOpacityConverter x:Key="TouchConverter" />
     <local:SelectedOpacityConverter x:Key="SelectedConverter" />
+    <local:InverseDoubleConverter x:Key="DoubleConverter"/>
     <BooleanToVisibilityConverter x:Key="VisibleIfTrueConverter" />
+    
     <PathFigure
         x:Key="HorizontalSegment"
         IsClosed="True"
         StartPoint="0,11">
-        <LineSegment Point="9.5,1" />
-        <LineSegment Point="11.5,0" />
-        <LineSegment Point="84.5,0" />
-        <LineSegment Point="87.5,1" />
-        <LineSegment Point="97,11" />
-        <LineSegment Point="97,14" />
-        <LineSegment Point="87.5,24" />
-        <LineSegment Point="84.5,25" />
-        <LineSegment Point="11.5,25" />
-        <LineSegment Point="9.5,24" />
-        <LineSegment Point="0,14" />
+        <LineSegment Point="9.5,1" p:Freeze="True"/>
+        <LineSegment Point="11.5,0" p:Freeze="True"/>
+        <LineSegment Point="84.5,0" p:Freeze="True"/>
+        <LineSegment Point="87.5,1" p:Freeze="True" />
+        <LineSegment Point="97,11" p:Freeze="True"/>
+        <LineSegment Point="97,14" p:Freeze="True"/>
+        <LineSegment Point="87.5,24" p:Freeze="True"/>
+        <LineSegment Point="84.5,25" p:Freeze="True"/>
+        <LineSegment Point="11.5,25" p:Freeze="True"/>
+        <LineSegment Point="9.5,24" p:Freeze="True"/>
+        <LineSegment Point="0,14" p:Freeze="True"/>
     </PathFigure>
     <PathFigure
         x:Key="VerticalSegment"
         IsClosed="True"
         StartPoint="14,0">
-        <LineSegment Point="11,0" />
-        <LineSegment Point="0,11" />
-        <LineSegment Point="0,86" />
-        <LineSegment Point="11,97" />
-        <LineSegment Point="14,97" />
-        <LineSegment Point="25,86" />
-        <LineSegment Point="25,11" />
+        <LineSegment Point="11,0" p:Freeze="True"/>
+        <LineSegment Point="0,11" p:Freeze="True"/>
+        <LineSegment Point="0,86" p:Freeze="True"/>
+        <LineSegment Point="11,97" p:Freeze="True"/>
+        <LineSegment Point="14,97" p:Freeze="True"/>
+        <LineSegment Point="25,86" p:Freeze="True"/>
+        <LineSegment Point="25,11" p:Freeze="True"/>
     </PathFigure>
-    <PathGeometry x:Key="Segment1">
+    <PathGeometry x:Key="Segment1" p:Freeze="True" >
         <PathGeometry.Transform>
-            <TranslateTransform X="22" Y="5" />
+            <TranslateTransform X="22" Y="5" p:Freeze="True" />
         </PathGeometry.Transform>
         <StaticResource ResourceKey="HorizontalSegment" />
     </PathGeometry>
-    <PathGeometry x:Key="Segment2">
+    <PathGeometry x:Key="Segment2" p:Freeze="True" >
         <PathGeometry.Transform>
-            <TranslateTransform X="111" Y="21" />
+            <TranslateTransform X="111" Y="21" p:Freeze="True" />
         </PathGeometry.Transform>
         <StaticResource ResourceKey="VerticalSegment" />
     </PathGeometry>
-    <PathGeometry x:Key="Segment3">
+    <PathGeometry x:Key="Segment3" p:Freeze="True" >
         <PathGeometry.Transform>
-            <TranslateTransform X="111" Y="125" />
+            <TranslateTransform X="111" Y="125" p:Freeze="True" />
         </PathGeometry.Transform>
         <StaticResource ResourceKey="VerticalSegment" />
     </PathGeometry>
-    <PathGeometry x:Key="Segment4">
+    <PathGeometry x:Key="Segment4" p:Freeze="True" >
         <PathGeometry.Transform>
-            <TranslateTransform X="22" Y="213" />
+            <TranslateTransform X="22" Y="213" p:Freeze="True" />
         </PathGeometry.Transform>
         <StaticResource ResourceKey="HorizontalSegment" />
     </PathGeometry>
-    <PathGeometry x:Key="Segment6">
+    <PathGeometry x:Key="Segment6" p:Freeze="True" >
         <PathGeometry.Transform>
-            <TranslateTransform X="5" Y="21" />
+            <TranslateTransform X="5" Y="21" p:Freeze="True" />
         </PathGeometry.Transform>
         <StaticResource ResourceKey="VerticalSegment" />
     </PathGeometry>
-    <PathGeometry x:Key="Segment5">
+    <PathGeometry x:Key="Segment5" p:Freeze="True" >
         <PathGeometry.Transform>
-            <TranslateTransform X="5" Y="125" />
+            <TranslateTransform X="5" Y="125" p:Freeze="True" />
         </PathGeometry.Transform>
         <StaticResource ResourceKey="VerticalSegment" />
     </PathGeometry>
-    <PathGeometry x:Key="Segment7">
+    <PathGeometry x:Key="Segment7" p:Freeze="True" >
         <PathGeometry.Transform>
-            <TranslateTransform X="22" Y="109" />
+            <TranslateTransform X="22" Y="109" p:Freeze="True" />
         </PathGeometry.Transform>
         <StaticResource ResourceKey="HorizontalSegment" />
     </PathGeometry>
@@ -80,30 +84,36 @@
         x:Key="DecimalPoint"
         Center="115.5,225"
         RadiusX="12.5"
-        RadiusY="12.5">
+        RadiusY="12.5" p:Freeze="True" >
         <EllipseGeometry.Transform>
-            <SkewTransform AngleX="{Binding DecimalDisplayAngle, FallbackValue=8}" />
+            <SkewTransform AngleX="{Binding DisplayAngle, Converter={StaticResource DoubleConverter}, FallbackValue=8}" p:Freeze="True" />
         </EllipseGeometry.Transform>
     </EllipseGeometry>
     <DropShadowEffect
         x:Key="SegmentDropShadow"
+        p:Freeze="True" 
         BlurRadius="12"
         ShadowDepth="3" />
-    <RectangleGeometry x:Key="TouchSquare" />
-    <CombinedGeometry x:Key="SegmentGeometry" GeometryCombineMode="Xor">
+    <RectangleGeometry x:Key="TouchSquare" p:Freeze="True" />
+    <CombinedGeometry x:Key="SegmentGeometry" GeometryCombineMode="Xor" p:Freeze="True" >
         <CombinedGeometry.Geometry1>
-            <RectangleGeometry Rect="0,0,160,245" />
+            <RectangleGeometry Rect="0,0,160,245" p:Freeze="True">
+            </RectangleGeometry>
         </CombinedGeometry.Geometry1>
         <CombinedGeometry.Geometry2>
-            <GeometryGroup>
-                <StaticResource ResourceKey="Segment1" />
-                <StaticResource ResourceKey="Segment2" />
-                <StaticResource ResourceKey="Segment3" />
-                <StaticResource ResourceKey="Segment4" />
-                <StaticResource ResourceKey="Segment5" />
-                <StaticResource ResourceKey="Segment6" />
-                <StaticResource ResourceKey="Segment7" />
-                <StaticResource ResourceKey="DecimalPoint" />
+            <GeometryGroup p:Freeze="True" >
+                <GeometryGroup p:Freeze="True" >
+                    <StaticResource ResourceKey="Segment1" />
+                    <StaticResource ResourceKey="Segment2" />
+                    <StaticResource ResourceKey="Segment3" />
+                    <StaticResource ResourceKey="Segment4" />
+                    <StaticResource ResourceKey="Segment5" />
+                    <StaticResource ResourceKey="Segment6" />
+                    <StaticResource ResourceKey="Segment7" />
+                </GeometryGroup>
+                <GeometryGroup>
+                    <StaticResource ResourceKey="DecimalPoint" />
+                </GeometryGroup>
             </GeometryGroup>
         </CombinedGeometry.Geometry2>
     </CombinedGeometry>

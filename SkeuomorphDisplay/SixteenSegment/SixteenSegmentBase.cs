@@ -48,14 +48,5 @@ namespace SkeuomorphDisplay.SixteenSegment
             throw new NotImplementedException();
         }
 
-        public override void Increment()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Decrement()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

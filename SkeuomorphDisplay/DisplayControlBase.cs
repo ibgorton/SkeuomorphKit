@@ -8,43 +8,42 @@ namespace SkeuomorphDisplay
     {
         protected readonly object _changeValueLock = new();
         public double IncrementFactor { get; set; }
+
         public DisplayControlBase()
         {
-            Loaded += (o, e) =>
-            {
-                LedFill = LedColor switch
-                {
-                    LedColorType.Lime => Colors.Lime.CreateLEDBrush(brightness: (int)Brightness),
-                    LedColorType.Red => Colors.Red.CreateLEDBrush(brightness: (int)Brightness),
-                    LedColorType.Blue => Colors.Blue.CreateLEDBrush(brightness: (int)Brightness),
-                    LedColorType.Orange => Colors.Orange.CreateLEDBrush(brightness: (int)Brightness),
-                    LedColorType.Yellow => Colors.Yellow.CreateLEDBrush(brightness: (int)Brightness),
-                    LedColorType.Purple => Colors.Purple.CreateLEDBrush(brightness: (int)Brightness),
-                    _ => Colors.Lime.CreateLEDBrush(brightness: (int)Brightness),
-                };
-            };
+            Loaded += (o, e) => SetColorBrightness();
         }
 
-        public abstract void Increment();
-
-        public abstract void Decrement();
+        public void SetColorBrightness()
+        {
+            LedFill = LedColor switch
+            {
+                LedColorType.Lime => Colors.Lime.CreateLEDBrush(brightness: (int)Brightness),
+                LedColorType.Red => Colors.Red.CreateLEDBrush(brightness: (int)Brightness),
+                LedColorType.Blue => Colors.Blue.CreateLEDBrush(brightness: (int)Brightness),
+                LedColorType.Orange => Colors.Orange.CreateLEDBrush(brightness: (int)Brightness),
+                LedColorType.Yellow => Colors.Yellow.CreateLEDBrush(brightness: (int)Brightness),
+                LedColorType.Purple => Colors.Purple.CreateLEDBrush(brightness: (int)Brightness),
+                _ => Colors.Lime.CreateLEDBrush(brightness: (int)Brightness),
+            };
+        }
 
         public abstract void BlankModule();
 
         public abstract void SetChar(char character);
 
         protected static readonly DependencyProperty PressedProperty =
-                DependencyProperty.Register(
-                    name: "Pressed", propertyType: typeof(bool),
-                    ownerType: typeof(DisplayControlBase),
-                    typeMetadata: new PropertyMetadata(defaultValue: false));
+            DependencyProperty.Register(
+                name: "Pressed", propertyType: typeof(bool),
+                ownerType: typeof(DisplayControlBase),
+                typeMetadata: new PropertyMetadata(defaultValue: false));
 
         public static readonly DependencyProperty IsSelectedProperty =
-                DependencyProperty.Register(
-                    name: "IsSelected", 
-                    propertyType: typeof(bool), 
-                    ownerType: typeof(DisplayControlBase), 
-                    typeMetadata: new PropertyMetadata(defaultValue: true));
+            DependencyProperty.Register(
+                name: "IsSelected", 
+                propertyType: typeof(bool), 
+                ownerType: typeof(DisplayControlBase), 
+                typeMetadata: new PropertyMetadata(defaultValue: true));
 
         public bool IsSelected
         {
@@ -69,7 +68,7 @@ namespace SkeuomorphDisplay
         }
 
         protected static readonly DependencyProperty DisplayScaleProperty =
-                DependencyProperty.Register(
+            DependencyProperty.Register(
                 name: "DisplayScale", propertyType: typeof(double),
                 ownerType: typeof(DisplayControlBase),
                 typeMetadata: new PropertyMetadata(defaultValue: 1.0));
@@ -115,7 +114,7 @@ namespace SkeuomorphDisplay
 
 
         private static readonly DependencyProperty LedFillProperty =
-                DependencyProperty.Register(
+            DependencyProperty.Register(
                 name: "LedFill", propertyType: typeof(Brush),
                 ownerType: typeof(DisplayControlBase),
                 typeMetadata: new PropertyMetadata(defaultValue: Brushes.Lime));
@@ -127,11 +126,11 @@ namespace SkeuomorphDisplay
         }
 
         private static readonly DependencyProperty BrightnessProperty =
-                DependencyProperty.Register(
-                    name: "Brightness", 
-                    propertyType: typeof(BrightnessType), 
-                    ownerType: typeof(DisplayControlBase), 
-                    typeMetadata: new PropertyMetadata(defaultValue: BrightnessType.Positive2));
+            DependencyProperty.Register(
+                name: "Brightness", 
+                propertyType: typeof(BrightnessType), 
+                ownerType: typeof(DisplayControlBase), 
+                typeMetadata: new PropertyMetadata(defaultValue: BrightnessType.Positive2));
 
         private BrightnessType Brightness
         {
@@ -140,7 +139,7 @@ namespace SkeuomorphDisplay
         }
 
         protected static readonly DependencyProperty LedColorProperty =
-                DependencyProperty.Register(
+            DependencyProperty.Register(
                 name: "LedColor", propertyType: typeof(LedColorType),
                 ownerType: typeof(DisplayControlBase),
                 typeMetadata: new PropertyMetadata(defaultValue: LedColorType.Lime));
@@ -152,11 +151,11 @@ namespace SkeuomorphDisplay
         }
 
         public static readonly DependencyProperty ChangeableProperty =
-                DependencyProperty.Register(
-                    name: "ChangeableProperty", 
-                    propertyType: typeof(bool), 
-                    ownerType: typeof(DisplayControlBase), 
-                    typeMetadata: new PropertyMetadata(defaultValue: true));
+            DependencyProperty.Register(
+                name: "ChangeableProperty", 
+                propertyType: typeof(bool), 
+                ownerType: typeof(DisplayControlBase), 
+                typeMetadata: new PropertyMetadata(defaultValue: true));
 
         public bool Changeable
         {

@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SkeuomorphDisplay.SevenSegment"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:p="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options" 
     Background="Black"
     DataContext="{Binding RelativeSource={RelativeSource Self}}"
     SnapsToDevicePixels="False"
@@ -24,38 +25,38 @@
             VerticalAlignment="Center">
             <Canvas.LayoutTransform>
                 <TransformGroup>
-                    <SkewTransform AngleX="{Binding DisplayAngle, FallbackValue=-8.0}" />
-                    <ScaleTransform ScaleX="{Binding DisplayScale, FallbackValue=2.0}" ScaleY="{Binding DisplayScale, FallbackValue=2.0}" />
+                    <SkewTransform AngleX="{Binding DisplayAngle, FallbackValue=-8.0}" p:Freeze="True" />
+                    <ScaleTransform ScaleX="{Binding DisplayScale, FallbackValue=2.0}" ScaleY="{Binding DisplayScale, FallbackValue=2.0}" p:Freeze="True" />
                 </TransformGroup>
             </Canvas.LayoutTransform>
             <Path
                 Data="{StaticResource ResourceKey=Segment1}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Red}"
                 Opacity="{Binding Segment1On, Converter={StaticResource SegmentConverter}}" />
             <Path
                 Data="{StaticResource ResourceKey=Segment2}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Red}"
                 Opacity="{Binding Segment2On, Converter={StaticResource SegmentConverter}}" />
             <Path
                 Data="{StaticResource ResourceKey=Segment3}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Red}"
                 Opacity="{Binding Segment3On, Converter={StaticResource SegmentConverter}}" />
             <Path
                 Data="{StaticResource ResourceKey=Segment4}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Red}"
                 Opacity="{Binding Segment4On, Converter={StaticResource SegmentConverter}}" />
             <Path
                 Data="{StaticResource ResourceKey=Segment5}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Red}"
                 Opacity="{Binding Segment5On, Converter={StaticResource SegmentConverter}}" />
             <Path
                 Data="{StaticResource ResourceKey=Segment6}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Red}"
                 Opacity="{Binding Segment6On, Converter={StaticResource SegmentConverter}}" />
             <Path
                 x:Name="_segmentSeven"
                 Data="{StaticResource ResourceKey=Segment7}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Red}"
                 Opacity="{Binding Segment7On, Converter={StaticResource SegmentConverter}}" />
             <Rectangle
                 x:Name="_topTouch"
@@ -63,7 +64,7 @@
                 Height="73"
                 Margin="33,33,0,0"
                 Panel.ZIndex="2"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Red}"
                 Opacity="{Binding TopPressed, Converter={StaticResource TouchConverter}, FallbackValue=0.15}"
                 RadiusX="4"
                 RadiusY="4"
@@ -74,7 +75,7 @@
                 Height="73"
                 Margin="33,138,0,0"
                 Panel.ZIndex="2"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Red}"
                 Opacity="{Binding BottomPressed, Converter={StaticResource TouchConverter}, FallbackValue=0.15}"
                 RadiusX="4"
                 RadiusY="4"
@@ -82,11 +83,8 @@
             <Path
                 x:Name="_Ellipse_DecimalPlace"
                 Data="{StaticResource ResourceKey=DecimalPoint}"
-                Fill="{Binding LedFill, FallbackValue=Lime}"
+                Fill="{Binding LedFill, FallbackValue=Red}"
                 Opacity="{Binding ShowDecimalPoint, Converter={StaticResource SegmentConverter}}">
-                <Path.LayoutTransform>
-                    <SkewTransform AngleX="{Binding DecimalDisplayAngle, FallbackValue=0}" />
-                </Path.LayoutTransform>
             </Path>
             <Path
                 x:Name="_segmentMask"

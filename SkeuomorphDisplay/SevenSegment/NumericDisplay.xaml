@@ -36,7 +36,7 @@
                                       LedColor="Orange"
                                       IncrementFactor="10.0" />
             <local:SevenSegmentLED x:Name="_Module_1" 
-                                      LedColor="Blue"
+                                      LedColor="Lime"
                                       ShowDecimalPoint="True"
                                       IncrementFactor="1.0" />
             <local:SevenSegmentLED x:Name="_Module_0" IncrementFactor="0.1" />

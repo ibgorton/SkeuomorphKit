@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SkeuomorphDisplay.Rectangle5x7
 {
@@ -23,16 +21,6 @@ namespace SkeuomorphDisplay.Rectangle5x7
         }
 
         public override void BlankModule()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Decrement()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Increment()
         {
             throw new NotImplementedException();
         }

@@ -175,14 +175,5 @@ namespace SkeuomorphDisplay.SevenSegment
             }
         }
 
-        public override void Decrement()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Increment()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
