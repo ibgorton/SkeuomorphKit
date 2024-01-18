@@ -21,26 +21,20 @@ namespace SkeuomorphDisplay.SevenSegment
         public NumericUpDownDisplay()
         {
             InitializeComponent();
-            if (DesignerProperties.GetIsInDesignMode(this))
+            if (DesignerProperties.GetIsInDesignMode(element: this))
                 return;
 
             _value = 0.0;
             _NumericDisplay.ShowSelector = true;
-            _NumericDisplay.IncrementChanged += _NumericDisplay_IncrementChanged;
+            _NumericDisplay.IncrementChanged += NumericDisplay_IncrementChanged;
         }
 
         public event Action<double> ValueChanged = delegate { };
-        
-        public void SetDecimals(byte value)
-        {
-            _NumericDisplay.SetNumberDecimals(value);
-        }
 
-        public void SetDigits(byte value)
-        {
-            _NumericDisplay.SetNumberDigits(value);
-        }
-        
+        public void SetDecimals(byte value) => _NumericDisplay.SetNumberDecimals(value: value);
+
+        public void SetDigits(byte value) => _NumericDisplay.SetNumberDigits(value: value);
+
         public double Increment
         {
             get => _increment;
@@ -76,16 +70,13 @@ namespace SkeuomorphDisplay.SevenSegment
 
         public void SetValue(double value)
         {
-            value = TrimToMaxMin(value);
-            EnableUpdownButtons(value);
+            value = TrimToMaxMin(value: value);
+            EnableUpdownButtons(value: value);
             _NumericDisplay.Input = _value = value;
-            ValueChanged?.Invoke(value);
+            ValueChanged?.Invoke(obj: value);
         }
-        
-        private void _NumericDisplay_IncrementChanged(double e)
-        {
-            Increment = e;
-        }
+
+        private void NumericDisplay_IncrementChanged(double e) => Increment = e;
 
         private void Button_IncrementDown_Click(object sender, RoutedEventArgs e)
         {
@@ -95,30 +86,30 @@ namespace SkeuomorphDisplay.SevenSegment
                 //if (_NumericDisplay.SelectedModule?.CurrentValue == 1)
                 //    _NumericDisplay.DropDecimalPosition();
             }
-            SetValue(_value - _increment);
+            SetValue(value: _value - _increment);
         }
 
         private void Button_IncrementUp_Click(object sender, RoutedEventArgs e)
         {
-            SetValue(_value + _increment);
+            SetValue(value: _value + _increment);
         }
 
         private void EnableUpdownButtons(double value)
         {
-            if ((Math.Abs(value - Maximum) < double.Epsilon) && Math.Abs(value) > double.Epsilon)
+            if ((Math.Abs(value: value - Maximum) < double.Epsilon) && Math.Abs(value: value) > double.Epsilon)
             {
                 _Button_IncrementUp.IsEnabled = false;
-                _PathUp.Stroke = _PathUp.Fill = (SolidColorBrush)new BrushConverter().ConvertFrom("#073642");
+                _PathUp.Stroke = _PathUp.Fill = (SolidColorBrush)new BrushConverter().ConvertFrom(value: "#073642");
             }
             else
             {
                 _Button_IncrementUp.IsEnabled = true;
             }
 
-            if (Math.Abs(value - Minimum) < double.Epsilon)
+            if (Math.Abs(value: value - Minimum) < double.Epsilon)
             {
                 _Button_IncrementDown.IsEnabled = false;
-                _PathDown.Stroke = _PathDown.Fill = (SolidColorBrush)new BrushConverter().ConvertFrom("#073642");
+                _PathDown.Stroke = _PathDown.Fill = (SolidColorBrush)new BrushConverter().ConvertFrom(value: "#073642");
             }
             else
             {

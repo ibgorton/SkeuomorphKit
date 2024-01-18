@@ -12,8 +12,8 @@ namespace SkeuomorphDisplay
         {
             RadialGradientBrush gradient = new()
             {
-                GradientOrigin = new Point(0.5, 0.5),
-                Center = new Point(0.5, 0.5)
+                GradientOrigin = new Point(x: 0.5, y: 0.5),
+                Center = new Point(x: 0.5, y: 0.5)
             };
 
             GradientStop highlight = new();
@@ -21,7 +21,7 @@ namespace SkeuomorphDisplay
             
             if (brightness > 0)
             {
-                highlight.Color = ChangeColorBrightness(color, brightness / 10d);
+                highlight.Color = ChangeColorBrightness(color: color, correctionFactor: brightness / 10d);
                 highlight.Offset = 0.0;
 
                 primary.Color = color;
@@ -33,10 +33,10 @@ namespace SkeuomorphDisplay
             }
             else if (brightness < 0)
             {
-                highlight.Color = primary.Color = ChangeColorBrightness(color, brightness / 10d);
+                highlight.Color = primary.Color = ChangeColorBrightness(color: color, correctionFactor: brightness / 10d);
             }
-            gradient.GradientStops.Add(highlight);
-            gradient.GradientStops.Add(primary);
+            gradient.GradientStops.Add(value: highlight);
+            gradient.GradientStops.Add(value: primary);
             return gradient;
         }
 
@@ -68,7 +68,7 @@ namespace SkeuomorphDisplay
                 green = (255 - green) * correctionFactor + green;
                 blue = (255 - blue) * correctionFactor + blue;
             }
-            return Color.FromArgb(color.A, Convert.ToByte(red), Convert.ToByte(green), Convert.ToByte(blue));
+            return Color.FromArgb(a: color.A, r: Convert.ToByte(value: red), g: Convert.ToByte(value: green), b: Convert.ToByte(value: blue));
         }
     }
 }

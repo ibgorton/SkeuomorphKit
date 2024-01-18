@@ -168,6 +168,8 @@
                     Background="DarkSlateGray" 
                     Style="{DynamicResource ButtonStyle1}"/>
         </StackPanel>
-        <SkeuomorphDisplay1:Clock HorizontalAlignment="Center"/>
+        <SkeuomorphDisplay1:Clock 
+           
+            HorizontalAlignment="Center"/>
     </StackPanel>
 </Window>

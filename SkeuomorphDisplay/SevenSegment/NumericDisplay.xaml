@@ -9,7 +9,7 @@
     mc:Ignorable="d"
     Background="Black"
     >
-    <Grid Height="96">
+    <Grid Height="48">
         <UniformGrid
             x:Name="_StackPanel"
             Rows="1"
@@ -39,7 +39,7 @@
                                       LedColor="Lime"
                                       ShowDecimalPoint="True"
                                       IncrementFactor="1.0" />
-            <local:SevenSegmentLED x:Name="_Module_0" IncrementFactor="0.1" />
+            <local:SevenSegmentLED x:Name="_Module_0" IncrementFactor="0.1" LedColor="Blue"/>
             <local:SevenSegmentLED x:Name="_Module_01" IncrementFactor="0.01" />
             <local:SevenSegmentLED x:Name="_Module_001" IncrementFactor="0.001" />
             <local:SevenSegmentLED x:Name="_Module_0001" IncrementFactor="0.0001" />

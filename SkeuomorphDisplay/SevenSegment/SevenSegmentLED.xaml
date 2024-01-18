@@ -91,7 +91,7 @@
                 Panel.ZIndex="1"
                 Data="{StaticResource ResourceKey=SegmentGeometry}"
                 Effect="{StaticResource ResourceKey=SegmentDropShadow}"
-                Fill="Black" />
+                Fill="{Binding MaskFill, FallbackValue=Black}" />
         </Canvas>
     </Viewbox>
 </local:SevenSegmentBase>

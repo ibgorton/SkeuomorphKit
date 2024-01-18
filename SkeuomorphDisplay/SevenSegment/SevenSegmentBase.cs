@@ -37,17 +37,17 @@ namespace SkeuomorphDisplay.SevenSegment
 
         public double DecimalDisplayAngle
         {
-            get => (double)GetValue(DecimalDisplayAngleProperty);
-            set => SetValue(DecimalDisplayAngleProperty, value);
+            get => (double)GetValue(dp: DecimalDisplayAngleProperty);
+            set => SetValue(dp: DecimalDisplayAngleProperty, value: value);
         }
 
         public double DisplayAngle
         {
-            get => (double)GetValue(SegmentDisplayAngleProperty);
-            set => SetValue(SegmentDisplayAngleProperty, value);
+            get => (double)GetValue(dp: SegmentDisplayAngleProperty);
+            set => SetValue(dp: SegmentDisplayAngleProperty, value: value);
         }
 
-        protected static readonly DependencyProperty BackgroundFillProperty =
+        protected static readonly DependencyProperty MaskFillProperty =
             DependencyProperty.Register(
             name: "BackgroundFill", propertyType: typeof(Brush),
             ownerType: typeof(SevenSegmentBase),

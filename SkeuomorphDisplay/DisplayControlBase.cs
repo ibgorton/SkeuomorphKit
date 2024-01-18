@@ -18,10 +18,10 @@ namespace SkeuomorphDisplay
         {
             LedFill = LedColor switch
             {
-                LedColorType.Lime => Colors.Lime.CreateLEDBrush(brightness: (int)Brightness),
+                LedColorType.Lime => Colors.LimeGreen.CreateLEDBrush(brightness: (int)Brightness),
                 LedColorType.Red => Colors.Red.CreateLEDBrush(brightness: (int)Brightness),
-                LedColorType.Blue => Colors.Blue.CreateLEDBrush(brightness: (int)Brightness),
-                LedColorType.Orange => Colors.Orange.CreateLEDBrush(brightness: (int)Brightness),
+                LedColorType.Blue => Colors.RoyalBlue.CreateLEDBrush(brightness: (int)Brightness),
+                LedColorType.Orange => Colors.DarkOrange.CreateLEDBrush(brightness: (int)Brightness),
                 LedColorType.Yellow => Colors.Yellow.CreateLEDBrush(brightness: (int)Brightness),
                 LedColorType.Purple => Colors.Purple.CreateLEDBrush(brightness: (int)Brightness),
                 _ => Colors.Lime.CreateLEDBrush(brightness: (int)Brightness),

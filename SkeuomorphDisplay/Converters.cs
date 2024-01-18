@@ -19,9 +19,9 @@ namespace SkeuomorphDisplay
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (targetType != typeof(double))
-                throw new InvalidOperationException("The target must be a double");
+                throw new InvalidOperationException(message: "The target must be a double");
 
-            var d = (double)value;
+            double d = (double)value;
             if (Equals(d, 0))
                 return 0;
             else

@@ -31,18 +31,18 @@ namespace SkeuomorphDisplay.SevenSegment
 
         public event Action<object> SelectionEvent = delegate { };
 
-        public Brush BackgroundFill
+        public Brush MaskFill
         {
-            get => (Brush)GetValue(BackgroundFillProperty);
-            set => SetValue(BackgroundFillProperty, value);
+            get => (Brush)GetValue(dp: MaskFillProperty);
+            set => SetValue(dp: MaskFillProperty, value: value);
         }
 
         public bool BottomPressed
         {
-            get => (bool)GetValue(BottomPressedProperty);
+            get => (bool)GetValue(dp: BottomPressedProperty);
             set
             {
-                SetValue(BottomPressedProperty, value);
+                SetValue(dp: BottomPressedProperty, value: value);
                 Pressed = value;
             }
         }
@@ -52,14 +52,14 @@ namespace SkeuomorphDisplay.SevenSegment
 
         public double SegmentDisplayAngle
         {
-            get => (double)GetValue(SegmentDisplayAngleProperty);
-            set => SetValue(SegmentDisplayAngleProperty, value);
+            get => (double)GetValue(dp: SegmentDisplayAngleProperty);
+            set => SetValue(dp: SegmentDisplayAngleProperty, value: value);
         }
 
         public bool ShowDecimalPoint
         {
-            get => (bool)GetValue(ShowDecimalPointProperty);
-            set => SetValue(ShowDecimalPointProperty, value);
+            get => (bool)GetValue(dp: ShowDecimalPointProperty);
+            set => SetValue(dp: ShowDecimalPointProperty, value: value);
         }
 
         public bool ShowDigitSelector
@@ -70,17 +70,17 @@ namespace SkeuomorphDisplay.SevenSegment
 
         public bool TopPressed
         {
-            get => (bool)GetValue(TopPressedProperty);
+            get => (bool)GetValue(dp: TopPressedProperty);
             set
             {
-                SetValue(TopPressedProperty, value);
+                SetValue(dp: TopPressedProperty, value: value);
                 Pressed = value;
             }
         }
 
         public void Select()
         {
-            SelectionEvent?.Invoke(this);
+            SelectionEvent?.Invoke(obj: this);
             IsSelected = true;
         }
         
@@ -113,7 +113,7 @@ namespace SkeuomorphDisplay.SevenSegment
                 BottomPressed = false;
                 if (_currentValue != null)
                 {
-                    if (Byte.TryParse(_currentValue.ToString(), out byte b))
+                    if (Byte.TryParse(s: _currentValue.ToString(), result: out byte b))
                     {
                         if (b > 0)
                         {
@@ -164,7 +164,7 @@ namespace SkeuomorphDisplay.SevenSegment
                 TopPressed = false;
                 if (_currentValue != null)
                 {
-                    if (Byte.TryParse(_currentValue.ToString(), out byte b))
+                    if (Byte.TryParse(s: _currentValue.ToString(), result: out byte b))
                     {
                         if (b < 9)
                         {

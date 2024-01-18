@@ -15,8 +15,8 @@ namespace SkeuomorphDisplay.SevenSegment
     public partial class NumericDisplay : UserControl
     {
         //private
-        private readonly BitArray _decimals = new(new bool[10]);
-        private readonly BitArray _digits = new(new bool[10]);
+        private readonly BitArray _decimals = new(values: new bool[10]);
+        private readonly BitArray _digits = new(values: new bool[10]);
         private bool _bool_ShowSelector;
         private readonly List<SevenSegmentBase> _modules = new();
         private int _integerCount;
@@ -25,7 +25,7 @@ namespace SkeuomorphDisplay.SevenSegment
 
         //public
         public int IntegerCount => _integerCount;
-        public SevenSegmentBase? SelectedModule => _modules.FirstOrDefault(m => m.IsSelected);
+        public SevenSegmentBase? SelectedModule => _modules.FirstOrDefault(predicate: m => m.IsSelected);
 
         //events
         public event Action<double> IncrementChanged = delegate { };
@@ -36,10 +36,10 @@ namespace SkeuomorphDisplay.SevenSegment
         public NumericDisplay()
         {
             InitializeComponent();
-            if (DesignerProperties.GetIsInDesignMode(this))
+            if (DesignerProperties.GetIsInDesignMode(element: this))
                 return;
 
-            _modules = LogicalTreeHelper.GetChildren(_StackPanel).OfType<SevenSegmentBase>().ToList();
+            _modules = LogicalTreeHelper.GetChildren(current: _StackPanel).OfType<SevenSegmentBase>().ToList();
             HookupSelectionEvents();
             ShowSelector = false;
         }
@@ -49,9 +49,9 @@ namespace SkeuomorphDisplay.SevenSegment
             value = Math.Min(value, (byte)10);
             //zero out the array
             for (int i = 0; i < _decimals.Count; i++)
-                _decimals[i] = false;
+                _decimals[index: i] = false;
             for (int i = 0; i < value; i++)
-                _decimals[i] = true;
+                _decimals[index: i] = true;
             SetDecimalsVisibility();
         }
 
@@ -61,9 +61,9 @@ namespace SkeuomorphDisplay.SevenSegment
             value = Math.Min(value, (byte)10);
             //zero out the array
             for (int i = 0; i < _digits.Count; i++)
-                _digits[i] = false;
+                _digits[index: i] = false;
             for (int i = 0; i < value; i++)
-                _digits[i] = true;
+                _digits[index: i] = true;
             SetDigitsVisibility();
         }
 
@@ -105,7 +105,7 @@ namespace SkeuomorphDisplay.SevenSegment
         internal void DropDecimalPosition()
         {
             int a = 10 - _integerCount;
-            if (_modules[a].IsSelected)
+            if (_modules[index: a].IsSelected)
             {
                 int b = Math.Min(a + 1, 9);
                 //_modules[b].Select();
@@ -128,7 +128,7 @@ namespace SkeuomorphDisplay.SevenSegment
             value = Math.Max(value, Minimum);
 
             long integerPart = (long)value;
-            double fractionalPart = Math.Round(value - integerPart, 10);
+            double fractionalPart = Math.Round(value: (value - integerPart), digits: 10);
 
             char[] integerChars = integerPart.ToString().ToCharArray().Reverse().ToArray();
             _integerCount = integerChars.Length;
@@ -137,32 +137,32 @@ namespace SkeuomorphDisplay.SevenSegment
             {
                 int p = 9 - i;
                 if (integerChars.Length > p)
-                    _modules[i].SetChar(integerChars[p]);
+                    _modules[index: i].SetChar(c: integerChars[p]);
             }
 
             if (fractionalPart > 0d)
             {
                 //remove the leading '0.'
-                string trimLeading = fractionalPart.ToString().Remove(0, 2);
+                string trimLeading = fractionalPart.ToString().Remove(startIndex: 0, count: 2);
                 char[] fractionChars = trimLeading.ToCharArray();
                 // Fill Decimal Values
                 for (int i = 10; i < 20; i++)
                 {
                     int p = i - 10;
                     if (fractionChars.Length > p)
-                        _modules[i].SetChar(fractionChars[p]);
+                        _modules[index: i].SetChar(c: fractionChars[p]);
                 }
             }
 
             // Blank unused digit locations
-            Modules.Take(10 - integerChars.Length).ToList().ForEach(m => m.BlankModule());
+            Modules.Take(count: 10 - integerChars.Length).ToList().ForEach(action: m => m.BlankModule());
         }
 
         private void SetDecimalsVisibility()
         {
             for (int i = 10; i < 20; i++)
             {
-                SetNumberModuleVisibility(_modules[i], _decimals[i - 10]);
+                SetNumberModuleVisibility(module: _modules[index: i], state: _decimals[index: i - 10]);
             }
         }
 
@@ -170,7 +170,7 @@ namespace SkeuomorphDisplay.SevenSegment
         {
             for (int i = 0; i < 10; i++)
             {
-                SetNumberModuleVisibility(_modules[i], _digits[9 - i]);
+                SetNumberModuleVisibility(module: _modules[index: i], state: _digits[index: 9 - i]);
             }
         }
 
@@ -181,11 +181,11 @@ namespace SkeuomorphDisplay.SevenSegment
 
         private void SevenSegmentDisplayModule_SelectionEvent(object sender)
         {
-            _modules.ForEach(m => m.IsSelected = false);
+            _modules.ForEach(action: m => m.IsSelected = false);
             if (sender is SevenSegmentLED s)
             {
                 s.IsSelected = true;
-                IncrementChanged?.Invoke(s.IncrementFactor);
+                IncrementChanged?.Invoke(obj: s.IncrementFactor);
             }
         }
     }
