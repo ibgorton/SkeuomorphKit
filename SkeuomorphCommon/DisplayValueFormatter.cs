@@ -35,7 +35,7 @@ namespace SkeuomorphCommon
             string fractionText = string.Empty;
             if (fractionalPart != 0d)
             {
-                fractionText = fractionalPart.ToString(CultureInfo.InvariantCulture);
+                fractionText = fractionalPart.ToString("0.###################", CultureInfo.InvariantCulture);
                 if (fractionText.Contains('.'))
                 {
                     fractionText = fractionText.Split('.')[1].TrimEnd('0');

@@ -29,6 +29,14 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
+    public void GetFractionDisplayChars_ForVerySmallFraction_DoesNotUseScientificNotation()
+    {
+        var result = DisplayValueFormatter.GetFractionDisplayChars(0.0000001234);
+
+        Assert.Equal(new[] { '0', '0', '0', '0', '0', '0', '1', '2', '3', '4' }, result);
+    }
+
+    [Fact]
     public void SevenMap_GetBitSeven_UnsupportedCharacter_BlanksSegmentArray()
     {
         bool[] bits = new bool[7];
