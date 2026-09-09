@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SkeuomorphCommon
 {
@@ -36,12 +35,15 @@ namespace SkeuomorphCommon
 
         public static void GetBitSeven(this bool[] t, char c)
         {
-            if (SevenBits.ContainsKey(key: c))
-            {
-                SevenBits[key: c].Reverse().ToArray().CopyTo(array: t, index: 0);
-                //SevenBits[key: c].CopyTo(array: t, index: 0);
-            }
-        }
+            if (t is null)
+                throw new ArgumentNullException(nameof(t));
 
+            Array.Clear(t, 0, t.Length);
+
+            if (!SevenBits.TryGetValue(c, out bool[] bits))
+                return;
+
+            Array.Copy(bits.Reverse().ToArray(), t, bits.Length);
+        }
     }
 }
