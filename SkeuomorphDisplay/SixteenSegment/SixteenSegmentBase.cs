@@ -40,12 +40,10 @@ namespace SkeuomorphDisplay.SixteenSegment
 
         public override void BlankModule()
         {
-            throw new NotImplementedException();
         }
 
         public override void SetChar(char character)
         {
-            throw new NotImplementedException();
         }
 
     }
