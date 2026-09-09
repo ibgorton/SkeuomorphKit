@@ -4,6 +4,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
+using SkeuomorphCommon;
+
 namespace SkeuomorphDisplay.SevenSegment
 {
     /// <summary>
@@ -101,27 +103,15 @@ namespace SkeuomorphDisplay.SevenSegment
             if (pathUp is null || pathDown is null)
                 return;
 
+            var buttonState = DisplayButtonState.FromValue(value, Minimum, Maximum);
             var disabledBrush = new BrushConverter().ConvertFromString("#073642") as SolidColorBrush ?? Brushes.DarkSlateGray;
+            var activeBrush = Brushes.Lime;
 
-            if ((Math.Abs(value: value - Maximum) < double.Epsilon) && Math.Abs(value: value) > double.Epsilon)
-            {
-                _Button_IncrementUp.IsEnabled = false;
-                pathUp.Stroke = pathUp.Fill = disabledBrush;
-            }
-            else
-            {
-                _Button_IncrementUp.IsEnabled = true;
-            }
+            _Button_IncrementUp.IsEnabled = !buttonState.UpDisabled;
+            pathUp.Stroke = pathUp.Fill = buttonState.UpDisabled ? disabledBrush : activeBrush;
 
-            if (Math.Abs(value: value - Minimum) < double.Epsilon)
-            {
-                _Button_IncrementDown.IsEnabled = false;
-                pathDown.Stroke = pathDown.Fill = disabledBrush;
-            }
-            else
-            {
-                _Button_IncrementDown.IsEnabled = true;
-            }
+            _Button_IncrementDown.IsEnabled = !buttonState.DownDisabled;
+            pathDown.Stroke = pathDown.Fill = buttonState.DownDisabled ? disabledBrush : activeBrush;
         }
         
         private double TrimToMaxMin(double value)

@@ -22,12 +22,10 @@ namespace SkeuomorphDisplay.Rectangle5x7
 
         public override void BlankModule()
         {
-            throw new NotImplementedException();
         }
 
         public override void SetChar(char character)
         {
-            throw new NotImplementedException();
         }
     }
 }

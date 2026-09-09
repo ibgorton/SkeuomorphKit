@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace SkeuomorphDisplay
 {
@@ -10,14 +12,21 @@ namespace SkeuomorphDisplay
     /// </summary>
     public partial class Clock : UserControl
     {
+        private readonly DispatcherTimer _timer = new()
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+
         public Clock()
         {
             InitializeComponent();
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
-            //_module_H.ShowColon();
-            //_module_M.ShowColon();
-            CompositionTarget.Rendering += SetTime;
+
+            _timer.Tick += SetTime;
+            Unloaded += (_, _) => _timer.Stop();
+            SetTime(this, EventArgs.Empty);
+            _timer.Start();
         }
 
         private void SetTime(object? sender, EventArgs e)

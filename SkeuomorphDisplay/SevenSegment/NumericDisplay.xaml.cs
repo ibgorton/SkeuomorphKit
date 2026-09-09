@@ -7,6 +7,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
+using SkeuomorphCommon;
+
 namespace SkeuomorphDisplay.SevenSegment
 {
     /// <summary>
@@ -127,35 +129,34 @@ namespace SkeuomorphDisplay.SevenSegment
             value = Math.Min(value, Maximum);
             value = Math.Max(value, Minimum);
 
-            long integerPart = (long)value;
-            double fractionalPart = Math.Round(value: (value - integerPart), digits: 10);
+            var (integerChars, fractionChars, negative) = DisplayValueFormatter.ParseDisplayParts(value);
+            var displayIntegerChars = negative ? new[] { '-' }.Concat(integerChars).ToArray() : integerChars;
 
-            char[] integerChars = integerPart.ToString().ToCharArray().Reverse().ToArray();
-            _integerCount = integerChars.Length;
-            // Fill Digit Values
-            for (int i = 0; i < 10; i++)
+            _integerCount = displayIntegerChars.Length - (negative ? 1 : 0);
+            ClearModules();
+
+            // Fill integer digits from the right-most available slot, leaving room for a leading sign.
+            int integerStart = 10 - displayIntegerChars.Length;
+            for (int i = 0; i < displayIntegerChars.Length; i++)
             {
-                int p = 9 - i;
-                if (integerChars.Length > p)
-                    _modules[index: i].SetChar(c: integerChars[p]);
+                int moduleIndex = integerStart + i;
+                if (moduleIndex >= 0 && moduleIndex < 10)
+                    _modules[moduleIndex].SetChar(displayIntegerChars[i]);
             }
 
-            if (fractionalPart > 0d)
+            int decimalStart = 10;
+            for (int i = 0; i < fractionChars.Length && i < 10; i++)
             {
-                //remove the leading '0.'
-                string trimLeading = fractionalPart.ToString().Remove(startIndex: 0, count: 2);
-                char[] fractionChars = trimLeading.ToCharArray();
-                // Fill Decimal Values
-                for (int i = 10; i < 20; i++)
-                {
-                    int p = i - 10;
-                    if (fractionChars.Length > p)
-                        _modules[index: i].SetChar(c: fractionChars[p]);
-                }
+                _modules[decimalStart + i].SetChar(fractionChars[i]);
             }
+        }
 
-            // Blank unused digit locations
-            Modules.Take(count: 10 - integerChars.Length).ToList().ForEach(action: m => m.BlankModule());
+        private void ClearModules()
+        {
+            foreach (var module in _modules)
+            {
+                module.BlankModule();
+            }
         }
 
         private void SetDecimalsVisibility()
