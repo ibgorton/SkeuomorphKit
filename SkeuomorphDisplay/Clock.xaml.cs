@@ -12,7 +12,10 @@ namespace SkeuomorphDisplay
     /// </summary>
     public partial class Clock : UserControl
     {
-        private readonly DispatcherTimer _timer;
+        private readonly DispatcherTimer _timer = new()
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
 
         public Clock()
         {
@@ -20,10 +23,6 @@ namespace SkeuomorphDisplay
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
 
-            _timer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(1)
-            };
             _timer.Tick += SetTime;
             Unloaded += (_, _) => _timer.Stop();
             SetTime(this, EventArgs.Empty);
