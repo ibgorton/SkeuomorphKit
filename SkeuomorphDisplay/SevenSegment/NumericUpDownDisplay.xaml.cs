@@ -96,10 +96,17 @@ namespace SkeuomorphDisplay.SevenSegment
 
         private void EnableUpdownButtons(double value)
         {
+            var pathUp = _PathUp;
+            var pathDown = _PathDown;
+            if (pathUp is null || pathDown is null)
+                return;
+
+            var disabledBrush = new BrushConverter().ConvertFromString("#073642") as SolidColorBrush ?? Brushes.DarkSlateGray;
+
             if ((Math.Abs(value: value - Maximum) < double.Epsilon) && Math.Abs(value: value) > double.Epsilon)
             {
                 _Button_IncrementUp.IsEnabled = false;
-                _PathUp.Stroke = _PathUp.Fill = (SolidColorBrush)new BrushConverter().ConvertFrom(value: "#073642");
+                pathUp.Stroke = pathUp.Fill = disabledBrush;
             }
             else
             {
@@ -109,7 +116,7 @@ namespace SkeuomorphDisplay.SevenSegment
             if (Math.Abs(value: value - Minimum) < double.Epsilon)
             {
                 _Button_IncrementDown.IsEnabled = false;
-                _PathDown.Stroke = _PathDown.Fill = (SolidColorBrush)new BrushConverter().ConvertFrom(value: "#073642");
+                pathDown.Stroke = pathDown.Fill = disabledBrush;
             }
             else
             {
