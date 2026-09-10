@@ -47,6 +47,60 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
+    public void GlyphLibrary_TryGetPattern_UsesSharedCanonicalMatrix()
+    {
+        var supported = GlyphLibrary.TryGetPattern('A', out var rows);
+
+        Assert.True(supported);
+        Assert.Equal(7, rows.Length);
+        Assert.Equal("01110", rows[0]);
+        Assert.Equal("10001", rows[1]);
+        Assert.Equal("11111", rows[3]);
+        Assert.Equal("10001", rows[6]);
+    }
+
+    [Fact]
+    public void RectangleMap_GetBitsRectangle_UsesSevenByFiveGlyphPattern()
+    {
+        var bits = 'A'.GetBitsRectangle();
+
+        Assert.Equal(35, bits.Length);
+        Assert.False(bits[0]);
+        Assert.True(bits[1]);
+        Assert.True(bits[2]);
+        Assert.True(bits[3]);
+        Assert.False(bits[4]);
+        Assert.True(bits[5]);
+        Assert.True(bits[10]);
+        Assert.True(bits[16]);
+        Assert.True(bits[19]);
+    }
+
+    [Fact]
+    public void SixteenMap_GetBitsSixteen_UsesSupportedGlyphPattern()
+    {
+        var bits = 'A'.GetBitsSixteen();
+
+        Assert.Equal(16, bits.Length);
+        Assert.True(bits[0]);
+        Assert.True(bits[1]);
+        Assert.True(bits[2]);
+        Assert.True(bits[3]);
+        Assert.False(bits[4]);
+        Assert.False(bits[5]);
+        Assert.True(bits[6]);
+        Assert.True(bits[7]);
+        Assert.False(bits[8]);
+        Assert.False(bits[9]);
+        Assert.False(bits[10]);
+        Assert.True(bits[11]);
+        Assert.False(bits[12]);
+        Assert.False(bits[13]);
+        Assert.False(bits[14]);
+        Assert.True(bits[15]);
+    }
+
+    [Fact]
     public void SevenMap_GetBitSeven_UnsupportedCharacter_BlanksSegmentArray()
     {
         bool[] bits = new bool[7];
