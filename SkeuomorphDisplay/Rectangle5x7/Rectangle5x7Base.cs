@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
+
+using SkeuomorphCommon;
 
 namespace SkeuomorphDisplay.Rectangle5x7
 {
@@ -21,147 +22,6 @@ namespace SkeuomorphDisplay.Rectangle5x7
         private const int SegmentCount = 35;
         private readonly bool[] _bits = new bool[SegmentCount];
 
-        private static readonly Dictionary<char, bool[]> CharacterMap = new()
-        {
-            { ' ', new bool[SegmentCount] },
-            { '-', new bool[SegmentCount] {
-                false,false,false,false,false,
-                false,false,false,false,false,
-                false,false,false,false,false,
-                false,false,false,false,false,
-                false,false,false,false,false,
-                false,false,false,false,false,
-                false,false,false,false,false } },
-            { '0', new bool[SegmentCount] {
-                true,true,true,true,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,true,true,true,true } },
-            { '1', new bool[SegmentCount] {
-                false,false,true,false,false,
-                false,true,true,false,false,
-                false,false,true,false,false,
-                false,false,true,false,false,
-                false,false,true,false,false,
-                false,false,true,false,false,
-                false,false,true,false,false } },
-            { '2', new bool[SegmentCount] {
-                true,true,true,true,true,
-                false,false,false,false,true,
-                false,false,false,true,false,
-                false,false,true,false,false,
-                false,true,false,false,false,
-                true,false,false,false,false,
-                true,true,true,true,true } },
-            { '3', new bool[SegmentCount] {
-                true,true,true,true,true,
-                false,false,false,false,true,
-                false,false,false,true,false,
-                false,false,true,true,true,
-                false,false,false,false,true,
-                false,false,false,false,true,
-                true,true,true,true,true } },
-            { '4', new bool[SegmentCount] {
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,true,true,true,true,
-                false,false,false,false,true,
-                false,false,false,false,true,
-                false,false,false,false,true } },
-            { '5', new bool[SegmentCount] {
-                true,true,true,true,true,
-                true,false,false,false,false,
-                true,true,true,true,true,
-                false,false,false,false,true,
-                false,false,false,false,true,
-                false,false,false,false,true,
-                true,true,true,true,true } },
-            { '6', new bool[SegmentCount] {
-                true,true,true,true,true,
-                true,false,false,false,false,
-                true,true,true,true,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,true,true,true,true } },
-            { '7', new bool[SegmentCount] {
-                true,true,true,true,true,
-                false,false,false,false,true,
-                false,false,false,true,false,
-                false,false,true,false,false,
-                false,true,false,false,false,
-                false,true,false,false,false,
-                false,true,false,false,false } },
-            { '8', new bool[SegmentCount] {
-                true,true,true,true,true,
-                true,false,false,false,true,
-                true,true,true,true,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,true,true,true,true } },
-            { '9', new bool[SegmentCount] {
-                true,true,true,true,true,
-                true,false,false,false,true,
-                true,true,true,true,true,
-                false,false,false,false,true,
-                false,false,false,false,true,
-                false,false,false,false,true,
-                true,true,true,true,true } },
-            { 'A', new bool[SegmentCount] {
-                true,true,true,true,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,true,true,true,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,false,false,false,true } },
-            { 'B', new bool[SegmentCount] {
-                true,true,true,true,true,
-                true,false,false,false,true,
-                true,true,true,true,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,true,true,true,true } },
-            { 'C', new bool[SegmentCount] {
-                true,true,true,true,true,
-                true,false,false,false,false,
-                true,false,false,false,false,
-                true,false,false,false,false,
-                true,false,false,false,false,
-                true,false,false,false,false,
-                true,true,true,true,true } },
-            { 'D', new bool[SegmentCount] {
-                true,true,true,true,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,false,false,false,true,
-                true,true,true,true,true } },
-            { 'E', new bool[SegmentCount] {
-                true,true,true,true,true,
-                true,false,false,false,false,
-                true,true,true,true,true,
-                true,false,false,false,false,
-                true,false,false,false,false,
-                true,false,false,false,false,
-                true,true,true,true,true } },
-            { 'F', new bool[SegmentCount] {
-                true,true,true,true,true,
-                true,false,false,false,false,
-                true,true,true,true,true,
-                true,false,false,false,false,
-                true,false,false,false,false,
-                true,false,false,false,false,
-                true,false,false,false,false } }
-        };
-
         public Rectangle5x7Base()
         {
         }
@@ -178,11 +38,7 @@ namespace SkeuomorphDisplay.Rectangle5x7
 
         public override void SetChar(char character)
         {
-            char normalized = char.ToUpperInvariant(character);
-            bool[] bits = CharacterMap.TryGetValue(normalized, out bool[]? mapped)
-                ? mapped ?? CharacterMap[' ']
-                : CharacterMap[' '];
-
+            bool[] bits = char.ToUpperInvariant(character).GetBitsRectangle();
             for (int i = 0; i < _bits.Length; i++)
             {
                 _bits[i] = bits[i];
