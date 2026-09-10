@@ -30,4 +30,22 @@ public class DisplayButtonStateTests
         Assert.False(state.UpDisabled);
         Assert.False(state.DownDisabled);
     }
+
+    [Fact]
+    public void FromValue_WhenAboveMaximum_UpButtonDisabled()
+    {
+        var state = DisplayButtonState.FromValue(11d, 0d, 10d);
+
+        Assert.True(state.UpDisabled);
+        Assert.False(state.DownDisabled);
+    }
+
+    [Fact]
+    public void FromValue_WhenBelowMinimum_DownButtonDisabled()
+    {
+        var state = DisplayButtonState.FromValue(-1d, 0d, 10d);
+
+        Assert.False(state.UpDisabled);
+        Assert.True(state.DownDisabled);
+    }
 }

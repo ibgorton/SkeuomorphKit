@@ -37,6 +37,16 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
+    public void ParseDisplayParts_ZeroValue_IsNotNegative()
+    {
+        var result = DisplayValueFormatter.ParseDisplayParts(-0d);
+
+        Assert.False(result.Negative);
+        Assert.Equal(new[] { '0' }, result.IntegerChars);
+        Assert.Empty(result.FractionChars);
+    }
+
+    [Fact]
     public void SevenMap_GetBitSeven_UnsupportedCharacter_BlanksSegmentArray()
     {
         bool[] bits = new bool[7];

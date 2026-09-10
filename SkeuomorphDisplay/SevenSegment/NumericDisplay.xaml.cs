@@ -16,9 +16,12 @@ namespace SkeuomorphDisplay.SevenSegment
     /// </summary>
     public partial class NumericDisplay : UserControl
     {
+        private const int DigitCapacity = 10;
+        private const int DecimalCapacity = 10;
+
         //private
-        private readonly BitArray _decimals = new(values: new bool[10]);
-        private readonly BitArray _digits = new(values: new bool[10]);
+        private readonly BitArray _decimals = new(values: new bool[DecimalCapacity]);
+        private readonly BitArray _digits = new(values: new bool[DigitCapacity]);
         private bool _bool_ShowSelector;
         private readonly List<SevenSegmentBase> _modules = new();
         private int _integerCount;
@@ -48,24 +51,21 @@ namespace SkeuomorphDisplay.SevenSegment
 
         public void SetNumberDecimals(byte value)
         {
-            value = Math.Min(value, (byte)10);
-            //zero out the array
+            value = Math.Min(value, (byte)DecimalCapacity);
             for (int i = 0; i < _decimals.Count; i++)
-                _decimals[index: i] = false;
+                _decimals[i] = false;
             for (int i = 0; i < value; i++)
-                _decimals[index: i] = true;
+                _decimals[i] = true;
             SetDecimalsVisibility();
         }
 
-
         public void SetNumberDigits(byte value)
         {
-            value = Math.Min(value, (byte)10);
-            //zero out the array
+            value = Math.Min(value, (byte)DigitCapacity);
             for (int i = 0; i < _digits.Count; i++)
-                _digits[index: i] = false;
+                _digits[i] = false;
             for (int i = 0; i < value; i++)
-                _digits[index: i] = true;
+                _digits[i] = true;
             SetDigitsVisibility();
         }
 
@@ -106,10 +106,10 @@ namespace SkeuomorphDisplay.SevenSegment
 
         internal void DropDecimalPosition()
         {
-            int a = 10 - _integerCount;
-            if (_modules[index: a].IsSelected)
+            int a = DigitCapacity - _integerCount;
+            if (_modules[a].IsSelected)
             {
-                int b = Math.Min(a + 1, 9);
+                int b = Math.Min(a + 1, DigitCapacity - 1);
                 //_modules[b].Select();
             }
         }
@@ -135,19 +135,23 @@ namespace SkeuomorphDisplay.SevenSegment
             _integerCount = displayIntegerChars.Length - (negative ? 1 : 0);
             ClearModules();
 
-            // Fill integer digits from the right-most available slot, leaving room for a leading sign.
-            int integerStart = 10 - displayIntegerChars.Length;
-            for (int i = 0; i < displayIntegerChars.Length; i++)
-            {
-                int moduleIndex = integerStart + i;
-                if (moduleIndex >= 0 && moduleIndex < 10)
-                    _modules[moduleIndex].SetChar(displayIntegerChars[i]);
-            }
+            int integerStart = DigitCapacity - displayIntegerChars.Length;
+            SetModuleChars(integerStart, displayIntegerChars);
 
-            int decimalStart = 10;
-            for (int i = 0; i < fractionChars.Length && i < 10; i++)
+            int decimalStart = DigitCapacity;
+            SetModuleChars(decimalStart, fractionChars, DecimalCapacity);
+        }
+
+        private void SetModuleChars(int startIndex, char[] chars, int maxCount = DigitCapacity)
+        {
+            int bounds = Math.Min(chars.Length, maxCount);
+            for (int i = 0; i < bounds; i++)
             {
-                _modules[decimalStart + i].SetChar(fractionChars[i]);
+                int moduleIndex = startIndex + i;
+                if (moduleIndex >= 0 && moduleIndex < _modules.Count)
+                {
+                    _modules[moduleIndex].SetChar(chars[i]);
+                }
             }
         }
 
@@ -161,17 +165,17 @@ namespace SkeuomorphDisplay.SevenSegment
 
         private void SetDecimalsVisibility()
         {
-            for (int i = 10; i < 20; i++)
+            for (int i = DigitCapacity; i < DigitCapacity + DecimalCapacity; i++)
             {
-                SetNumberModuleVisibility(module: _modules[index: i], state: _decimals[index: i - 10]);
+                SetNumberModuleVisibility(module: _modules[i], state: _decimals[i - DigitCapacity]);
             }
         }
 
         private void SetDigitsVisibility()
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < DigitCapacity; i++)
             {
-                SetNumberModuleVisibility(module: _modules[index: i], state: _digits[index: 9 - i]);
+                SetNumberModuleVisibility(module: _modules[i], state: _digits[DigitCapacity - 1 - i]);
             }
         }
 
