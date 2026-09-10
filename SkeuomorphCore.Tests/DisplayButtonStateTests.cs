@@ -1,6 +1,6 @@
-using SkeuomorphCommon;
+using SkeuomorphCore;
 
-namespace SkeuomorphCommon.Tests;
+namespace SkeuomorphCore.Tests;
 
 public class DisplayButtonStateTests
 {

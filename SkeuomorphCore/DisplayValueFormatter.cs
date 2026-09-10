@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 
-namespace SkeuomorphCommon
+namespace SkeuomorphCore
 {
     public static class DisplayValueFormatter
     {

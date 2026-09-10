@@ -1,6 +1,6 @@
 using System;
 
-namespace SkeuomorphCommon
+namespace SkeuomorphCore
 {
     public readonly record struct DisplayButtonState(bool UpDisabled, bool DownDisabled)
     {

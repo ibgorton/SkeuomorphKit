@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SkeuomorphCommon
+namespace SkeuomorphCore
 {
     public static class SevenMap
     {
@@ -34,6 +34,20 @@ namespace SkeuomorphCommon
             { 'r', new bool[SegmentCount] { true, false, true, false, false, false, false } },
             { 'o', new bool[SegmentCount] { true, false, true, true, true, false, false } }
         };
+
+        public static bool[] GetBitsSeven(this char c)
+        {
+            var result = new bool[SegmentCount];
+            if (!SevenBits.TryGetValue(c, out bool[] bits))
+                return result;
+
+            for (int i = 0; i < SegmentCount; i++)
+            {
+                result[i] = bits[i];
+            }
+
+            return result;
+        }
 
         public static void GetBitSeven(this bool[] t, char c)
         {

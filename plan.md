@@ -28,10 +28,15 @@ Reduce repeated allocations and improve maintainability in the shared display lo
 - Added cases for values below minimum and above maximum.
 
 ## Validation
-- `dotnet test SkeuomorphCommon.Tests/SkeuomorphCommon.Tests.csproj --nologo`
+- `dotnet test SkeuomorphCore.Tests/SkeuomorphCore.Tests.csproj --nologo`
 - `dotnet build SkeuomorphKit.sln --nologo`
 
 Both succeeded with 0 failing tests and 0 build errors.
+
+## Shared glyph library
+- Added a canonical `GlyphLibrary` in `SkeuomorphCore` so each display layout consumes the same glyph catalog rather than maintaining independent character tables.
+- `RectangleMap` now delegates to the shared matrix generator, while `SixteenMap` continues to translate the same supported glyph set into its device-specific segment pattern.
+- This keeps the code open for additional layouts such as 14-segment, 7-segment, or custom font families without duplicating the character definition set.
 
 ## Follow-up
 If we continue this effort later, the next likely performance work is to isolate more display logic from the WPF-specific control layer so the reusable display engine can be moved to a cross-platform host without extra UI churn.

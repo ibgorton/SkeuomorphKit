@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29609.76
@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkeuomorphDemo", "Skeuomorp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkeuomorphDisplay", "SkeuomorphDisplay\SkeuomorphDisplay.csproj", "{EDE53AD2-BB26-44B5-8FAA-61B41B99ED7B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkeuomorphCommon", "SkeuomorphCommon\SkeuomorphCommon.csproj", "{1DA29E44-FFB1-4C6C-8E74-243C408E7499}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkeuomorphCore", "SkeuomorphCore\SkeuomorphCore.csproj", "{1DA29E44-FFB1-4C6C-8E74-243C408E7499}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkeuomorphCommon.Tests", "SkeuomorphCommon.Tests\SkeuomorphCommon.Tests.csproj", "{45A8BAD6-1E7D-4A3C-A363-8F7A981EBC7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkeuomorphCore.Tests", "SkeuomorphCore.Tests\SkeuomorphCore.Tests.csproj", "{45A8BAD6-1E7D-4A3C-A363-8F7A981EBC7D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

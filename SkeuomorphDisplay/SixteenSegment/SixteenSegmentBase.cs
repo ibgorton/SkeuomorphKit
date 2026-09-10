@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Windows;
+
+using SkeuomorphCore;
 
 namespace SkeuomorphDisplay.SixteenSegment
 {
@@ -36,47 +37,19 @@ namespace SkeuomorphDisplay.SixteenSegment
 
     public abstract class SixteenSegmentBase : DisplayControlBase
     {
-        private const int SegmentCount = 16;
-        private readonly bool[] _bits = new bool[SegmentCount];
-
-        private static readonly Dictionary<char, bool[]> CharacterMap = new()
-        {
-            { ' ', new bool[SegmentCount] },
-            { '-', new bool[SegmentCount] { false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false } },
-            { '0', new bool[SegmentCount] { true, true, true, true, true, true, false, false, false, false, true, true, true, true, true, true } },
-            { '1', new bool[SegmentCount] { false, false, false, false, false, true, true, false, false, false, false, false, false, false, true, true } },
-            { '2', new bool[SegmentCount] { true, true, true, true, false, true, true, false, true, true, false, true, true, true, true, true } },
-            { '3', new bool[SegmentCount] { true, true, true, true, false, true, true, false, false, true, true, true, true, true, true, true } },
-            { '4', new bool[SegmentCount] { false, false, true, true, true, true, true, false, false, false, false, true, true, true, true, false } },
-            { '5', new bool[SegmentCount] { true, true, true, true, true, false, true, false, false, true, true, true, true, true, true, false } },
-            { '6', new bool[SegmentCount] { true, true, true, true, true, false, true, false, true, true, true, true, true, true, true, false } },
-            { '7', new bool[SegmentCount] { true, true, true, false, false, true, true, false, false, false, false, true, true, false, false, true } },
-            { '8', new bool[SegmentCount] { true, true, true, true, true, true, true, false, true, true, true, true, true, true, true, true } },
-            { '9', new bool[SegmentCount] { true, true, true, true, true, true, true, false, false, true, true, true, true, true, true, true } },
-            { 'A', new bool[SegmentCount] { true, true, true, true, true, true, true, false, true, true, true, true, true, true, true, true } },
-            { 'B', new bool[SegmentCount] { true, true, true, true, true, true, true, false, true, true, true, true, true, true, true, true } },
-            { 'C', new bool[SegmentCount] { true, true, true, true, true, false, false, false, true, true, true, true, true, false, false, true } },
-            { 'D', new bool[SegmentCount] { true, true, true, true, true, true, true, false, true, true, true, true, true, true, true, true } },
-            { 'E', new bool[SegmentCount] { true, true, true, true, true, false, true, false, true, true, true, true, true, false, true, true } },
-            { 'F', new bool[SegmentCount] { true, true, true, true, true, false, true, false, true, true, true, true, true, false, false, false } }
-        };
-
         protected SixteenSegmentBase()
         {
         }
 
         public override void BlankModule()
         {
-            var bits = new bool[SegmentCount];
+            var bits = new bool[16];
             ApplyBits(bits);
         }
 
         public override void SetChar(char character)
         {
-            char normalized = char.ToUpperInvariant(character);
-            bool[] bits = CharacterMap.TryGetValue(normalized, out bool[]? mapped)
-                ? mapped ?? CharacterMap[' ']
-                : CharacterMap[' '];
+            var bits = char.ToUpperInvariant(character).GetBitsSixteen();
             ApplyBits(bits);
         }
 
