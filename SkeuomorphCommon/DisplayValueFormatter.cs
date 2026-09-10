@@ -10,7 +10,9 @@ namespace SkeuomorphCommon
         {
             var (integerChars, _, negative) = ParseDisplayParts(value);
             if (negative)
+            {
                 return new[] { '-' }.Concat(integerChars).ToArray();
+            }
 
             return integerChars;
         }
@@ -24,22 +26,27 @@ namespace SkeuomorphCommon
         public static (char[] IntegerChars, char[] FractionChars, bool Negative) ParseDisplayParts(double value)
         {
             if (double.IsNaN(value) || double.IsInfinity(value))
+            {
                 return (Array.Empty<char>(), Array.Empty<char>(), false);
+            }
 
-            bool negative = value < 0;
-            double magnitude = Math.Abs(value);
-            long integerPart = (long)magnitude;
-            double fractionalPart = Math.Round(magnitude - integerPart, 10, MidpointRounding.AwayFromZero);
+            bool negative = value < 0d;
+            decimal magnitude = Convert.ToDecimal(Math.Abs(value));
+            decimal integerPart = decimal.Truncate(magnitude);
+            decimal fractionalPart = magnitude - integerPart;
 
-            string integerText = integerPart.ToString(CultureInfo.InvariantCulture);
+            string integerText = integerPart == 0m ? "0" : integerPart.ToString(CultureInfo.InvariantCulture);
             string fractionText = string.Empty;
-            if (fractionalPart != 0d)
+            if (fractionalPart != 0m)
             {
                 fractionText = fractionalPart.ToString("0.###################", CultureInfo.InvariantCulture);
-                if (fractionText.Contains('.'))
+                int decimalIndex = fractionText.IndexOf('.');
+                if (decimalIndex >= 0)
                 {
-                    fractionText = fractionText.Split('.')[1].TrimEnd('0');
+                    fractionText = fractionText[(decimalIndex + 1)..];
                 }
+
+                fractionText = fractionText.TrimEnd('0');
             }
 
             return (integerText.ToCharArray(), fractionText.ToCharArray(), negative);
