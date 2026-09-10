@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Windows;
 
-using SkeuomorphCommon;
+using SkeuomorphCore;
 
 namespace SkeuomorphDisplay.Rectangle5x7
 {

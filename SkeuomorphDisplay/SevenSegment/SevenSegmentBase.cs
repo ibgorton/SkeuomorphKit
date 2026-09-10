@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
-using static SkeuomorphCommon.SevenMap;
+using static SkeuomorphCore.SevenMap;
 
 namespace SkeuomorphDisplay.SevenSegment
 {
