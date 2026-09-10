@@ -27,5 +27,24 @@ namespace SkeuomorphDisplay
 
             _setters[segmentIndex](isOn);
         }
+
+        public void Apply(ReadOnlySpan<bool> values)
+        {
+            if (values.Length != _setters.Length)
+            {
+                throw new ArgumentException($"Expected {_setters.Length} values, received {values.Length}.", nameof(values));
+            }
+
+            for (var index = 0; index < values.Length; index++)
+            {
+                _setters[index](values[index]);
+            }
+        }
+
+        public void Apply(bool[] values)
+        {
+            ArgumentNullException.ThrowIfNull(values);
+            Apply(values.AsSpan());
+        }
     }
 }

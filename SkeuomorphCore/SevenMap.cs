@@ -38,15 +38,30 @@ namespace SkeuomorphCore
         public static bool[] GetBitsSeven(this char c)
         {
             var result = new bool[SegmentCount];
-            if (!SevenBits.TryGetValue(c, out bool[] bits))
-                return result;
+            GetBitsSeven(c, result);
+            return result;
+        }
 
-            for (int i = 0; i < SegmentCount; i++)
+        public static bool GetBitsSeven(char c, Span<bool> destination)
+        {
+            if (destination.Length < SegmentCount)
             {
-                result[i] = bits[i];
+                throw new ArgumentException($"Destination span must hold at least {SegmentCount} values.", nameof(destination));
             }
 
-            return result;
+            var matched = SevenBits.TryGetValue(c, out bool[] bits);
+            if (!matched)
+            {
+                destination.Clear();
+                return false;
+            }
+
+            for (var i = 0; i < SegmentCount; i++)
+            {
+                destination[i] = bits[i];
+            }
+
+            return true;
         }
 
         public static void GetBitSeven(this bool[] t, char c)
@@ -54,15 +69,7 @@ namespace SkeuomorphCore
             if (t is null)
                 throw new ArgumentNullException(nameof(t));
 
-            Array.Clear(t, 0, t.Length);
-
-            if (!SevenBits.TryGetValue(c, out bool[] bits))
-                return;
-
-            for (int i = 0; i < SegmentCount; i++)
-            {
-                t[i] = bits[i];
-            }
+            GetBitsSeven(c, t.AsSpan());
         }
     }
 }
