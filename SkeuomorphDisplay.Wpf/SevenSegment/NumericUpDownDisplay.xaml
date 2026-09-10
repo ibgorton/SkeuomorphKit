@@ -1,17 +1,14 @@
-﻿<Window
-    x:Class="DigitalDemo.MainWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:SkeuomorphDisplay="clr-namespace:SkeuomorphDisplay.Wpf.SevenSegment;assembly=SkeuomorphDisplay" xmlns:SkeuomorphDisplay1="clr-namespace:SkeuomorphDisplay.Wpf;assembly=SkeuomorphDisplay"
-    Title="Digital Numeric Display Demo"
-    Background="Black"
-    SizeToContent="WidthAndHeight"
+﻿<UserControl x:Class="SkeuomorphDisplay.Wpf.SevenSegment.NumericUpDownDisplay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SkeuomorphDisplay.Wpf.SevenSegment"
+            DataContext="{Binding
+        RelativeSource={RelativeSource Self}}"
     mc:Ignorable="d">
-    <Window.Resources>
+    <UserControl.Resources>
        
-
         <SolidColorBrush
             x:Key="BlackBrush"
             Color="Black" />
@@ -155,21 +152,61 @@
                 </Setter.Value>
             </Setter>
         </Style>
-    </Window.Resources>
-    <StackPanel>
-        <SkeuomorphDisplay:NumericUpDownDisplay x:Name="_upDown" />
-        <StackPanel Orientation="Horizontal">
-            <SkeuomorphDisplay:NumericDisplay x:Name="_numbers" />
-            <Button x:Name="_toggle" 
-                    Margin="8,0,0,0"
-                    Width="34" 
-                    Height="66" 
+    </UserControl.Resources>
+    <Grid
+        Background="Black"
+        >
+        <StackPanel 
+            Orientation="Horizontal">
+
+            <local:NumericDisplay
+                x:Name="_NumericDisplay"
+                Margin="0,0,0,0"
+                />
+
+            <StackPanel Margin="8,0,0,0" Orientation="Vertical">
+                <Button
+                    x:Name="_Button_IncrementUp"
+                    Background="DarkSlateGray"
                     BorderThickness="0"
-                    Background="DarkSlateGray" 
-                    Style="{DynamicResource ButtonStyle1}"/>
+                    Click="Button_IncrementUp_Click"
+                    Style="{DynamicResource ButtonStyle1}">
+                    <Viewbox
+                        Height="32"
+                        Width="32"
+                        Stretch="Fill">
+                        <Canvas
+                            Height="24"
+                            Width="24">
+                            <Path
+                                x:Name="_PathUp"
+                                Data="M7,15L12,10L17,15H7Z"
+                                Fill="Lime"
+                                 />
+                        </Canvas>
+                    </Viewbox>
+                </Button>
+                <Button
+                    x:Name="_Button_IncrementDown"
+                    Background="DarkSlateGray"
+                    BorderThickness="0"
+                    Click="Button_IncrementDown_Click"
+                    Style="{DynamicResource ButtonStyle1}">
+                    <Viewbox
+                        Height="32"
+                        Width="32">
+                        <Canvas
+                            Height="24"
+                            Width="24">
+                            <Path
+                                x:Name="_PathDown"
+                                Data="M7,10L12,15L17,10H7Z"
+                                Fill="Lime"
+                                 />
+                        </Canvas>
+                    </Viewbox>
+                </Button>
+            </StackPanel>
         </StackPanel>
-        <SkeuomorphDisplay1:Clock 
-           
-            HorizontalAlignment="Center"/>
-    </StackPanel>
-</Window>
+    </Grid>
+</UserControl>

@@ -1,14 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Nullable>enable</Nullable>
+    <AssemblyName>SkeuomorphDisplay</AssemblyName>
     <RootNamespace>SkeuomorphDisplay</RootNamespace>
-    <AssemblyName>SkeuomorphDisplay.Abstractions</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SkeuomorphCore\SkeuomorphCore.csproj" />
+    <ProjectReference Include="..\SkeuomorphDisplay\SkeuomorphDisplay.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SkeuomorphDisplay\SkeuomorphDisplay.csproj" />
+    <ProjectReference Include="..\SkeuomorphDisplay.Wpf\SkeuomorphDisplay.Wpf.csproj" />
   </ItemGroup>
 
 </Project>
