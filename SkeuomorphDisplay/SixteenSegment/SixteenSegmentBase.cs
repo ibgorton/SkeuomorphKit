@@ -37,32 +37,20 @@ namespace SkeuomorphDisplay.SixteenSegment
 
     public abstract class SixteenSegmentBase : DisplayControlBase
     {
-        private const int SegmentCount = 16;
-        private readonly bool[] _bits = new bool[SegmentCount];
-
         protected SixteenSegmentBase()
         {
         }
 
         public override void BlankModule()
         {
-            for (int i = 0; i < _bits.Length; i++)
-            {
-                _bits[i] = false;
-            }
-
-            ApplyBits(_bits);
+            var bits = new bool[16];
+            ApplyBits(bits);
         }
 
         public override void SetChar(char character)
         {
-            bool[] bits = char.ToUpperInvariant(character).GetBitsSixteen();
-            for (int i = 0; i < _bits.Length; i++)
-            {
-                _bits[i] = bits[i];
-            }
-
-            ApplyBits(_bits);
+            var bits = char.ToUpperInvariant(character).GetBitsSixteen();
+            ApplyBits(bits);
         }
 
         private void ApplyBits(bool[] source)

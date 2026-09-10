@@ -20,7 +20,6 @@ namespace SkeuomorphDisplay.Rectangle5x7
     public abstract class Rectangle5x7Base : DisplayControlBase
     {
         private const int SegmentCount = 35;
-        private readonly bool[] _bits = new bool[SegmentCount];
 
         public Rectangle5x7Base()
         {
@@ -28,23 +27,14 @@ namespace SkeuomorphDisplay.Rectangle5x7
 
         public override void BlankModule()
         {
-            for (int i = 0; i < _bits.Length; i++)
-            {
-                _bits[i] = false;
-            }
-
-            ApplyBits(_bits);
+            var bits = new bool[SegmentCount];
+            ApplyBits(bits);
         }
 
         public override void SetChar(char character)
         {
-            bool[] bits = char.ToUpperInvariant(character).GetBitsRectangle();
-            for (int i = 0; i < _bits.Length; i++)
-            {
-                _bits[i] = bits[i];
-            }
-
-            ApplyBits(_bits);
+            var bits = char.ToUpperInvariant(character).GetBitsRectangle();
+            ApplyBits(bits);
         }
 
         private void ApplyBits(bool[] source)

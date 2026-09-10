@@ -29,8 +29,6 @@ namespace SkeuomorphDisplay.SevenSegment
 
     public abstract class SevenSegmentBase : DisplayControlBase
     {
-        private readonly bool[] _bits = new bool[7];
-
         public SevenSegmentBase() : base()
         {
         }
@@ -140,14 +138,14 @@ namespace SkeuomorphDisplay.SevenSegment
         {
             lock (_changeValueLock)
             {
-                _bits.GetBitSeven(c: c);
-                Segment1On = _bits[0];
-                Segment2On = _bits[1];
-                Segment3On = _bits[2];
-                Segment4On = _bits[3];
-                Segment5On = _bits[4];
-                Segment6On = _bits[5];
-                Segment7On = _bits[6];
+                var bits = c.GetBitsSeven();
+                Segment1On = bits[0];
+                Segment2On = bits[1];
+                Segment3On = bits[2];
+                Segment4On = bits[3];
+                Segment5On = bits[4];
+                Segment6On = bits[5];
+                Segment7On = bits[6];
             }
         }
 
@@ -155,12 +153,12 @@ namespace SkeuomorphDisplay.SevenSegment
         {
             lock (_changeValueLock)
             {
-                Segment1On =
-                Segment2On =
-                Segment3On =
-                Segment4On =
-                Segment5On =
-                Segment6On =
+                Segment1On = false;
+                Segment2On = false;
+                Segment3On = false;
+                Segment4On = false;
+                Segment5On = false;
+                Segment6On = false;
                 Segment7On = false;
             }
         }
