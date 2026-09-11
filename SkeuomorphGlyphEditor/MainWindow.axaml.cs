@@ -22,12 +22,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        LayoutPicker.ItemsSource = new[]
-        {
-            "SevenSegment",
-            "Rectangle5x7",
-            "SixteenSegment"
-        };
+        LayoutPicker.ItemsSource = DisplayCharacterProfiles.AllNames;
         LayoutPicker.SelectedIndex = 1;
         CharacterInput.Text = "A";
         LayoutPicker.SelectionChanged += (_, _) => RefreshLayout();
@@ -47,19 +42,14 @@ public partial class MainWindow : Window
 
     private void RefreshLayout()
     {
-        var selected = LayoutPicker.SelectedItem as string ?? "Rectangle5x7";
-        _segmentCount = selected switch
-        {
-            "SevenSegment" => 7,
-            "Rectangle5x7" => 35,
-            "SixteenSegment" => 16,
-            _ => 35
-        };
+        var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
+        var profile = DisplayCharacterProfiles.Get(selected);
+        _segmentCount = profile.SegmentCount;
 
-        BuildSegmentGrid(selected);
-        BuildCharacterMap(selected);
+        BuildSegmentGrid(profile);
+        BuildCharacterMap(profile.Name);
         var inputText = CharacterInput.Text ?? string.Empty;
-        LoadCharacterIntoGrid(selected, inputText.Length > 0 ? inputText[0].ToString() : "A");
+        LoadCharacterIntoGrid(profile.Name, inputText.Length > 0 ? inputText[0].ToString() : "A");
         UpdateMaskText();
         UpdateSegmentLegend();
     }
@@ -101,13 +91,7 @@ public partial class MainWindow : Window
 
         foreach (var character in candidates)
         {
-            var supported = layout switch
-            {
-                "SevenSegment" => DisplayCharacterProfiles.IsSupportedForSevenSegment(character),
-                "Rectangle5x7" => DisplayCharacterProfiles.IsSupportedForRectangle5x7(character),
-                "SixteenSegment" => DisplayCharacterProfiles.IsSupportedForSixteenSegment(character),
-                _ => false
-            };
+            var supported = DisplayCharacterProfiles.IsSupported(layout, character);
 
             if (supported && !characters.Contains(character))
             {
@@ -118,7 +102,7 @@ public partial class MainWindow : Window
         return characters;
     }
 
-    private void BuildSegmentGrid(string layout)
+    private void BuildSegmentGrid(IDisplayProfile profile)
     {
         SegmentGrid.Children.Clear();
         SegmentGrid.RowDefinitions.Clear();
@@ -126,93 +110,97 @@ public partial class MainWindow : Window
 
         _segmentButtons.Clear();
 
-        if (layout == "SevenSegment")
+        switch (profile)
         {
-            var canvas = new Canvas
+            case SevenSegmentDisplayProfile:
             {
-                Width = 220,
-                Height = 240,
-                Background = Brushes.Black,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+                var canvas = new Canvas
+                {
+                    Width = 220,
+                    Height = 240,
+                    Background = Brushes.Black,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
 
-            var segments = new[]
-            {
-                new SegmentSpec(0, 60, 18, 80, 12, 0),
-                new SegmentSpec(1, 152, 52, 12, 80, 90),
-                new SegmentSpec(2, 152, 146, 12, 80, 90),
-                new SegmentSpec(3, 60, 214, 80, 12, 0),
-                new SegmentSpec(4, 24, 146, 12, 80, 90),
-                new SegmentSpec(5, 24, 52, 12, 80, 90),
-                new SegmentSpec(6, 60, 112, 80, 12, 0)
-            };
+                var segments = new[]
+                {
+                    new SegmentSpec(0, 60, 18, 80, 12, 0),
+                    new SegmentSpec(1, 152, 52, 12, 80, 90),
+                    new SegmentSpec(2, 152, 146, 12, 80, 90),
+                    new SegmentSpec(3, 60, 214, 80, 12, 0),
+                    new SegmentSpec(4, 24, 146, 12, 80, 90),
+                    new SegmentSpec(5, 24, 52, 12, 80, 90),
+                    new SegmentSpec(6, 60, 112, 80, 12, 0)
+                };
 
-            foreach (var segment in segments)
-            {
-                var button = CreateSegmentButton(segment.Index, segment.Width, segment.Height, segment.X, segment.Y, segment.Angle);
-                canvas.Children.Add(button);
-                _segmentButtons.Add(button);
+                foreach (var segment in segments)
+                {
+                    var button = CreateSegmentButton(segment.Index, segment.Width, segment.Height, segment.X, segment.Y, segment.Angle);
+                    canvas.Children.Add(button);
+                    _segmentButtons.Add(button);
+                }
+
+                SegmentGrid.Children.Add(canvas);
+                return;
             }
+            case SixteenSegmentDisplayProfile:
+            {
+                var canvas = new Canvas
+                {
+                    Width = 260,
+                    Height = 260,
+                    Background = Brushes.Black,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
 
-            SegmentGrid.Children.Add(canvas);
-            return;
+                // 3x3 anchor lattice: each segment must touch exactly two adjacent reference points.
+                var anchor = new[]
+                {
+                    new Point(70, 35), new Point(130, 35), new Point(190, 35),
+                    new Point(70, 130), new Point(130, 130), new Point(190, 130),
+                    new Point(70, 225), new Point(130, 225), new Point(190, 225)
+                };
+
+                // Keep the segment numbering aligned to the actual 16-seg lattice:
+                // 0..7 are the outer perimeter; 8..15 are the center-to-corner and center-cross segments.
+                var segments = new[]
+                {
+                    new SegmentSpec(0, anchor[0], anchor[1], 12),
+                    new SegmentSpec(1, anchor[1], anchor[2], 12),
+                    new SegmentSpec(2, anchor[2], anchor[5], 12),
+                    new SegmentSpec(3, anchor[5], anchor[8], 12),
+                    new SegmentSpec(4, anchor[7], anchor[8], 12),
+                    new SegmentSpec(5, anchor[6], anchor[7], 12),
+                    new SegmentSpec(6, anchor[3], anchor[6], 12),
+                    new SegmentSpec(7, anchor[0], anchor[3], 12),
+                    new SegmentSpec(8, anchor[0], anchor[4], 12),
+                    new SegmentSpec(9, anchor[1], anchor[4], 12),
+                    new SegmentSpec(10, anchor[4], anchor[2], 12),
+                    new SegmentSpec(11, anchor[4], anchor[5], 12),
+                    new SegmentSpec(12, anchor[4], anchor[8], 12),
+                    new SegmentSpec(13, anchor[7], anchor[4], 12),
+                    new SegmentSpec(14, anchor[6], anchor[4], 12),
+                    new SegmentSpec(15, anchor[3], anchor[4], 12)
+                };
+
+                foreach (var segment in segments)
+                {
+                    var button = CreateSegmentButton(segment);
+                    canvas.Children.Add(button);
+                    _segmentButtons.Add(button);
+                }
+
+                SegmentGrid.Children.Add(canvas);
+                return;
+            }
+            default:
+                break;
         }
 
-        if (layout == "SixteenSegment")
-        {
-            var canvas = new Canvas
-            {
-                Width = 260,
-                Height = 260,
-                Background = Brushes.Black,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            // 3x3 anchor lattice: each segment must touch exactly two adjacent reference points.
-            var anchor = new[]
-            {
-                new Point(70, 35), new Point(130, 35), new Point(190, 35),
-                new Point(70, 130), new Point(130, 130), new Point(190, 130),
-                new Point(70, 225), new Point(130, 225), new Point(190, 225)
-            };
-
-            // Keep the segment numbering aligned to the actual 16-seg lattice:
-            // 0..7 are the outer perimeter; 8..15 are the center-to-corner and center-cross segments.
-            var segments = new[]
-            {
-                new SegmentSpec(0, anchor[0], anchor[1], 12),
-                new SegmentSpec(1, anchor[1], anchor[2], 12),
-                new SegmentSpec(2, anchor[2], anchor[5], 12),
-                new SegmentSpec(3, anchor[5], anchor[8], 12),
-                new SegmentSpec(4, anchor[7], anchor[8], 12),
-                new SegmentSpec(5, anchor[6], anchor[7], 12),
-                new SegmentSpec(6, anchor[3], anchor[6], 12),
-                new SegmentSpec(7, anchor[0], anchor[3], 12),
-                new SegmentSpec(8, anchor[0], anchor[4], 12),
-                new SegmentSpec(9, anchor[1], anchor[4], 12),
-                new SegmentSpec(10, anchor[4], anchor[2], 12),
-                new SegmentSpec(11, anchor[4], anchor[5], 12),
-                new SegmentSpec(12, anchor[4], anchor[8], 12),
-                new SegmentSpec(13, anchor[7], anchor[4], 12),
-                new SegmentSpec(14, anchor[6], anchor[4], 12),
-                new SegmentSpec(15, anchor[3], anchor[4], 12)
-            };
-
-            foreach (var segment in segments)
-            {
-                var button = CreateSegmentButton(segment);
-                canvas.Children.Add(button);
-                _segmentButtons.Add(button);
-            }
-
-            SegmentGrid.Children.Add(canvas);
-            return;
-        }
-
-        var rows = 7;
-        var columns = 5;
+        var rows = profile.Height;
+        var columns = profile.Width;
 
         for (var x = 0; x < columns; x++)
         {
@@ -406,14 +394,9 @@ public partial class MainWindow : Window
 
     private void LoadCharacterIntoGrid(string layout, string rawText)
     {
+        var profile = DisplayCharacterProfiles.Get(layout);
         var character = rawText.Length > 0 ? rawText[0] : 'A';
-        var bits = layout switch
-        {
-            "SevenSegment" => SevenMap.GetBitsSeven(character),
-            "Rectangle5x7" => GlyphLibrary.GetMatrixBits(character),
-            "SixteenSegment" => SixteenMap.GetBitsSixteen(character),
-            _ => GlyphLibrary.GetMatrixBits(character)
-        };
+        var bits = profile.GetBits(character);
 
         for (var index = 0; index < _segmentButtons.Count; index++)
         {
@@ -436,23 +419,12 @@ public partial class MainWindow : Window
             }
         }
 
+        var profile = DisplayCharacterProfiles.Get(selected);
         var characterText = CharacterInput.Text ?? string.Empty;
         var character = characterText.Length > 0 ? characterText : "A";
         var text = character[0];
-        var width = selected switch
-        {
-            "SevenSegment" => 7,
-            "Rectangle5x7" => 5,
-            "SixteenSegment" => 4,
-            _ => 5
-        };
-        var height = selected switch
-        {
-            "SevenSegment" => 1,
-            "Rectangle5x7" => 7,
-            "SixteenSegment" => 4,
-            _ => 7
-        };
+        var width = profile.Width;
+        var height = profile.Height;
         var bits = string.Join(", ", GetCurrentBits().Select(v => v ? "true" : "false"));
 
         MaskValueText.Text = $"{text} :: mask = {mask} (0x{mask:X})";
@@ -515,7 +487,8 @@ public partial class MainWindow : Window
 
     private void SaveCurrentCharacter()
     {
-        var selected = LayoutPicker.SelectedItem as string ?? "Rectangle5x7";
+        var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
+        var profile = DisplayCharacterProfiles.Get(selected);
         var characterText = CharacterInput.Text ?? string.Empty;
         if (string.IsNullOrEmpty(characterText))
         {
@@ -523,30 +496,9 @@ public partial class MainWindow : Window
         }
 
         var character = characterText[0].ToString();
-
-        var mapName = selected switch
-        {
-            "SevenSegment" => "SevenSegmentMap",
-            "Rectangle5x7" => "Rectangle5x7Map",
-            "SixteenSegment" => "SixteenSegmentMap",
-            _ => "Rectangle5x7Map"
-        };
-
-        var width = selected switch
-        {
-            "SevenSegment" => 7,
-            "Rectangle5x7" => 5,
-            "SixteenSegment" => 4,
-            _ => 5
-        };
-
-        var height = selected switch
-        {
-            "SevenSegment" => 1,
-            "Rectangle5x7" => 7,
-            "SixteenSegment" => 4,
-            _ => 7
-        };
+        var mapName = profile.Name + "Map";
+        var width = profile.Width;
+        var height = profile.Height;
 
         var mask = 0UL;
         for (var index = 0; index < _segmentButtons.Count; index++)

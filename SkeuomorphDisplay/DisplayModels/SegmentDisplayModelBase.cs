@@ -20,13 +20,13 @@ namespace SkeuomorphDisplay
 
     public readonly record struct SegmentDisplayUpdate(int SegmentIndex, bool IsOn);
 
-    public abstract class SegmentDisplayModel : IDisplayControl
+    public abstract class SegmentDisplayModelBase : IDisplayControl
     {
         private readonly bool[] _segments;
         private readonly bool[] _dirtyFlags;
         private readonly object _syncRoot = new();
 
-        protected SegmentDisplayModel(int segmentCount)
+        protected SegmentDisplayModelBase(int segmentCount)
         {
             if (segmentCount <= 0)
             {

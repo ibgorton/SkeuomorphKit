@@ -116,7 +116,7 @@ namespace SkeuomorphCore
         public static bool[] GetBitsSixteen(this char c)
         {
             var key = char.ToUpperInvariant(c);
-            if (!DisplayCharacterProfiles.IsSupportedForSixteenSegment(key))
+            if (!DisplayCharacterProfiles.IsSupported("SixteenSegment", key))
             {
                 return new bool[SegmentCount];
             }

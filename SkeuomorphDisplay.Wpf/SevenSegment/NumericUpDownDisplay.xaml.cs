@@ -9,7 +9,7 @@ using SkeuomorphCore;
 namespace SkeuomorphDisplay.Wpf.SevenSegment
 {
     /// <summary>
-    /// Interaction logic for NumericUpDownDisplay.xaml
+    /// Provides a numeric display with increment and decrement controls.
     /// </summary>
     public partial class NumericUpDownDisplay : UserControl
     {
@@ -18,7 +18,7 @@ namespace SkeuomorphDisplay.Wpf.SevenSegment
         private double _value = 0d;
 
         /// <summary>
-        /// Class Constructor
+        /// Initializes the numeric up/down display.
         /// </summary>
         public NumericUpDownDisplay()
         {

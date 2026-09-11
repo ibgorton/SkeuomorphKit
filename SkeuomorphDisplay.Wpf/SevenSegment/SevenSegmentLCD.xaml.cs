@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 namespace SkeuomorphDisplay.Wpf.SevenSegment
 {
     /// <summary>
-    /// Interaction logic for SevenSegmentLCD.xaml
+    /// Displays a seven-segment LCD-style value.
     /// </summary>
     public partial class SevenSegmentLCD : SevenSegmentBase
     {

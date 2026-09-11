@@ -2,7 +2,7 @@ using SkeuomorphCore;
 
 namespace SkeuomorphDisplay
 {
-    public abstract class SevenSegmentDisplayBase : SegmentDisplayModel
+    public abstract class SevenSegmentDisplayBase : SegmentDisplayModelBase
     {
         protected SevenSegmentDisplayBase() : base(7)
         {

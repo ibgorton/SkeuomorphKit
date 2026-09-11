@@ -7,7 +7,7 @@ using System.Windows.Media;
 namespace DigitalDemo
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Demonstrates the WPF display controls and timer behavior.
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -15,7 +15,7 @@ namespace DigitalDemo
         private readonly Stopwatch _sw = new();
 
         /// <summary>
-        /// Class constructor
+        /// Initializes the demo window.
         /// </summary>
         public MainWindow()
         {
@@ -50,7 +50,7 @@ namespace DigitalDemo
         }
 
         /// <summary>
-        /// Handles the button click event to pause and continue the running timer
+        /// Toggles the running timer on and off.
         /// </summary>
         private void Toggle_Click(object sender, RoutedEventArgs e)
         {

@@ -10,7 +10,7 @@ namespace SkeuomorphCore
 
         public static bool[] GetBitsRectangle(this char c)
         {
-            if (!DisplayCharacterProfiles.IsSupportedForRectangle5x7(c))
+            if (!DisplayCharacterProfiles.IsSupported("Rectangle5x7", c))
             {
                 return new bool[SegmentCount];
             }

@@ -78,7 +78,7 @@ namespace SkeuomorphCore
             }
 
             var normalized = char.ToUpperInvariant(c);
-            if (!DisplayCharacterProfiles.IsSupportedForSevenSegment(normalized))
+            if (!DisplayCharacterProfiles.IsSupported("SevenSegment", normalized))
             {
                 destination.Clear();
                 return false;

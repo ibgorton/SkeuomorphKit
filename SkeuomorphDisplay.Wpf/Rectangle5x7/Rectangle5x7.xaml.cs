@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 namespace SkeuomorphDisplay.Wpf.Rectangle5x7
 {
     /// <summary>
-    /// Interaction logic for Rectangle5x7.xaml
+    /// Displays a 5x7 rectangle-based glyph layout as a WPF control.
     /// </summary>
     public partial class Rectangle5x7 : UserControl
     {

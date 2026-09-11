@@ -5,12 +5,12 @@ using System.Windows.Media;
 namespace SkeuomorphDisplay.Wpf.SevenSegment
 {
     /// <summary>
-    /// Interaction logic for SevenSegmentModule.xaml
+    /// Displays a seven-segment LED-style value with selection and press handling.
     /// </summary>
     public sealed partial class SevenSegmentLED : SevenSegmentBase
     {
         /// <summary>
-        /// Class constructor
+        /// Initializes the LED segment control.
         /// </summary>
         public SevenSegmentLED() : base()
         {

@@ -12,7 +12,7 @@ using SkeuomorphCore;
 namespace SkeuomorphDisplay.Wpf.SevenSegment
 {
     /// <summary>
-    /// Interaction logic for UserControl1.xaml
+    /// Displays an editable numeric value using segmented LED-style modules.
     /// </summary>
     public partial class NumericDisplay : UserControl
     {
@@ -36,7 +36,7 @@ namespace SkeuomorphDisplay.Wpf.SevenSegment
         public event Action<double> IncrementChanged = delegate { };
 
         /// <summary>
-        /// Class constructor
+        /// Initializes the numeric display control.
         /// </summary>
         public NumericDisplay()
         {

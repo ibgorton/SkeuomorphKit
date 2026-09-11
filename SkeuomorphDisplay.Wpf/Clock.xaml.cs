@@ -8,7 +8,7 @@ using System.Windows.Threading;
 namespace SkeuomorphDisplay.Wpf
 {
     /// <summary>
-    /// Interaction logic for Clock.xaml
+    /// Displays the current time using segmented modules for hours, minutes, and seconds.
     /// </summary>
     public partial class Clock : UserControl
     {

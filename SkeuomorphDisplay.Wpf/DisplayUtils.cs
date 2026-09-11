@@ -41,14 +41,11 @@ namespace SkeuomorphDisplay.Wpf
         }
 
         /// <summary>
-        /// Creates color with corrected brightness.
+        /// Adjusts the brightness of a color by a specified correction factor.
         /// </summary>
-        /// <param name="color">Color to correct.</param>
-        /// <param name="correctionFactor">The brightness correction factor. Must be between -1 and 1.
-        /// Negative values produce darker colors.</param>
-        /// <returns>
-        /// Corrected <see cref="Color"/> structure.
-        /// </returns>
+        /// <param name="color">The color to adjust.</param>
+        /// <param name="correctionFactor">The brightness adjustment factor. Values below zero darken the color and values above zero brighten it.</param>
+        /// <returns>The adjusted <see cref="Color"/>.</returns>
         private static Color ChangeColorBrightness(Color color, double correctionFactor)
         {
             double red = color.R;
