@@ -94,7 +94,7 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
-    public void SixteenMap_GetBitsSixteen_UsesSupportedGlyphPattern()
+    public void SixteenMap_GetBitsSixteen_UsesReferenceGlyphPattern()
     {
         var bits = 'A'.GetBitsSixteen();
 
@@ -115,6 +115,16 @@ public class DisplayValueFormatterTests
         Assert.False(bits[13]);
         Assert.False(bits[14]);
         Assert.True(bits[15]);
+    }
+
+    [Fact]
+    public void SegmentMaps_MatchDmadsionReferencePatternsForCommonChars()
+    {
+        var seven = '1'.GetBitsSeven();
+        var sixteen = 'A'.GetBitsSixteen();
+
+        Assert.Equal(new[] { false, true, true, false, false, false, false }, seven);
+        Assert.Equal(new[] { true, true, true, true, false, false, true, true, false, false, false, true, false, false, false, true }, sixteen);
     }
 
     [Fact]

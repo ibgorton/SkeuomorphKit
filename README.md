@@ -9,6 +9,13 @@ Stock Windows UI elements are boring, and poorly suited for machinery HMIs. So I
 
 ![Gif of colors](/docs/Luminescent.gif)
 
+## Reference glyph data
+
+The segment masks and ordering used by the library follow the reference implementation from dmadison/led-segment-ascii:
+https://github.com/dmadison/led-segment-ascii
+
+This project intentionally matches the upstream 7-segment and 16-segment bit order so the same ASCII glyph conventions can be shared across hardware-oriented display implementations. The upstream project is licensed under the MIT License (Copyright © 2017 David Madison), and its source is used here as a reference model.
+
 ## TODO:
 
 * Add negative value support

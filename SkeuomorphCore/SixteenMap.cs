@@ -4,105 +4,113 @@ using System.Collections.Generic;
 
 namespace SkeuomorphCore
 {
+    // Canonical 16-segment bit ordering follows the dmadison/led-segment-ascii reference set:
+    // no-decimal-point mask order: DP is handled separately by the display model, so the 16-bit values
+    // are aligned to the upstream library's NDP table (A..P, with bit 0 = A, bit 15 = P).
+    // See https://github.com/dmadison/led-segment-ascii
+    // Licensed under the MIT license (Copyright © 2017 David Madison).
     public static class SixteenMap
     {
-        private static readonly Dictionary<char, BitArray> SixteenBits = new()
+        private const int SegmentCount = 16;
+
+        // Canonical NDP mask table from dmadison/led-segment-ascii.
+        private static readonly Dictionary<char, ushort> SixteenMasks = new()
         {
-            { ' ', new BitArray(values: new[] { 0 }) { Length = 16 } },
-            { '!', new BitArray(values: new[] { 15 }) { Length = 16 } },
-            { '"', new BitArray(values: new[] { 51 }) { Length = 16 } },
-            { '#', new BitArray(values: new[] { 831 }) { Length = 16 } },
-            { '$', new BitArray(values: new[] { 799 }) { Length = 16 } },
-            { '%', new BitArray(values: new[] { 855 }) { Length = 16 } },
-            { '&', new BitArray(values: new[] { 895 }) { Length = 16 } },
-            { '\'', new BitArray(values: new[] { 3 }) { Length = 16 } },
-            { '(', new BitArray(values: new[] { 5120 }) { Length = 16 } },
-            { ')', new BitArray(values: new[] { 16640 }) { Length = 16 } },
-            { '*', new BitArray(values: new[] { 65280 }) { Length = 16 } },
-            { '+', new BitArray(values: new[] { 43520 }) { Length = 16 } },
-            { ',', new BitArray(values: new[] { 16384 }) { Length = 16 } },
-            { '-', new BitArray(values: new[] { 34816 }) { Length = 16 } },
-            { '.', new BitArray(values: new[] { 16384 }) { Length = 16 } },
-            { '/', new BitArray(values: new[] { 17408 }) { Length = 16 } },
-            { '~', new BitArray(values: new[] { 855 }) { Length = 16 } },
-            { '0', new BitArray(values: new[] { 17663 }) { Length = 16 } },
-            { '1', new BitArray(values: new[] { 1036 }) { Length = 16 } },
-            { '2', new BitArray(values: new[] { 34935 }) { Length = 16 } },
-            { '3', new BitArray(values: new[] { 2111 }) { Length = 16 } },
-            { '4', new BitArray(values: new[] { 34956 }) { Length = 16 } },
-            { '5', new BitArray(values: new[] { 37043 }) { Length = 16 } },
-            { '6', new BitArray(values: new[] { 35067 }) { Length = 16 } },
-            { '7', new BitArray(values: new[] { 15 }) { Length = 16 } },
-            { '8', new BitArray(values: new[] { 35071 }) { Length = 16 } },
-            { '9', new BitArray(values: new[] { 35007 }) { Length = 16 } },
-            { ':', new BitArray(values: new[] { 8704 }) { Length = 16 } },
-            { ';', new BitArray(values: new[] { 16896 }) { Length = 16 } },
-            { '<', new BitArray(values: new[] { 37888 }) { Length = 16 } },
-            { '=', new BitArray(values: new[] { 34864 }) { Length = 16 } },
-            { '>', new BitArray(values: new[] { 18688 }) { Length = 16 } },
-            { '?', new BitArray(values: new[] { 10247 }) { Length = 16 } },
-            { '@', new BitArray(values: new[] { 2807 }) { Length = 16 } },
-            { 'A', new BitArray(values: new[] { 35023 }) { Length = 16 } },
-            { 'B', new BitArray(values: new[] { 10815 }) { Length = 16 } },
-            { 'C', new BitArray(values: new[] { 243 }) { Length = 16 } },
-            { 'D', new BitArray(values: new[] { 8767 }) { Length = 16 } },
-            { 'E', new BitArray(values: new[] { 33011 }) { Length = 16 } },
-            { 'F', new BitArray(values: new[] { 32963 }) { Length = 16 } },
-            { 'G', new BitArray(values: new[] { 2299 }) { Length = 16 } },
-            { 'H', new BitArray(values: new[] { 35020 }) { Length = 16 } },
-            { 'I', new BitArray(values: new[] { 8755 }) { Length = 16 } },
-            { 'J', new BitArray(values: new[] { 124 }) { Length = 16 } },
-            { 'K', new BitArray(values: new[] { 38080 }) { Length = 16 } },
-            { 'L', new BitArray(values: new[] { 240 }) { Length = 16 } },
-            { 'M', new BitArray(values: new[] { 1484 }) { Length = 16 } },
-            { 'N', new BitArray(values: new[] { 4556 }) { Length = 16 } },
-            { 'O', new BitArray(values: new[] { 255 }) { Length = 16 } },
-            { 'P', new BitArray(values: new[] { 35015 }) { Length = 16 } },
-            { 'Q', new BitArray(values: new[] { 4351 }) { Length = 16 } },
-            { 'R', new BitArray(values: new[] { 39111 }) { Length = 16 } },
-            { 'S', new BitArray(values: new[] { 35003 }) { Length = 16 } },
-            { 'T', new BitArray(values: new[] { 8707 }) { Length = 16 } },
-            { 'U', new BitArray(values: new[] { 252 }) { Length = 16 } },
-            { 'V', new BitArray(values: new[] { 17600 }) { Length = 16 } },
-            { 'W', new BitArray(values: new[] { 20684 }) { Length = 16 } },
-            { 'X', new BitArray(values: new[] { 21760 }) { Length = 16 } },
-            { 'Y', new BitArray(values: new[] { 35004 }) { Length = 16 } },
-            { 'Z', new BitArray(values: new[] { 17459 }) { Length = 16 } },
-            { '[', new BitArray(values: new[] { 8722 }) { Length = 16 } },
-            { '\\', new BitArray(values: new[] { 4352 }) { Length = 16 } },
-            { ']', new BitArray(values: new[] { 8737 }) { Length = 16 } },
-            { '^', new BitArray(values: new[] { 20480 }) { Length = 16 } },
-            { '_', new BitArray(values: new[] { 48 }) { Length = 16 } },
-            { '`', new BitArray(values: new[] { 256 }) { Length = 16 } },
-            { 'a', new BitArray(values: new[] { 41072 }) { Length = 16 } },
-            { 'b', new BitArray(values: new[] { 41184 }) { Length = 16 } },
-            { 'c', new BitArray(values: new[] { 32864 }) { Length = 16 } },
-            { 'd', new BitArray(values: new[] { 10268 }) { Length = 16 } },
-            { 'e', new BitArray(values: new[] { 49248 }) { Length = 16 } },
-            { 'f', new BitArray(values: new[] { 43522 }) { Length = 16 } },
-            { 'g', new BitArray(values: new[] { 41633 }) { Length = 16 } },
-            { 'h', new BitArray(values: new[] { 41152 }) { Length = 16 } },
-            { 'i', new BitArray(values: new[] { 8192 }) { Length = 16 } },
-            { 'j', new BitArray(values: new[] { 8800 }) { Length = 16 } },
-            { 'k', new BitArray(values: new[] { 13824 }) { Length = 16 } },
-            { 'l', new BitArray(values: new[] { 192 }) { Length = 16 } },
-            { 'm', new BitArray(values: new[] { 43080 }) { Length = 16 } },
-            { 'n', new BitArray(values: new[] { 41024 }) { Length = 16 } },
-            { 'o', new BitArray(values: new[] { 41056 }) { Length = 16 } },
-            { 'p', new BitArray(values: new[] { 33473 }) { Length = 16 } },
-            { 'q', new BitArray(values: new[] { 41601 }) { Length = 16 } },
-            { 'r', new BitArray(values: new[] { 32832 }) { Length = 16 } },
-            { 's', new BitArray(values: new[] { 41121 }) { Length = 16 } },
-            { 't', new BitArray(values: new[] { 32992 }) { Length = 16 } },
-            { 'u', new BitArray(values: new[] { 8288 }) { Length = 16 } },
-            { 'v', new BitArray(values: new[] { 16448 }) { Length = 16 } },
-            { 'w', new BitArray(values: new[] { 20552 }) { Length = 16 } },
-            { 'x', new BitArray(values: new[] { 21760 }) { Length = 16 } },
-            { 'y', new BitArray(values: new[] { 2588 }) { Length = 16 } },
-            { 'z', new BitArray(values: new[] { 49184 }) { Length = 16 } },
-            { '{', new BitArray(values: new[] { 41490 }) { Length = 16 } },
-            { '|', new BitArray(values: new[] { 8704 }) { Length = 16 } },
-            { '}', new BitArray(values: new[] { 10785 }) { Length = 16 } }
+            [' '] = 0x0000,
+            ['!'] = 0x000C,
+            ['"'] = 0x0204,
+            ['#'] = 0xAA3C,
+            ['$'] = 0xAABB,
+            ['%'] = 0xEE99,
+            ['&'] = 0x9371,
+            ['\''] = 0x0200,
+            ['('] = 0x1400,
+            [')'] = 0x4100,
+            ['*'] = 0xFF00,
+            ['+'] = 0xAA00,
+            [','] = 0x4000,
+            ['-'] = 0x8800,
+            ['.'] = 0x1000,
+            ['/'] = 0x4400,
+            ['0'] = 0x44FF,
+            ['1'] = 0x040C,
+            ['2'] = 0x8877,
+            ['3'] = 0x083F,
+            ['4'] = 0x888C,
+            ['5'] = 0x90B3,
+            ['6'] = 0x88FB,
+            ['7'] = 0x000F,
+            ['8'] = 0x88FF,
+            ['9'] = 0x88BF,
+            [':'] = 0x2200,
+            [';'] = 0x4200,
+            ['<'] = 0x9400,
+            ['='] = 0x8830,
+            ['>'] = 0x4900,
+            ['?'] = 0x2807,
+            ['@'] = 0x0AF7,
+            ['A'] = 0x88CF,
+            ['B'] = 0x2A3F,
+            ['C'] = 0x00F3,
+            ['D'] = 0x223F,
+            ['E'] = 0x80F3,
+            ['F'] = 0x80C3,
+            ['G'] = 0x08FB,
+            ['H'] = 0x88CC,
+            ['I'] = 0x2233,
+            ['J'] = 0x007C,
+            ['K'] = 0x94C0,
+            ['L'] = 0x00F0,
+            ['M'] = 0x05CC,
+            ['N'] = 0x11CC,
+            ['O'] = 0x00FF,
+            ['P'] = 0x88C7,
+            ['Q'] = 0x10FF,
+            ['R'] = 0x98C7,
+            ['S'] = 0x88BB,
+            ['T'] = 0x2203,
+            ['U'] = 0x00FC,
+            ['V'] = 0x44C0,
+            ['W'] = 0x50CC,
+            ['X'] = 0x5500,
+            ['Y'] = 0x88BC,
+            ['Z'] = 0x4433,
+            ['['] = 0x2212,
+            ['\\'] = 0x1100,
+            [']'] = 0x2221,
+            ['^'] = 0x5000,
+            ['_'] = 0x0030,
+            ['`'] = 0x0100,
+            ['a'] = 0xA070,
+            ['b'] = 0xA0E0,
+            ['c'] = 0x8060,
+            ['d'] = 0x281C,
+            ['e'] = 0xC060,
+            ['f'] = 0xAA02,
+            ['g'] = 0xA2A1,
+            ['h'] = 0xA0C0,
+            ['i'] = 0x2000,
+            ['j'] = 0x2260,
+            ['k'] = 0x3600,
+            ['l'] = 0x00C0,
+            ['m'] = 0xA848,
+            ['n'] = 0xA040,
+            ['o'] = 0xA060,
+            ['p'] = 0x82C1,
+            ['q'] = 0xA281,
+            ['r'] = 0x8040,
+            ['s'] = 0xA0A1,
+            ['t'] = 0x80E0,
+            ['u'] = 0x2060,
+            ['v'] = 0x4040,
+            ['w'] = 0x5048,
+            ['x'] = 0x5500,
+            ['y'] = 0x0A1C,
+            ['z'] = 0xC020,
+            ['{'] = 0xA212,
+            ['|'] = 0x2200,
+            ['}'] = 0x2A21,
+            ['~'] = 0xCC00
         };
 
         public static bool[] GetBitsSixteen(this char c)
@@ -110,32 +118,31 @@ namespace SkeuomorphCore
             var key = char.ToUpperInvariant(c);
             if (!DisplayCharacterProfiles.IsSupportedForSixteenSegment(key))
             {
-                return new bool[16];
+                return new bool[SegmentCount];
             }
 
-            if (SixteenBits.TryGetValue(c, out BitArray bits))
+            if (TryGetMask(c, key, out var mask))
             {
-                var result = new bool[16];
-                for (int i = 0; i < 16; i++)
+                var result = new bool[SegmentCount];
+                for (var i = 0; i < SegmentCount; i++)
                 {
-                    result[i] = bits.Get(i);
+                    result[i] = ((mask >> i) & 1) == 1;
                 }
 
                 return result;
             }
 
-            if (SixteenBits.TryGetValue(key, out var upperBits))
-            {
-                var result = new bool[16];
-                for (int i = 0; i < 16; i++)
-                {
-                    result[i] = upperBits.Get(i);
-                }
+            return new bool[SegmentCount];
+        }
 
-                return result;
+        private static bool TryGetMask(char original, char normalized, out ushort mask)
+        {
+            if (SixteenMasks.TryGetValue(original, out mask))
+            {
+                return true;
             }
 
-            return new bool[16];
+            return SixteenMasks.TryGetValue(normalized, out mask);
         }
     }
 }
