@@ -1,9 +1,26 @@
 using SkeuomorphCore;
+using SkeuomorphDisplay;
 
 namespace SkeuomorphCore.Tests;
 
 public class DisplayValueFormatterTests
 {
+    private sealed class TestDisplayHost : ISegmentDisplayHost
+    {
+        public int ApplyCount { get; private set; }
+        public int RefreshCount { get; private set; }
+
+        public void ApplySegmentState(int segmentIndex, bool isOn)
+        {
+            ApplyCount++;
+        }
+
+        public void Refresh()
+        {
+            RefreshCount++;
+        }
+    }
+
     [Fact]
     public void GetIntegerDisplayChars_PositiveValue_UsesDigitsOnly()
     {
@@ -101,12 +118,95 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
+    public void DisplayCharacterProfiles_SevenSegment_RestrictsToReadableSubset()
+    {
+        Assert.True(DisplayCharacterProfiles.IsSupportedForSevenSegment('A'));
+        Assert.True(DisplayCharacterProfiles.IsSupportedForSevenSegment('3'));
+        Assert.True(DisplayCharacterProfiles.IsSupportedForSevenSegment('-'));
+        Assert.False(DisplayCharacterProfiles.IsSupportedForSevenSegment('@'));
+    }
+
+    [Fact]
+    public void DisplayCharacterProfiles_Rectangle5x7_SupportsGeneralTextSubset()
+    {
+        Assert.True(DisplayCharacterProfiles.IsSupportedForRectangle5x7('a'));
+        Assert.True(DisplayCharacterProfiles.IsSupportedForRectangle5x7('?'));
+        Assert.True(DisplayCharacterProfiles.IsSupportedForRectangle5x7('Z'));
+        Assert.False(DisplayCharacterProfiles.IsSupportedForRectangle5x7('$'));
+    }
+
+    [Fact]
+    public void DisplayCharacterProfiles_SixteenSegment_ProvidesBroadAsciiSupport()
+    {
+        Assert.True(DisplayCharacterProfiles.IsSupportedForSixteenSegment('@'));
+        Assert.True(DisplayCharacterProfiles.IsSupportedForSixteenSegment('z'));
+        Assert.True(DisplayCharacterProfiles.IsSupportedForSixteenSegment('%'));
+        Assert.False(DisplayCharacterProfiles.IsSupportedForSixteenSegment('~'));
+    }
+
+    [Fact]
+    public void GlyphLibrary_ExplicitlySupportsCommonPunctuationAndLowercase()
+    {
+        Assert.True(GlyphLibrary.TryGetPattern('.', out var dotRows));
+        Assert.True(GlyphLibrary.TryGetPattern('a', out var lowercaseRows));
+        Assert.Equal(7, dotRows.Length);
+        Assert.Equal(7, lowercaseRows.Length);
+    }
+
+    [Fact]
+    public void SevenMap_GetBitSeven_ExpandsReadableAlphaSubset()
+    {
+        var bits = 'P'.GetBitsSeven();
+
+        Assert.Equal(7, bits.Length);
+        Assert.True(bits[0]);
+        Assert.True(bits[1]);
+        Assert.True(bits[2]);
+        Assert.False(bits[3]);
+        Assert.True(bits[4]);
+        Assert.True(bits[5]);
+        Assert.True(bits[6]);
+    }
+
+    [Fact]
     public void SevenMap_GetBitSeven_UnsupportedCharacter_BlanksSegmentArray()
     {
         bool[] bits = new bool[7];
 
-        bits.GetBitSeven('Z');
+        bits.GetBitSeven('@');
 
         Assert.All(bits, value => Assert.False(value));
+    }
+
+    [Fact]
+    public void SegmentDisplayConnection_Bind_IsIdempotentForSameHost()
+    {
+        var display = new SevenSegmentDisplay();
+        var connection = new SegmentDisplayConnection<SevenSegmentDisplay>(display);
+        var host = new TestDisplayHost();
+
+        connection.Bind(host);
+        connection.Bind(host);
+        display.SetSegmentState(0, true);
+
+        Assert.True(connection.IsBound);
+        Assert.Equal(1, host.ApplyCount);
+        Assert.Equal(1, host.RefreshCount);
+    }
+
+    [Fact]
+    public void SegmentDisplayConnection_Unbind_StopsFurtherHostCallbacks()
+    {
+        var display = new SevenSegmentDisplay();
+        var connection = new SegmentDisplayConnection<SevenSegmentDisplay>(display);
+        var host = new TestDisplayHost();
+
+        connection.Bind(host);
+        connection.Unbind();
+        display.SetSegmentState(0, true);
+
+        Assert.False(connection.IsBound);
+        Assert.Equal(0, host.ApplyCount);
+        Assert.Equal(0, host.RefreshCount);
     }
 }

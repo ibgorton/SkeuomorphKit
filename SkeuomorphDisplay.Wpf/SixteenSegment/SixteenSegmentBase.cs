@@ -42,6 +42,8 @@ namespace SkeuomorphDisplay.Wpf.SixteenSegment
 
         protected SixteenSegmentBase()
         {
+            _display.RaiseSegmentStateChangedEvents = true;
+
             _segmentMapper = new SegmentValueMapper(
                 value => Segment1On = value,
                 value => Segment2On = value,

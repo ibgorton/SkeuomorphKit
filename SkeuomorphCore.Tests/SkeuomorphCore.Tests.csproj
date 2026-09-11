@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SkeuomorphCore\SkeuomorphCore.csproj" />
+    <ProjectReference Include="..\SkeuomorphDisplay\SkeuomorphDisplay.csproj" />
   </ItemGroup>
 
 </Project>
