@@ -11,6 +11,8 @@ namespace SkeuomorphCore
         private static readonly Dictionary<char, bool[]> SevenBits = new()
         {
             { '-', new bool[SegmentCount] { true, false, false, false, false, false, false } },
+            { '.', new bool[SegmentCount] { false, false, false, false, false, true, false } },
+            { ':', new bool[SegmentCount] { false, false, false, false, false, true, false } },
             { '0', new bool[SegmentCount] { false, true, true, true, true, true, true } },
             { '1', new bool[SegmentCount] { false, false, false, false, true, true, false } },
             { '2', new bool[SegmentCount] { true, false, true, true, false, true, true } },
@@ -22,6 +24,8 @@ namespace SkeuomorphCore
             { '8', new bool[SegmentCount] { true, true, true, true, true, true, true } },
             { '9', new bool[SegmentCount] { true, true, false, true, true, true, true } },
             { '=', new bool[SegmentCount] { true, false, false, true, false, false, false } },
+            { '+', new bool[SegmentCount] { true, false, false, true, false, false, false } },
+            { '/', new bool[SegmentCount] { false, false, false, false, false, true, false } },
             { 'A', new bool[SegmentCount] { true, true, true, false, true, true, true } },
             { 'B', new bool[SegmentCount] { true, true, true, true, true, false, false } },
             { 'C', new bool[SegmentCount] { false, true, true, true, false, false, true } },
@@ -30,6 +34,24 @@ namespace SkeuomorphCore
             { 'F', new bool[SegmentCount] { true, true, true, false, false, false, true } },
             { 'G', new bool[SegmentCount] { false, true, true, true, true, false, true } },
             { 'H', new bool[SegmentCount] { true, true, true, false, true, true, false } },
+            { 'I', new bool[SegmentCount] { false, false, false, false, true, true, false } },
+            { 'J', new bool[SegmentCount] { false, false, true, true, true, true, false } },
+            { 'K', new bool[SegmentCount] { true, true, true, false, true, true, false } },
+            { 'L', new bool[SegmentCount] { false, true, true, true, false, false, true } },
+            { 'M', new bool[SegmentCount] { true, true, true, false, true, true, false } },
+            { 'N', new bool[SegmentCount] { true, true, true, false, true, true, false } },
+            { 'O', new bool[SegmentCount] { false, true, true, true, true, true, true } },
+            { 'P', new bool[SegmentCount] { true, true, true, false, true, true, true } },
+            { 'Q', new bool[SegmentCount] { true, true, true, true, true, true, false } },
+            { 'R', new bool[SegmentCount] { true, true, true, false, true, true, true } },
+            { 'S', new bool[SegmentCount] { true, true, false, true, true, false, true } },
+            { 'T', new bool[SegmentCount] { true, false, false, false, false, false, false } },
+            { 'U', new bool[SegmentCount] { false, true, true, true, true, true, false } },
+            { 'V', new bool[SegmentCount] { false, true, true, true, true, true, false } },
+            { 'W', new bool[SegmentCount] { true, true, true, false, true, true, false } },
+            { 'X', new bool[SegmentCount] { true, true, true, false, true, true, false } },
+            { 'Y', new bool[SegmentCount] { true, true, false, false, true, true, false } },
+            { 'Z', new bool[SegmentCount] { true, false, true, true, false, true, true } },
             { '_', new bool[SegmentCount] { false, false, false, true, false, false, false } },
             { 'r', new bool[SegmentCount] { true, false, true, false, false, false, false } },
             { 'o', new bool[SegmentCount] { true, false, true, true, true, false, false } }
@@ -49,7 +71,14 @@ namespace SkeuomorphCore
                 throw new ArgumentException($"Destination span must hold at least {SegmentCount} values.", nameof(destination));
             }
 
-            var matched = SevenBits.TryGetValue(c, out bool[] bits);
+            var normalized = char.ToUpperInvariant(c);
+            if (!DisplayCharacterProfiles.IsSupportedForSevenSegment(normalized))
+            {
+                destination.Clear();
+                return false;
+            }
+
+            var matched = SevenBits.TryGetValue(normalized, out bool[] bits);
             if (!matched)
             {
                 destination.Clear();

@@ -24,6 +24,8 @@ namespace SkeuomorphDisplay.Wpf.Rectangle5x7
 
         public Rectangle5x7Base()
         {
+            _display.RaiseSegmentStateChangedEvents = true;
+
             _segmentMapper = new SegmentValueMapper(
                 value => Segment1On = value,
                 value => Segment2On = value,

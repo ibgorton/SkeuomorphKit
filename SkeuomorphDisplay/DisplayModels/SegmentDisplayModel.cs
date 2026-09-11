@@ -18,11 +18,12 @@ namespace SkeuomorphDisplay
         public bool IsOn { get; }
     }
 
-    public readonly record struct SegmentDisplaySnapshot(int SegmentCount, bool[] Segments);
+    public readonly record struct SegmentDisplayUpdate(int SegmentIndex, bool IsOn);
 
     public abstract class SegmentDisplayModel : IDisplayControl
     {
         private readonly bool[] _segments;
+        private readonly bool[] _dirtyFlags;
         private readonly object _syncRoot = new();
 
         protected SegmentDisplayModel(int segmentCount)
@@ -33,11 +34,33 @@ namespace SkeuomorphDisplay
             }
 
             _segments = new bool[segmentCount];
+            _dirtyFlags = new bool[segmentCount];
         }
 
         public event EventHandler<SegmentStateChangedEventArgs>? SegmentStateChanged;
 
-        public Action<SegmentDisplaySnapshot>? StateChangedCallback { get; set; }
+        public bool RaiseSegmentStateChangedEvents { get; set; }
+
+        public int Version { get; private set; }
+
+        public bool HasDirtySegments
+        {
+            get
+            {
+                lock (_syncRoot)
+                {
+                    for (var i = 0; i < _dirtyFlags.Length; i++)
+                    {
+                        if (_dirtyFlags[i])
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+            }
+        }
 
         public double IncrementFactor { get; set; }
 
@@ -60,12 +83,36 @@ namespace SkeuomorphDisplay
             }
         }
 
-        public SegmentDisplaySnapshot GetSnapshot()
+        public int[] DrainDirtySegments()
         {
             lock (_syncRoot)
             {
-                return new SegmentDisplaySnapshot(_segments.Length, (bool[])_segments.Clone());
+                var dirty = new List<int>();
+                for (var i = 0; i < _dirtyFlags.Length; i++)
+                {
+                    if (_dirtyFlags[i])
+                    {
+                        dirty.Add(i);
+                        _dirtyFlags[i] = false;
+                    }
+                }
+
+                return dirty.ToArray();
             }
+        }
+
+        public SegmentDisplayUpdate[] GetDirtyUpdates()
+        {
+            var dirtySegments = DrainDirtySegments();
+            var updates = new SegmentDisplayUpdate[dirtySegments.Length];
+
+            for (var i = 0; i < dirtySegments.Length; i++)
+            {
+                var segmentIndex = dirtySegments[i];
+                updates[i] = new SegmentDisplayUpdate(segmentIndex, GetSegmentState(segmentIndex));
+            }
+
+            return updates;
         }
 
         public void CopySegments(Span<bool> destination)
@@ -93,11 +140,14 @@ namespace SkeuomorphDisplay
                 }
 
                 _segments[segmentIndex] = isOn;
+                _dirtyFlags[segmentIndex] = true;
+                Version++;
             }
 
-            var snapshot = GetSnapshot();
-            StateChangedCallback?.Invoke(snapshot);
-            SegmentStateChanged?.Invoke(this, new SegmentStateChangedEventArgs(segmentIndex, isOn));
+            if (RaiseSegmentStateChangedEvents)
+            {
+                SegmentStateChanged?.Invoke(this, new SegmentStateChangedEventArgs(segmentIndex, isOn));
+            }
         }
 
         public void ApplyBitPattern(bool[] source)
@@ -123,14 +173,18 @@ namespace SkeuomorphDisplay
                     {
                         _segments[i] = source[i];
                         changed.Add(i);
+                        _dirtyFlags[i] = true;
                     }
+                }
+
+                if (changed.Count > 0)
+                {
+                    Version++;
                 }
             }
 
-            if (changed.Count > 0)
+            if (RaiseSegmentStateChangedEvents && changed.Count > 0)
             {
-                var snapshot = GetSnapshot();
-                StateChangedCallback?.Invoke(snapshot);
                 foreach (var segmentIndex in changed)
                 {
                     SegmentStateChanged?.Invoke(this, new SegmentStateChangedEventArgs(segmentIndex, source[segmentIndex]));

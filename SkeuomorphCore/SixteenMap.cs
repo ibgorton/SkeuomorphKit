@@ -100,7 +100,7 @@ namespace SkeuomorphCore
         public static bool[] GetBitsSixteen(this char c)
         {
             var key = char.ToUpperInvariant(c);
-            if (!GlyphLibrary.TryGetPattern(c, out _))
+            if (!DisplayCharacterProfiles.IsSupportedForSixteenSegment(key))
             {
                 return new bool[16];
             }
