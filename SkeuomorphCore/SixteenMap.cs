@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,15 +9,22 @@ namespace SkeuomorphCore
         private static readonly Dictionary<char, BitArray> SixteenBits = new()
         {
             { ' ', new BitArray(values: new[] { 0 }) { Length = 16 } },
-            { '!', new BitArray(values: new[] { 12 }) { Length = 16 } },
-            { '"', new BitArray(values: new[] { 516 }) { Length = 16 } },
+            { '!', new BitArray(values: new[] { 15 }) { Length = 16 } },
+            { '"', new BitArray(values: new[] { 51 }) { Length = 16 } },
+            { '#', new BitArray(values: new[] { 831 }) { Length = 16 } },
+            { '$', new BitArray(values: new[] { 799 }) { Length = 16 } },
+            { '%', new BitArray(values: new[] { 855 }) { Length = 16 } },
+            { '&', new BitArray(values: new[] { 895 }) { Length = 16 } },
+            { '\'', new BitArray(values: new[] { 3 }) { Length = 16 } },
             { '(', new BitArray(values: new[] { 5120 }) { Length = 16 } },
             { ')', new BitArray(values: new[] { 16640 }) { Length = 16 } },
             { '*', new BitArray(values: new[] { 65280 }) { Length = 16 } },
             { '+', new BitArray(values: new[] { 43520 }) { Length = 16 } },
             { ',', new BitArray(values: new[] { 16384 }) { Length = 16 } },
             { '-', new BitArray(values: new[] { 34816 }) { Length = 16 } },
+            { '.', new BitArray(values: new[] { 16384 }) { Length = 16 } },
             { '/', new BitArray(values: new[] { 17408 }) { Length = 16 } },
+            { '~', new BitArray(values: new[] { 855 }) { Length = 16 } },
             { '0', new BitArray(values: new[] { 17663 }) { Length = 16 } },
             { '1', new BitArray(values: new[] { 1036 }) { Length = 16 } },
             { '2', new BitArray(values: new[] { 34935 }) { Length = 16 } },
@@ -105,16 +113,29 @@ namespace SkeuomorphCore
                 return new bool[16];
             }
 
-            if (!SixteenBits.TryGetValue(key, out BitArray bits))
-                return new bool[16];
-
-            var result = new bool[16];
-            for (int i = 0; i < 16; i++)
+            if (SixteenBits.TryGetValue(c, out BitArray bits))
             {
-                result[i] = bits.Get(i);
+                var result = new bool[16];
+                for (int i = 0; i < 16; i++)
+                {
+                    result[i] = bits.Get(i);
+                }
+
+                return result;
             }
 
-            return result;
+            if (SixteenBits.TryGetValue(key, out var upperBits))
+            {
+                var result = new bool[16];
+                for (int i = 0; i < 16; i++)
+                {
+                    result[i] = upperBits.Get(i);
+                }
+
+                return result;
+            }
+
+            return new bool[16];
         }
     }
 }
