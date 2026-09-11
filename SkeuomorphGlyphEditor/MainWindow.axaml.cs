@@ -140,11 +140,11 @@ public partial class MainWindow : Window
             var segments = new[]
             {
                 new SegmentSpec(0, 60, 18, 80, 12, 0),
-                new SegmentSpec(1, 152, 52, 12, 80, 0),
-                new SegmentSpec(2, 152, 146, 12, 80, 0),
+                new SegmentSpec(1, 152, 52, 12, 80, 90),
+                new SegmentSpec(2, 152, 146, 12, 80, 90),
                 new SegmentSpec(3, 60, 214, 80, 12, 0),
-                new SegmentSpec(4, 24, 146, 12, 80, 0),
-                new SegmentSpec(5, 24, 52, 12, 80, 0),
+                new SegmentSpec(4, 24, 146, 12, 80, 90),
+                new SegmentSpec(5, 24, 52, 12, 80, 90),
                 new SegmentSpec(6, 60, 112, 80, 12, 0)
             };
 
@@ -375,10 +375,21 @@ public partial class MainWindow : Window
         public SegmentSpec(int index, double x, double y, double width, double height, double angle)
         {
             Index = index;
-            Start = new Point(x, y);
-            End = new Point(x + width, y + height);
-            Thickness = Math.Min(width, height);
             Angle = angle;
+
+            var isVertical = Math.Abs((angle % 180.0) - 90.0) < 45.0 || Math.Abs((angle % 180.0) + 90.0) < 45.0;
+            if (isVertical)
+            {
+                Start = new Point(x, y);
+                End = new Point(x, y + height);
+                Thickness = width;
+            }
+            else
+            {
+                Start = new Point(x, y);
+                End = new Point(x + width, y);
+                Thickness = height;
+            }
         }
 
         public int Index { get; }
