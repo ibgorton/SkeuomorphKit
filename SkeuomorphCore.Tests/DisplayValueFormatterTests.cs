@@ -141,7 +141,7 @@ public class DisplayValueFormatterTests
         Assert.True(DisplayCharacterProfiles.IsSupportedForSixteenSegment('@'));
         Assert.True(DisplayCharacterProfiles.IsSupportedForSixteenSegment('z'));
         Assert.True(DisplayCharacterProfiles.IsSupportedForSixteenSegment('%'));
-        Assert.False(DisplayCharacterProfiles.IsSupportedForSixteenSegment('~'));
+        Assert.True(DisplayCharacterProfiles.IsSupportedForSixteenSegment('~'));
     }
 
     [Fact]
@@ -151,6 +151,36 @@ public class DisplayValueFormatterTests
         Assert.True(GlyphLibrary.TryGetPattern('a', out var lowercaseRows));
         Assert.Equal(7, dotRows.Length);
         Assert.Equal(7, lowercaseRows.Length);
+    }
+
+    [Fact]
+    public void CharacterMap_CanCreateAndEditGlyphsWithIntegerMask()
+    {
+        var map = new CharacterMap(5, 7);
+        map.Set('A', new[] { "01110", "10001", "10001", "11111", "10001", "10001", "10001" });
+
+        Assert.True(map.TryGetMask('A', out var mask));
+        Assert.Equal(0b01110UL, map.GetMask('A') & 0b11111UL);
+        Assert.Equal(35, map.GetBits('A').Length);
+
+        map.Set('B', new[] { "11110", "10001", "10001", "11110", "10001", "10001", "11110" });
+        Assert.True(map.TryGetMask('B', out _));
+        Assert.NotEqual(map.GetMask('A'), map.GetMask('B'));
+
+        var bits = new bool[] { true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+        var maskFromBits = CharacterMap.MaskFromBits(bits);
+        var roundTripBits = CharacterMap.BitsFromMask(maskFromBits, bits.Length);
+
+        Assert.Equal(bits, roundTripBits);
+    }
+
+    [Fact]
+    public void CharacterMap_RejectsInvalidRowSizes()
+    {
+        var map = new CharacterMap(5, 7);
+
+        var ex = Assert.Throws<ArgumentException>(() => map.Set('X', new[] { "01110", "10001" }));
+        Assert.Contains("Expected 7 rows", ex.Message);
     }
 
     [Fact]

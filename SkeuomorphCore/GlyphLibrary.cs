@@ -14,6 +14,17 @@ namespace SkeuomorphCore
         public const int Width = 5;
         public const int Height = 7;
 
+        public static CharacterMap CreateRectangleMap()
+        {
+            var map = new CharacterMap(Width, Height);
+            foreach (var pair in Patterns)
+            {
+                map.Set(pair.Key, pair.Value);
+            }
+
+            return map;
+        }
+
         private static readonly Dictionary<char, string[]> Patterns = new()
         {
             { ' ', new[] { "00000", "00000", "00000", "00000", "00000", "00000", "00000" } },

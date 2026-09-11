@@ -1,0 +1,42 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="650"
+        x:Class="SkeuomorphGlyphEditor.MainWindow"
+        Title="Glyph Map Editor"
+        Width="980" Height="680"
+        WindowStartupLocation="CenterScreen">
+    <DockPanel Margin="20">
+        <StackPanel DockPanel.Dock="Top" Spacing="12">
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <TextBlock Text="Layout" VerticalAlignment="Center" FontWeight="SemiBold" />
+                <ComboBox x:Name="LayoutPicker" Width="180" />
+
+                <TextBlock Text="Char" VerticalAlignment="Center" FontWeight="SemiBold" />
+                <TextBox x:Name="CharacterInput" Width="60" MaxLength="1" Text="A" />
+
+                <Button Content="Load" Click="LoadButton_Click" Width="90" />
+                <Button Content="Save to project" Click="SaveButton_Click" Width="140" />
+            </StackPanel>
+
+            <TextBlock x:Name="MaskValueText" FontSize="18" FontWeight="Bold" />
+        </StackPanel>
+
+        <Grid Margin="0,16,0,0" ColumnDefinitions="*, 320">
+            <Border BorderBrush="#444" BorderThickness="1" CornerRadius="8" Padding="12">
+                <Grid x:Name="SegmentGrid" />
+            </Border>
+
+            <Border Grid.Column="1" Margin="16,0,0,0" BorderBrush="#444" BorderThickness="1" CornerRadius="8" Padding="12">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Generated C#" FontWeight="SemiBold" />
+                    <TextBox x:Name="CodePreview" Height="220" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" />
+
+                    <TextBlock Text="Notes" FontWeight="SemiBold" />
+                    <TextBlock Text="- click cells to toggle segment bits&#10;- the mask updates live&#10;- save writes a C# snippet into SkeuomorphCore/GeneratedGlyphMaps.cs" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>
