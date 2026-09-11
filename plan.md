@@ -38,6 +38,11 @@ Both succeeded with 0 failing tests and 0 build errors.
 - `RectangleMap` now delegates to the shared matrix generator, while `SixteenMap` continues to translate the same supported glyph set into its device-specific segment pattern.
 - This keeps the code open for additional layouts such as 14-segment, 7-segment, or custom font families without duplicating the character definition set.
 
+### Compact bitmask refactor
+- Replaced the large `bool[]` dictionaries with small numeric masks (`byte` for 7-seg, `ushort` for 16-seg) and convert to `bool[]` only at the boundary.
+- Kept the display-order semantics intact while making the data tables much easier to scan and maintain.
+- Validated that both the host-order and the character-map regressions still pass under the existing unit suite.
+
 ## Follow-up
 - Confirm the 16-segment editor preview matches the physical 3x3 lattice and the host’s actual WPF segment shapes.
 - Continue validating the generic character-map editor against the supported layout sets and the existing WPF display behavior.

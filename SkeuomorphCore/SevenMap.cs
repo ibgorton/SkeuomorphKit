@@ -4,57 +4,63 @@ using System.Linq;
 
 namespace SkeuomorphCore
 {
+    // Canonical bit ordering follows the dmadison/led-segment-ascii reference set:
+    // 7-segment: DP-G-F-E-D-C-B-A
+    // See https://github.com/dmadison/led-segment-ascii
+    // Licensed under the MIT license (Copyright © 2017 David Madison).
     public static class SevenMap
     {
         private const int SegmentCount = 7;
 
-        private static readonly Dictionary<char, bool[]> SevenBits = new()
+        // Compact byte-based masks keep the same host-order semantics while eliminating the giant bool[][] tables.
+        private static readonly Dictionary<char, byte> SevenMasks = new()
         {
-            { '-', new bool[SegmentCount] { true, false, false, false, false, false, false } },
-            { '.', new bool[SegmentCount] { false, false, false, false, false, true, false } },
-            { ':', new bool[SegmentCount] { false, false, false, false, false, true, false } },
-            { '0', new bool[SegmentCount] { false, true, true, true, true, true, true } },
-            { '1', new bool[SegmentCount] { false, false, false, false, true, true, false } },
-            { '2', new bool[SegmentCount] { true, false, true, true, false, true, true } },
-            { '3', new bool[SegmentCount] { true, false, false, true, true, true, true } },
-            { '4', new bool[SegmentCount] { true, true, false, false, true, true, false } },
-            { '5', new bool[SegmentCount] { true, true, false, true, true, false, true } },
-            { '6', new bool[SegmentCount] { true, true, true, true, true, false, true } },
-            { '7', new bool[SegmentCount] { false, false, false, false, true, true, true } },
-            { '8', new bool[SegmentCount] { true, true, true, true, true, true, true } },
-            { '9', new bool[SegmentCount] { true, true, false, true, true, true, true } },
-            { '=', new bool[SegmentCount] { true, false, false, true, false, false, false } },
-            { '+', new bool[SegmentCount] { true, false, false, true, false, false, false } },
-            { '/', new bool[SegmentCount] { false, false, false, false, false, true, false } },
-            { 'A', new bool[SegmentCount] { true, true, true, false, true, true, true } },
-            { 'B', new bool[SegmentCount] { true, true, true, true, true, false, false } },
-            { 'C', new bool[SegmentCount] { false, true, true, true, false, false, true } },
-            { 'D', new bool[SegmentCount] { true, false, true, true, true, true, false } },
-            { 'E', new bool[SegmentCount] { true, true, true, true, false, false, true } },
-            { 'F', new bool[SegmentCount] { true, true, true, false, false, false, true } },
-            { 'G', new bool[SegmentCount] { false, true, true, true, true, false, true } },
-            { 'H', new bool[SegmentCount] { true, true, true, false, true, true, false } },
-            { 'I', new bool[SegmentCount] { false, false, false, false, true, true, false } },
-            { 'J', new bool[SegmentCount] { false, false, true, true, true, true, false } },
-            { 'K', new bool[SegmentCount] { true, true, true, false, true, true, false } },
-            { 'L', new bool[SegmentCount] { false, true, true, true, false, false, true } },
-            { 'M', new bool[SegmentCount] { true, true, true, false, true, true, false } },
-            { 'N', new bool[SegmentCount] { true, true, true, false, true, true, false } },
-            { 'O', new bool[SegmentCount] { false, true, true, true, true, true, true } },
-            { 'P', new bool[SegmentCount] { true, true, true, false, true, true, true } },
-            { 'Q', new bool[SegmentCount] { true, true, true, true, true, true, false } },
-            { 'R', new bool[SegmentCount] { true, true, true, false, true, true, true } },
-            { 'S', new bool[SegmentCount] { true, true, false, true, true, false, true } },
-            { 'T', new bool[SegmentCount] { true, false, false, false, false, false, false } },
-            { 'U', new bool[SegmentCount] { false, true, true, true, true, true, false } },
-            { 'V', new bool[SegmentCount] { false, true, true, true, true, true, false } },
-            { 'W', new bool[SegmentCount] { true, true, true, false, true, true, false } },
-            { 'X', new bool[SegmentCount] { true, true, true, false, true, true, false } },
-            { 'Y', new bool[SegmentCount] { true, true, false, false, true, true, false } },
-            { 'Z', new bool[SegmentCount] { true, false, true, true, false, true, true } },
-            { '_', new bool[SegmentCount] { false, false, false, true, false, false, false } },
-            { 'r', new bool[SegmentCount] { true, false, true, false, false, false, false } },
-            { 'o', new bool[SegmentCount] { true, false, true, true, true, false, false } }
+            [' '] = 0x00,
+            ['-'] = 0x40,
+            ['.'] = 0x02,
+            [':'] = 0x02,
+            ['0'] = 0x3F,
+            ['1'] = 0x06,
+            ['2'] = 0x5B,
+            ['3'] = 0x4F,
+            ['4'] = 0x66,
+            ['5'] = 0x6D,
+            ['6'] = 0x7D,
+            ['7'] = 0x07,
+            ['8'] = 0x7F,
+            ['9'] = 0x6F,
+            ['='] = 0x48,
+            ['+'] = 0x48,
+            ['/'] = 0x02,
+            ['A'] = 0x77,
+            ['B'] = 0x7C,
+            ['C'] = 0x39,
+            ['D'] = 0x5E,
+            ['E'] = 0x79,
+            ['F'] = 0x71,
+            ['G'] = 0x3D,
+            ['H'] = 0x76,
+            ['I'] = 0x06,
+            ['J'] = 0x1E,
+            ['K'] = 0x76,
+            ['L'] = 0x39,
+            ['M'] = 0x76,
+            ['N'] = 0x76,
+            ['O'] = 0x3F,
+            ['P'] = 0x77,
+            ['Q'] = 0x7E,
+            ['R'] = 0x77,
+            ['S'] = 0x6D,
+            ['T'] = 0x40,
+            ['U'] = 0x3E,
+            ['V'] = 0x3E,
+            ['W'] = 0x76,
+            ['X'] = 0x76,
+            ['Y'] = 0x66,
+            ['Z'] = 0x5B,
+            ['_'] = 0x08,
+            ['r'] = 0x50,
+            ['o'] = 0x5C
         };
 
         public static bool[] GetBitsSeven(this char c)
@@ -78,25 +84,28 @@ namespace SkeuomorphCore
                 return false;
             }
 
-            var matched = SevenBits.TryGetValue(normalized, out bool[] bits);
-            if (!matched)
+            if (!TryGetMask(c, normalized, out var mask))
             {
                 destination.Clear();
                 return false;
             }
 
-            // The canonical table is stored in legacy internal ordering, but the WPF host expects the
-            // hardware numbering: top (1), upper-right (2), lower-right (3), bottom (4), lower-left (5),
-            // upper-left (6), center (7). The raw table’s right-hand segments are reversed relative to that.
-            destination[0] = bits[6];
-            destination[1] = bits[5];
-            destination[2] = bits[4];
-            destination[3] = bits[3];
-            destination[4] = bits[2];
-            destination[5] = bits[1];
-            destination[6] = bits[0];
+            for (var i = 0; i < SegmentCount; i++)
+            {
+                destination[i] = ((mask >> i) & 1) == 1;
+            }
 
             return true;
+        }
+
+        private static bool TryGetMask(char original, char normalized, out byte mask)
+        {
+            if (SevenMasks.TryGetValue(original, out mask))
+            {
+                return true;
+            }
+
+            return SevenMasks.TryGetValue(normalized, out mask);
         }
 
         public static void GetBitSeven(this bool[] t, char c)

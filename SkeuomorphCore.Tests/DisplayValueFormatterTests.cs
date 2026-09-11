@@ -94,7 +94,7 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
-    public void SixteenMap_GetBitsSixteen_UsesSupportedGlyphPattern()
+    public void SixteenMap_GetBitsSixteen_UsesReferenceGlyphPattern()
     {
         var bits = 'A'.GetBitsSixteen();
 
@@ -115,6 +115,16 @@ public class DisplayValueFormatterTests
         Assert.False(bits[13]);
         Assert.False(bits[14]);
         Assert.True(bits[15]);
+    }
+
+    [Fact]
+    public void SegmentMaps_MatchDmadsionReferencePatternsForCommonChars()
+    {
+        var seven = '1'.GetBitsSeven();
+        var sixteen = 'A'.GetBitsSixteen();
+
+        Assert.Equal(new[] { false, true, true, false, false, false, false }, seven);
+        Assert.Equal(new[] { true, true, true, true, false, false, true, true, false, false, false, true, false, false, false, true }, sixteen);
     }
 
     [Fact]
@@ -151,6 +161,37 @@ public class DisplayValueFormatterTests
         Assert.True(GlyphLibrary.TryGetPattern('a', out var lowercaseRows));
         Assert.Equal(7, dotRows.Length);
         Assert.Equal(7, lowercaseRows.Length);
+    }
+
+    [Fact]
+    public void GlyphLibrary_LowercaseUsesDistinctPatternFromUppercase()
+    {
+        Assert.True(GlyphLibrary.TryGetPattern('a', out var lowercaseRows));
+        Assert.True(GlyphLibrary.TryGetPattern('A', out var uppercaseRows));
+
+        Assert.NotEqual(lowercaseRows, uppercaseRows);
+        Assert.Equal("00000", lowercaseRows[0]);
+        Assert.Equal("00000", lowercaseRows[1]);
+        Assert.Equal("01110", lowercaseRows[2]);
+        Assert.Equal("00001", lowercaseRows[3]);
+        Assert.Equal("01111", lowercaseRows[4]);
+        Assert.Equal("10001", lowercaseRows[5]);
+        Assert.Equal("01111", lowercaseRows[6]);
+    }
+
+    [Fact]
+    public void SevenAndSixteenDisplays_TreatPeriodAsDecimalPointToggle()
+    {
+        var seven = new SevenSegmentDisplay();
+        var sixteen = new SixteenSegmentDisplay();
+
+        seven.SetChar('.');
+        sixteen.SetChar('.');
+
+        Assert.True(seven.ShowDecimalPoint);
+        Assert.True(sixteen.ShowDecimalPoint);
+        Assert.DoesNotContain(true, seven.GetSegments());
+        Assert.DoesNotContain(true, sixteen.GetSegments());
     }
 
     [Fact]
