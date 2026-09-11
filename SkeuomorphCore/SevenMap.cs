@@ -85,10 +85,16 @@ namespace SkeuomorphCore
                 return false;
             }
 
-            for (var i = 0; i < SegmentCount; i++)
-            {
-                destination[i] = bits[i];
-            }
+            // The canonical table is stored in legacy internal ordering, but the WPF host expects the
+            // hardware numbering: top (1), upper-right (2), lower-right (3), bottom (4), lower-left (5),
+            // upper-left (6), center (7). The raw table’s right-hand segments are reversed relative to that.
+            destination[0] = bits[6];
+            destination[1] = bits[5];
+            destination[2] = bits[4];
+            destination[3] = bits[3];
+            destination[4] = bits[2];
+            destination[5] = bits[1];
+            destination[6] = bits[0];
 
             return true;
         }

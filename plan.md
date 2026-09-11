@@ -1,6 +1,6 @@
 # Performance fix plan
 
-Status: Completed.
+Status: Active — the 16-segment editor preview geometry was corrected so segment shapes are positioned in their own local coordinate space and remain visible.
 
 ## Goal
 Reduce repeated allocations and improve maintainability in the shared display logic while preserving the existing runtime behavior and test coverage.
@@ -39,4 +39,6 @@ Both succeeded with 0 failing tests and 0 build errors.
 - This keeps the code open for additional layouts such as 14-segment, 7-segment, or custom font families without duplicating the character definition set.
 
 ## Follow-up
-If we continue this effort later, the next likely performance work is to isolate more display logic from the WPF-specific control layer so the reusable display engine can be moved to a cross-platform host without extra UI churn.
+- Confirm the 16-segment editor preview matches the physical 3x3 lattice and the host’s actual WPF segment shapes.
+- Continue validating the generic character-map editor against the supported layout sets and the existing WPF display behavior.
+- If we continue this effort later, the next likely performance work is to isolate more display logic from the WPF-specific control layer so the reusable display engine can be moved to a cross-platform host without extra UI churn.
