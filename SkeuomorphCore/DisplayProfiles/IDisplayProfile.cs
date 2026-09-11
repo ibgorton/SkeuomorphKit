@@ -1,12 +1,11 @@
-namespace SkeuomorphCore
+namespace SkeuomorphCore;
+
+public interface IDisplayProfile
 {
-    public interface IDisplayProfile
-    {
-        string Name { get; }
-        int SegmentCount { get; }
-        int Width { get; }
-        int Height { get; }
-        bool IsSupported(char c);
-        bool[] GetBits(char c);
-    }
+    string Name { get; }
+    int SegmentCount { get; }
+    int Width { get; }
+    int Height { get; }
+    bool IsSupported(char c);
+    bool[] GetBits(char c);
 }

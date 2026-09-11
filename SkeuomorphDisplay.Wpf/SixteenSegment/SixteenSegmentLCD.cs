@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SkeuomorphDisplay.Wpf.SixteenSegment
+namespace SkeuomorphDisplay.Wpf.SixteenSegment;
+
+public class SixteenSegmentLCD : SixteenSegmentBase
 {
-    public class SixteenSegmentLCD : SixteenSegmentBase
-    {
-    }
 }

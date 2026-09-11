@@ -11,16 +11,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SkeuomorphDisplay.Wpf.Rectangle5x7
+namespace SkeuomorphDisplay.Wpf.Rectangle5x7;
+
+/// <summary>
+/// Displays a 5x7 rectangle-based glyph layout as a WPF control.
+/// </summary>
+public partial class Rectangle5x7 : UserControl
 {
-    /// <summary>
-    /// Displays a 5x7 rectangle-based glyph layout as a WPF control.
-    /// </summary>
-    public partial class Rectangle5x7 : UserControl
+    public Rectangle5x7()
     {
-        public Rectangle5x7()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
