@@ -184,6 +184,39 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
+    public void SevenMap_GetBitsSeven_UsesWpfSegmentOrdering()
+    {
+        var one = '1'.GetBitsSeven();
+        var two = '2'.GetBitsSeven();
+        var zero = '0'.GetBitsSeven();
+
+        Assert.Equal(7, one.Length);
+        Assert.False(one[0]);
+        Assert.True(one[1]);
+        Assert.True(one[2]);
+        Assert.False(one[3]);
+        Assert.False(one[4]);
+        Assert.False(one[5]);
+        Assert.False(one[6]);
+
+        Assert.True(two[0]);
+        Assert.True(two[1]);
+        Assert.False(two[2]);
+        Assert.True(two[3]);
+        Assert.True(two[4]);
+        Assert.False(two[5]);
+        Assert.True(two[6]);
+
+        Assert.True(zero[0]);
+        Assert.True(zero[1]);
+        Assert.True(zero[2]);
+        Assert.True(zero[3]);
+        Assert.True(zero[4]);
+        Assert.True(zero[5]);
+        Assert.False(zero[6]);
+    }
+
+    [Fact]
     public void SevenMap_GetBitSeven_ExpandsReadableAlphaSubset()
     {
         var bits = 'P'.GetBitsSeven();

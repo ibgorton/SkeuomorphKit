@@ -21,6 +21,7 @@
             </StackPanel>
 
             <TextBlock x:Name="MaskValueText" FontSize="18" FontWeight="Bold" />
+            <TextBlock x:Name="SegmentLegendText" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" />
         </StackPanel>
 
         <Grid Margin="0,16,0,0" ColumnDefinitions="*, 320">
@@ -30,11 +31,16 @@
 
             <Border Grid.Column="1" Margin="16,0,0,0" BorderBrush="#444" BorderThickness="1" CornerRadius="8" Padding="12">
                 <StackPanel Spacing="12">
+                    <TextBlock Text="Character Map" FontWeight="SemiBold" />
+                    <ScrollViewer Height="180" VerticalScrollBarVisibility="Auto">
+                        <WrapPanel x:Name="CharacterMapPanel" Orientation="Horizontal" />
+                    </ScrollViewer>
+
                     <TextBlock Text="Generated C#" FontWeight="SemiBold" />
-                    <TextBox x:Name="CodePreview" Height="220" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" />
+                    <TextBox x:Name="CodePreview" Height="180" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" />
 
                     <TextBlock Text="Notes" FontWeight="SemiBold" />
-                    <TextBlock Text="- click cells to toggle segment bits&#10;- the mask updates live&#10;- save writes a C# snippet into SkeuomorphCore/GeneratedGlyphMaps.cs" TextWrapping="Wrap" />
+                    <TextBlock Text="- click cells to toggle segment bits&#10;- click a character below to load it&#10;- the mask updates live&#10;- save writes a C# snippet into SkeuomorphCore/GeneratedGlyphMaps.cs" TextWrapping="Wrap" />
                 </StackPanel>
             </Border>
         </Grid>
