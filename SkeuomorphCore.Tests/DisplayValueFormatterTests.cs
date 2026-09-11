@@ -154,6 +154,37 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
+    public void GlyphLibrary_LowercaseUsesDistinctPatternFromUppercase()
+    {
+        Assert.True(GlyphLibrary.TryGetPattern('a', out var lowercaseRows));
+        Assert.True(GlyphLibrary.TryGetPattern('A', out var uppercaseRows));
+
+        Assert.NotEqual(lowercaseRows, uppercaseRows);
+        Assert.Equal("00000", lowercaseRows[0]);
+        Assert.Equal("00000", lowercaseRows[1]);
+        Assert.Equal("01110", lowercaseRows[2]);
+        Assert.Equal("00001", lowercaseRows[3]);
+        Assert.Equal("01111", lowercaseRows[4]);
+        Assert.Equal("10001", lowercaseRows[5]);
+        Assert.Equal("01111", lowercaseRows[6]);
+    }
+
+    [Fact]
+    public void SevenAndSixteenDisplays_TreatPeriodAsDecimalPointToggle()
+    {
+        var seven = new SevenSegmentDisplay();
+        var sixteen = new SixteenSegmentDisplay();
+
+        seven.SetChar('.');
+        sixteen.SetChar('.');
+
+        Assert.True(seven.ShowDecimalPoint);
+        Assert.True(sixteen.ShowDecimalPoint);
+        Assert.DoesNotContain(true, seven.GetSegments());
+        Assert.DoesNotContain(true, sixteen.GetSegments());
+    }
+
+    [Fact]
     public void CharacterMap_CanCreateAndEditGlyphsWithIntegerMask()
     {
         var map = new CharacterMap(5, 7);

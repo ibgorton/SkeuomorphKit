@@ -118,10 +118,16 @@ namespace SkeuomorphCore
 
         public static bool TryGetPattern(char c, out string[] rows)
         {
-            var key = char.ToUpperInvariant(c);
-            if (Patterns.TryGetValue(key, out var pattern))
+            if (Patterns.TryGetValue(c, out var exactPattern))
             {
-                rows = pattern;
+                rows = exactPattern;
+                return true;
+            }
+
+            var upper = char.ToUpperInvariant(c);
+            if (Patterns.TryGetValue(upper, out var upperPattern))
+            {
+                rows = upperPattern;
                 return true;
             }
 

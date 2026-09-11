@@ -65,6 +65,12 @@ namespace SkeuomorphDisplay.Wpf.SixteenSegment
             _display.SegmentStateChanged += (_, e) => _segmentMapper.Apply(e.SegmentIndex, e.IsOn);
         }
 
+        public bool ShowDecimalPoint
+        {
+            get => _display.ShowDecimalPoint;
+            set => _display.ShowDecimalPoint = value;
+        }
+
         public override void BlankModule()
         {
             _display.BlankModule();

@@ -9,7 +9,6 @@ namespace SkeuomorphDisplay
         }
 
         public double DisplayAngle { get; set; } = -8d;
-
         public double DecimalDisplayAngle { get; set; } = 8d;
 
         public bool ShowDecimalPoint { get; set; }
@@ -19,6 +18,13 @@ namespace SkeuomorphDisplay
     {
         public override void SetChar(char character)
         {
+            ShowDecimalPoint = character == '.';
+            if (character == '.')
+            {
+                ApplyBitPattern(new bool[7]);
+                return;
+            }
+
             ApplyBitPattern(character.GetBitsSeven());
         }
     }
