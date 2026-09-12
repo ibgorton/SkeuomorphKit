@@ -8,7 +8,7 @@ namespace SkeuomorphDisplay
         void Refresh();
     }
 
-    public sealed class SegmentDisplayConnection<TDisplay> where TDisplay : SegmentDisplayModelBase
+    public sealed class SegmentDisplayConnection<TDisplay> where TDisplay : SegmentDisplayState
     {
         private readonly TDisplay _display;
         private ISegmentDisplayHost? _host;
@@ -100,7 +100,7 @@ namespace SkeuomorphDisplay
         public static SegmentDisplayConnection<SixteenSegmentDisplay> CreateSixteenSegment()
             => new(new SixteenSegmentDisplay());
 
-        public static SegmentDisplayConnection<TDisplay> Create<TDisplay>() where TDisplay : SegmentDisplayModelBase, new()
+        public static SegmentDisplayConnection<TDisplay> Create<TDisplay>() where TDisplay : SegmentDisplayState, new()
             => new(new TDisplay());
     }
 }

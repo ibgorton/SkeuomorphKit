@@ -2,7 +2,7 @@ using SkeuomorphCore;
 
 namespace SkeuomorphDisplay
 {
-    public abstract class SixteenSegmentDisplayBase : SegmentDisplayModelBase
+    public abstract class SixteenSegmentDisplayBase : SegmentDisplayState
     {
         protected SixteenSegmentDisplayBase() : base(16)
         {
@@ -15,6 +15,11 @@ namespace SkeuomorphDisplay
     {
         public override void SetChar(char character)
         {
+            if (!TrySetCurrentCharacter(character))
+            {
+                return;
+            }
+
             ShowDecimalPoint = character == '.';
             if (character == '.')
             {

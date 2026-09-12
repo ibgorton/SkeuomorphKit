@@ -20,13 +20,15 @@ namespace SkeuomorphDisplay
 
     public readonly record struct SegmentDisplayUpdate(int SegmentIndex, bool IsOn);
 
-    public abstract class SegmentDisplayModelBase : IDisplayControl
+    public abstract class SegmentDisplayState : IDisplayControl
     {
         private readonly bool[] _segments;
         private readonly bool[] _dirtyFlags;
         private readonly object _syncRoot = new();
+        private char _lastCharacter;
+        private bool _hasLastCharacter;
 
-        protected SegmentDisplayModelBase(int segmentCount)
+        protected SegmentDisplayState(int segmentCount)
         {
             if (segmentCount <= 0)
             {
@@ -167,6 +169,21 @@ namespace SkeuomorphDisplay
 
             lock (_syncRoot)
             {
+                var isIdentical = true;
+                for (var i = 0; i < source.Length; i++)
+                {
+                    if (_segments[i] != source[i])
+                    {
+                        isIdentical = false;
+                        break;
+                    }
+                }
+
+                if (isIdentical)
+                {
+                    return;
+                }
+
                 for (var i = 0; i < source.Length; i++)
                 {
                     if (_segments[i] != source[i])
@@ -202,6 +219,39 @@ namespace SkeuomorphDisplay
         }
 
         public abstract void SetChar(char character);
+
+        protected bool TrySetCurrentCharacter(char character)
+        {
+            if (_hasLastCharacter && _lastCharacter == character)
+            {
+                return false;
+            }
+
+            _lastCharacter = character;
+            _hasLastCharacter = true;
+            return true;
+        }
+
+        protected bool IsPatternIdentical(ReadOnlySpan<bool> source)
+        {
+            if (source.Length != _segments.Length)
+            {
+                return false;
+            }
+
+            lock (_syncRoot)
+            {
+                for (var i = 0; i < source.Length; i++)
+                {
+                    if (_segments[i] != source[i])
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
 
         protected void ValidateSegmentIndex(int segmentIndex)
         {
