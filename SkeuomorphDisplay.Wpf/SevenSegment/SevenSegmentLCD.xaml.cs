@@ -12,21 +12,20 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SkeuomorphDisplay.Wpf.SevenSegment
+namespace SkeuomorphDisplay.Wpf.SevenSegment;
+
+/// <summary>
+/// Displays a seven-segment LCD-style value.
+/// </summary>
+public partial class SevenSegmentLCD : SevenSegmentBase
 {
-    /// <summary>
-    /// Interaction logic for SevenSegmentLCD.xaml
-    /// </summary>
-    public partial class SevenSegmentLCD : SevenSegmentBase
+    public SevenSegmentLCD() : base()
     {
-        public SevenSegmentLCD() : base()
+        InitializeComponent();
+        DecimalDisplayAngle = 0;
+        if (DesignerProperties.GetIsInDesignMode(this))
         {
-            InitializeComponent();
-            DecimalDisplayAngle = 0;
-            if (DesignerProperties.GetIsInDesignMode(this))
-            {
-                return;
-            }
+            return;
         }
     }
 }

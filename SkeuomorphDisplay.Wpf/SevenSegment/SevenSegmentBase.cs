@@ -6,213 +6,212 @@ using System.Windows.Media;
 
 using static SkeuomorphCore.SevenMap;
 
-namespace SkeuomorphDisplay.Wpf.SevenSegment
+namespace SkeuomorphDisplay.Wpf.SevenSegment;
+
+/*     SEGMENT NUMBERING
+*
+*          __________
+*        _/   ONE    \_
+*       / \__________/ \
+*      | S |        | T |
+*      | I |        | W |
+*      | X |        | O |
+*      |   |________|   |
+*       \_/  SEVEN   \_/
+*       / \__________/T\
+*      | F |        | H |
+*      | I |        | R |
+*      | V |        | E |
+*      | E |________| E |    __
+*       \_/   FOUR   \_/    /  \ <- DECIMAL POINT
+*         \__________/      \__/
+*/
+
+public abstract class SevenSegmentBase : DisplayControlBase
 {
-    /*     SEGMENT NUMBERING
-    *
-    *          __________
-    *        _/   ONE    \_
-    *       / \__________/ \
-    *      | S |        | T |
-    *      | I |        | W |
-    *      | X |        | O |
-    *      |   |________|   |
-    *       \_/  SEVEN   \_/
-    *       / \__________/T\
-    *      | F |        | H |
-    *      | I |        | R |
-    *      | V |        | E |
-    *      | E |________| E |    __
-    *       \_/   FOUR   \_/    /  \ <- DECIMAL POINT
-    *         \__________/      \__/
-    */
+    private readonly SevenSegmentDisplay _display = new();
+    private readonly SegmentValueMapper _segmentMapper;
 
-    public abstract class SevenSegmentBase : DisplayControlBase
+    public SevenSegmentBase() : base()
     {
-        private readonly SevenSegmentDisplay _display = new();
-        private readonly SegmentValueMapper _segmentMapper;
+        _display.RaiseSegmentStateChangedEvents = true;
 
-        public SevenSegmentBase() : base()
+        _segmentMapper = new SegmentValueMapper(
+            value => Segment1On = value,
+            value => Segment2On = value,
+            value => Segment3On = value,
+            value => Segment4On = value,
+            value => Segment5On = value,
+            value => Segment6On = value,
+            value => Segment7On = value);
+
+        _display.SegmentStateChanged += (_, e) => _segmentMapper.Apply(e.SegmentIndex, e.IsOn);
+    }
+
+    public double DecimalDisplayAngle
+    {
+        get => _display.DecimalDisplayAngle;
+        set
         {
-            _display.RaiseSegmentStateChangedEvents = true;
-
-            _segmentMapper = new SegmentValueMapper(
-                value => Segment1On = value,
-                value => Segment2On = value,
-                value => Segment3On = value,
-                value => Segment4On = value,
-                value => Segment5On = value,
-                value => Segment6On = value,
-                value => Segment7On = value);
-
-            _display.SegmentStateChanged += (_, e) => _segmentMapper.Apply(e.SegmentIndex, e.IsOn);
+            _display.DecimalDisplayAngle = value;
+            SetValue(dp: DecimalDisplayAngleProperty, value: value);
         }
+    }
 
-        public double DecimalDisplayAngle
+    public double DisplayAngle
+    {
+        get => _display.DisplayAngle;
+        set
         {
-            get => _display.DecimalDisplayAngle;
-            set
-            {
-                _display.DecimalDisplayAngle = value;
-                SetValue(dp: DecimalDisplayAngleProperty, value: value);
-            }
+            _display.DisplayAngle = value;
+            SetValue(dp: SegmentDisplayAngleProperty, value: value);
         }
+    }
 
-        public double DisplayAngle
-        {
-            get => _display.DisplayAngle;
-            set
-            {
-                _display.DisplayAngle = value;
-                SetValue(dp: SegmentDisplayAngleProperty, value: value);
-            }
-        }
+    protected static readonly DependencyProperty MaskFillProperty =
+        DependencyProperty.Register(
+        name: "BackgroundFill", propertyType: typeof(Brush),
+        ownerType: typeof(SevenSegmentBase),
+        typeMetadata: new PropertyMetadata(defaultValue: Brushes.Black));
 
-        protected static readonly DependencyProperty MaskFillProperty =
-            DependencyProperty.Register(
-            name: "BackgroundFill", propertyType: typeof(Brush),
+    protected static readonly DependencyProperty BottomPressedProperty =
+        DependencyProperty.Register(
+        name: "BottomPressed", propertyType: typeof(bool),
+        ownerType: typeof(SevenSegmentBase),
+        typeMetadata: new PropertyMetadata(defaultValue: false));
+
+    protected static readonly DependencyProperty DecimalDisplayAngleProperty =
+        DependencyProperty.Register(
+            name: "DecimalDisplayAngle",
+            propertyType: typeof(double),
             ownerType: typeof(SevenSegmentBase),
-            typeMetadata: new PropertyMetadata(defaultValue: Brushes.Black));
+            typeMetadata: new PropertyMetadata(defaultValue: 8d));
 
-        protected static readonly DependencyProperty BottomPressedProperty =
-            DependencyProperty.Register(
-            name: "BottomPressed", propertyType: typeof(bool),
+    protected static readonly DependencyProperty SegmentDisplayAngleProperty =
+        DependencyProperty.Register(
+            name: "DisplayAngle",
+            propertyType: typeof(double),
+            ownerType: typeof(SevenSegmentBase),
+            typeMetadata: new PropertyMetadata(defaultValue: -8d));
+
+    protected static readonly DependencyProperty ShowDecimalPointProperty =
+        DependencyProperty.Register(
+            name: "ShowDecimalPoint",
+            propertyType: typeof(bool),
             ownerType: typeof(SevenSegmentBase),
             typeMetadata: new PropertyMetadata(defaultValue: false));
 
-        protected static readonly DependencyProperty DecimalDisplayAngleProperty =
-            DependencyProperty.Register(
-                name: "DecimalDisplayAngle",
-                propertyType: typeof(double),
-                ownerType: typeof(SevenSegmentBase),
-                typeMetadata: new PropertyMetadata(defaultValue: 8d));
+    protected static readonly DependencyProperty TopPressedProperty =
+        DependencyProperty.Register(
+            name: "TopPressed",
+            propertyType: typeof(bool),
+            ownerType: typeof(SevenSegmentBase),
+            typeMetadata: new PropertyMetadata(defaultValue: false));
 
-        protected static readonly DependencyProperty SegmentDisplayAngleProperty =
-            DependencyProperty.Register(
-                name: "DisplayAngle",
-                propertyType: typeof(double),
-                ownerType: typeof(SevenSegmentBase),
-                typeMetadata: new PropertyMetadata(defaultValue: -8d));
+    private static readonly DependencyProperty SegmentFiveOnProperty =
+        DependencyProperty.Register(
+            name: "Segment5On",
+            propertyType: typeof(bool),
+            ownerType: typeof(SevenSegmentBase),
+            typeMetadata: new PropertyMetadata(defaultValue: true));
 
-        protected static readonly DependencyProperty ShowDecimalPointProperty =
-            DependencyProperty.Register(
-                name: "ShowDecimalPoint",
-                propertyType: typeof(bool),
-                ownerType: typeof(SevenSegmentBase),
-                typeMetadata: new PropertyMetadata(defaultValue: false));
+    private static readonly DependencyProperty SegmentFourOnProperty =
+        DependencyProperty.Register(
+            name: "Segment4On",
+            propertyType: typeof(bool),
+            ownerType: typeof(SevenSegmentBase),
+            typeMetadata: new PropertyMetadata(defaultValue: true));
 
-        protected static readonly DependencyProperty TopPressedProperty =
-            DependencyProperty.Register(
-                name: "TopPressed",
-                propertyType: typeof(bool),
-                ownerType: typeof(SevenSegmentBase),
-                typeMetadata: new PropertyMetadata(defaultValue: false));
+    private static readonly DependencyProperty SegmentOneOnProperty =
+        DependencyProperty.Register(
+            name: "Segment1On",
+            propertyType: typeof(bool),
+            ownerType: typeof(SevenSegmentBase),
+            typeMetadata: new PropertyMetadata(defaultValue: true));
 
-        private static readonly DependencyProperty SegmentFiveOnProperty =
-            DependencyProperty.Register(
-                name: "Segment5On",
-                propertyType: typeof(bool),
-                ownerType: typeof(SevenSegmentBase),
-                typeMetadata: new PropertyMetadata(defaultValue: true));
+    private static readonly DependencyProperty SegmentSevenOnProperty =
+        DependencyProperty.Register(
+            name: "Segment7On",
+            propertyType: typeof(bool),
+            ownerType: typeof(SevenSegmentBase),
+            typeMetadata: new PropertyMetadata(defaultValue: true));
 
-        private static readonly DependencyProperty SegmentFourOnProperty =
-            DependencyProperty.Register(
-                name: "Segment4On",
-                propertyType: typeof(bool),
-                ownerType: typeof(SevenSegmentBase),
-                typeMetadata: new PropertyMetadata(defaultValue: true));
+    private static readonly DependencyProperty SegmentSixOnProperty =
+        DependencyProperty.Register(
+            name: "Segment6On",
+            propertyType: typeof(bool),
+            ownerType: typeof(SevenSegmentBase),
+            typeMetadata: new PropertyMetadata(defaultValue: true));
 
-        private static readonly DependencyProperty SegmentOneOnProperty =
-            DependencyProperty.Register(
-                name: "Segment1On",
-                propertyType: typeof(bool),
-                ownerType: typeof(SevenSegmentBase),
-                typeMetadata: new PropertyMetadata(defaultValue: true));
+    private static readonly DependencyProperty SegmentThreeOnProperty =
+        DependencyProperty.Register(
+            name: "Segment3On",
+            propertyType: typeof(bool),
+            ownerType: typeof(SevenSegmentBase),
+            typeMetadata: new PropertyMetadata(defaultValue: true));
 
-        private static readonly DependencyProperty SegmentSevenOnProperty =
-            DependencyProperty.Register(
-                name: "Segment7On",
-                propertyType: typeof(bool),
-                ownerType: typeof(SevenSegmentBase),
-                typeMetadata: new PropertyMetadata(defaultValue: true));
+    private static readonly DependencyProperty SegmentTwoOnProperty =
+        DependencyProperty.Register(
+            name: "Segment2On",
+            propertyType: typeof(bool),
+            ownerType: typeof(SevenSegmentBase),
+            typeMetadata: new PropertyMetadata(defaultValue: true));
 
-        private static readonly DependencyProperty SegmentSixOnProperty =
-            DependencyProperty.Register(
-                name: "Segment6On",
-                propertyType: typeof(bool),
-                ownerType: typeof(SevenSegmentBase),
-                typeMetadata: new PropertyMetadata(defaultValue: true));
-
-        private static readonly DependencyProperty SegmentThreeOnProperty =
-            DependencyProperty.Register(
-                name: "Segment3On",
-                propertyType: typeof(bool),
-                ownerType: typeof(SevenSegmentBase),
-                typeMetadata: new PropertyMetadata(defaultValue: true));
-
-        private static readonly DependencyProperty SegmentTwoOnProperty =
-            DependencyProperty.Register(
-                name: "Segment2On",
-                propertyType: typeof(bool),
-                ownerType: typeof(SevenSegmentBase),
-                typeMetadata: new PropertyMetadata(defaultValue: true));
-
-        public override void SetChar(char c)
+    public override void SetChar(char c)
+    {
+        lock (_changeValueLock)
         {
-            lock (_changeValueLock)
-            {
-                _display.SetChar(c);
-            }
+            _display.SetChar(c);
         }
+    }
 
-        public override void BlankModule()
+    public override void BlankModule()
+    {
+        lock (_changeValueLock)
         {
-            lock (_changeValueLock)
-            {
-                _display.BlankModule();
-            }
+            _display.BlankModule();
         }
+    }
 
-        public bool Segment5On
-        {
-            get => (bool)GetValue(dp: SegmentFiveOnProperty);
-            set => SetValue(dp: SegmentFiveOnProperty, value: value);
-        }
+    public bool Segment5On
+    {
+        get => (bool)GetValue(dp: SegmentFiveOnProperty);
+        set => SetValue(dp: SegmentFiveOnProperty, value: value);
+    }
 
-        public bool Segment4On
-        {
-            get => (bool)GetValue(dp: SegmentFourOnProperty);
-            set => SetValue(dp: SegmentFourOnProperty, value: value);
-        }
+    public bool Segment4On
+    {
+        get => (bool)GetValue(dp: SegmentFourOnProperty);
+        set => SetValue(dp: SegmentFourOnProperty, value: value);
+    }
 
-        public bool Segment1On
-        {
-            get => (bool)GetValue(dp: SegmentOneOnProperty); 
-            set => SetValue(dp: SegmentOneOnProperty, value: value);
-        }
+    public bool Segment1On
+    {
+        get => (bool)GetValue(dp: SegmentOneOnProperty); 
+        set => SetValue(dp: SegmentOneOnProperty, value: value);
+    }
 
-        public bool Segment7On
-        {
-            get => (bool)GetValue(dp: SegmentSevenOnProperty); 
-            set => SetValue(dp: SegmentSevenOnProperty, value: value);
-        }
+    public bool Segment7On
+    {
+        get => (bool)GetValue(dp: SegmentSevenOnProperty); 
+        set => SetValue(dp: SegmentSevenOnProperty, value: value);
+    }
 
-        public bool Segment6On
-        {
-            get => (bool)GetValue(dp: SegmentSixOnProperty); 
-            set => SetValue(dp: SegmentSixOnProperty, value: value);
-        }
+    public bool Segment6On
+    {
+        get => (bool)GetValue(dp: SegmentSixOnProperty); 
+        set => SetValue(dp: SegmentSixOnProperty, value: value);
+    }
 
-        public bool Segment3On
-        {
-            get => (bool)GetValue(dp: SegmentThreeOnProperty); 
-            set => SetValue(dp: SegmentThreeOnProperty, value: value);
-        }
+    public bool Segment3On
+    {
+        get => (bool)GetValue(dp: SegmentThreeOnProperty); 
+        set => SetValue(dp: SegmentThreeOnProperty, value: value);
+    }
 
-        public bool Segment2On
-        {
-            get => (bool)GetValue(dp: SegmentTwoOnProperty); 
-            set => SetValue(dp: SegmentTwoOnProperty, value: value);
-        }
+    public bool Segment2On
+    {
+        get => (bool)GetValue(dp: SegmentTwoOnProperty); 
+        set => SetValue(dp: SegmentTwoOnProperty, value: value);
     }
 }

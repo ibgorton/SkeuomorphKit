@@ -5,6 +5,43 @@ namespace SkeuomorphCore.Tests;
 
 public class DisplayValueFormatterTests
 {
+    private sealed class TestDisplayProfile : IDisplayProfile
+    {
+        public TestDisplayProfile(string name, int segmentCount, IEnumerable<char> supportedCharacters)
+            : this(name, segmentCount, segmentCount, 1, supportedCharacters)
+        {
+        }
+
+        public TestDisplayProfile(string name, int segmentCount, int width, int height, IEnumerable<char> supportedCharacters)
+        {
+            Name = name;
+            SegmentCount = segmentCount;
+            Width = width;
+            Height = height;
+            SupportedCharacters = new HashSet<char>(supportedCharacters);
+        }
+
+        public string Name { get; }
+
+        public int SegmentCount { get; }
+
+        public int Width { get; }
+
+        public int Height { get; }
+
+        private HashSet<char> SupportedCharacters { get; }
+
+        public bool IsSupported(char c)
+        {
+            return SupportedCharacters.Contains(c) || SupportedCharacters.Contains(char.ToUpperInvariant(c));
+        }
+
+        public bool[] GetBits(char c)
+        {
+            return IsSupported(c) ? new bool[SegmentCount] : new bool[SegmentCount];
+        }
+    }
+
     private sealed class TestDisplayHost : ISegmentDisplayHost
     {
         public int ApplyCount { get; private set; }
@@ -128,30 +165,35 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
-    public void DisplayCharacterProfiles_SevenSegment_RestrictsToReadableSubset()
+    public void DisplayCharacterProfiles_Registry_ProvidesBuiltInLayouts()
     {
-        Assert.True(DisplayCharacterProfiles.IsSupportedForSevenSegment('A'));
-        Assert.True(DisplayCharacterProfiles.IsSupportedForSevenSegment('3'));
-        Assert.True(DisplayCharacterProfiles.IsSupportedForSevenSegment('-'));
-        Assert.False(DisplayCharacterProfiles.IsSupportedForSevenSegment('@'));
+        var seven = DisplayCharacterProfiles.Get("SevenSegment");
+        var rectangle = DisplayCharacterProfiles.Get("Rectangle5x7");
+        var sixteen = DisplayCharacterProfiles.Get("SixteenSegment");
+
+        Assert.True(seven.IsSupported('A'));
+        Assert.True(seven.IsSupported('3'));
+        Assert.False(seven.IsSupported('@'));
+
+        Assert.True(rectangle.IsSupported('a'));
+        Assert.True(rectangle.IsSupported('?'));
+        Assert.False(rectangle.IsSupported('$'));
+
+        Assert.True(sixteen.IsSupported('@'));
+        Assert.True(sixteen.IsSupported('z'));
+        Assert.True(sixteen.IsSupported('~'));
     }
 
     [Fact]
-    public void DisplayCharacterProfiles_Rectangle5x7_SupportsGeneralTextSubset()
+    public void DisplayCharacterProfiles_CanRegisterCustomProfiles()
     {
-        Assert.True(DisplayCharacterProfiles.IsSupportedForRectangle5x7('a'));
-        Assert.True(DisplayCharacterProfiles.IsSupportedForRectangle5x7('?'));
-        Assert.True(DisplayCharacterProfiles.IsSupportedForRectangle5x7('Z'));
-        Assert.False(DisplayCharacterProfiles.IsSupportedForRectangle5x7('$'));
-    }
+        var custom = new TestDisplayProfile("CustomDisplay", 8, new[] { 'X', 'Y' });
 
-    [Fact]
-    public void DisplayCharacterProfiles_SixteenSegment_ProvidesBroadAsciiSupport()
-    {
-        Assert.True(DisplayCharacterProfiles.IsSupportedForSixteenSegment('@'));
-        Assert.True(DisplayCharacterProfiles.IsSupportedForSixteenSegment('z'));
-        Assert.True(DisplayCharacterProfiles.IsSupportedForSixteenSegment('%'));
-        Assert.True(DisplayCharacterProfiles.IsSupportedForSixteenSegment('~'));
+        DisplayCharacterProfiles.Register(custom);
+
+        Assert.True(DisplayCharacterProfiles.IsSupported("CustomDisplay", 'Y'));
+        Assert.False(DisplayCharacterProfiles.IsSupported("CustomDisplay", 'Z'));
+        Assert.Equal(8, DisplayCharacterProfiles.Get("CustomDisplay").SegmentCount);
     }
 
     [Fact]
