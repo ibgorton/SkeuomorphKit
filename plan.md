@@ -1,6 +1,6 @@
 # Performance fix plan
 
-Status: Active — the 16-segment editor preview geometry was corrected so segment shapes are positioned in their own local coordinate space and remain visible.
+Status: Active — the 16-segment editor preview geometry was corrected, and the 14-segment preview now uses the same anchored segment lattice without the two unused bits so the editor matches the canonical layout model.
 
 ## Goal
 Reduce repeated allocations and improve maintainability in the shared display logic while preserving the existing runtime behavior and test coverage.
@@ -27,6 +27,11 @@ Reduce repeated allocations and improve maintainability in the shared display lo
 - Made the disable decisions explicit and easier to test.
 - Added cases for values below minimum and above maximum.
 
+### 5) Correct the 14-segment editor preview geometry
+- Replaced the generic 7x2 grid with the same anchored segment-lattice approach used for the 16-seg editor.
+- Kept the canonical 14-bit ordering intact while omitting the final two unused layout bits so the preview matches the device model.
+- Verified the visual editor still builds cleanly and the core layout regression suite remains green.
+
 ## Validation
 - `dotnet test SkeuomorphCore.Tests/SkeuomorphCore.Tests.csproj --nologo`
 - `dotnet build SkeuomorphKit.sln --nologo`
@@ -46,4 +51,5 @@ Both succeeded with 0 failing tests and 0 build errors.
 ## Follow-up
 - Confirm the 16-segment editor preview matches the physical 3x3 lattice and the host’s actual WPF segment shapes.
 - Continue validating the generic character-map editor against the supported layout sets and the existing WPF display behavior.
+- If a specific 14-segment hardware reference is identified, compare the compact canonical lattice against that board to confirm whether any final per-segment offsets are needed.
 - If we continue this effort later, the next likely performance work is to isolate more display logic from the WPF-specific control layer so the reusable display engine can be moved to a cross-platform host without extra UI churn.

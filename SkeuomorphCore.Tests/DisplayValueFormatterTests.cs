@@ -168,12 +168,18 @@ public class DisplayValueFormatterTests
     public void DisplayCharacterProfiles_Registry_ProvidesBuiltInLayouts()
     {
         var seven = DisplayCharacterProfiles.Get("SevenSegment");
+        var fourteen = DisplayCharacterProfiles.Get("FourteenSegment");
         var rectangle = DisplayCharacterProfiles.Get("Rectangle5x7");
         var sixteen = DisplayCharacterProfiles.Get("SixteenSegment");
 
         Assert.True(seven.IsSupported('A'));
         Assert.True(seven.IsSupported('3'));
         Assert.False(seven.IsSupported('@'));
+
+        Assert.True(fourteen.IsSupported('A'));
+        Assert.True(fourteen.IsSupported('a'));
+        Assert.True(fourteen.IsSupported('3'));
+        Assert.True(fourteen.IsSupported('$'));
 
         Assert.True(rectangle.IsSupported('a'));
         Assert.True(rectangle.IsSupported('?'));
@@ -182,6 +188,22 @@ public class DisplayValueFormatterTests
         Assert.True(sixteen.IsSupported('@'));
         Assert.True(sixteen.IsSupported('z'));
         Assert.True(sixteen.IsSupported('~'));
+    }
+
+    [Fact]
+    public void FourteenMap_GetBitsFourteen_UsesSevenSegmentBaseWithSecondarySegments()
+    {
+        var bits = 'A'.GetBitsFourteen();
+
+        Assert.Equal(14, bits.Length);
+        Assert.Equal(new[]
+        {
+            true, true, true, true,
+            false, false, true,
+            true, false, false,
+            true, false, false,
+            true
+        }, bits);
     }
 
     [Fact]

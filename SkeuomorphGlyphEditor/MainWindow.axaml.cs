@@ -144,6 +144,57 @@ public partial class MainWindow : Window
                 SegmentGrid.Children.Add(canvas);
                 return;
             }
+            case FourteenSegmentDisplayProfile:
+            {
+                var canvas = new Canvas
+                {
+                    Width = 260,
+                    Height = 260,
+                    Background = Brushes.Black,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                var anchor = new[]
+                {
+                    new Point(70, 35), new Point(130, 35), new Point(190, 35),
+                    new Point(70, 130), new Point(130, 130), new Point(190, 130),
+                    new Point(70, 225), new Point(130, 225), new Point(190, 225)
+                };
+
+                // Real 14-seg parts omit the I and O center segments, leaving the standard
+                // A/B/C/D/E/F/G/H/J/K/L/M/N/P set used by the Lite-On datasheet.
+                var segments = new[]
+                {
+                    new SegmentSpec(0, anchor[0], anchor[1], 12),
+                    new SegmentSpec(1, anchor[1], anchor[2], 12),
+                    new SegmentSpec(2, anchor[2], anchor[5], 12),
+                    new SegmentSpec(3, anchor[5], anchor[8], 12),
+                    new SegmentSpec(4, anchor[7], anchor[8], 12),
+                    new SegmentSpec(5, anchor[6], anchor[7], 12),
+                    new SegmentSpec(6, anchor[3], anchor[6], 12),
+                    new SegmentSpec(7, anchor[0], anchor[3], 12),
+                    new SegmentSpec(8, anchor[0], anchor[4], 12),
+                    new SegmentSpec(9, anchor[1], anchor[4], 12),
+                    new SegmentSpec(10, anchor[4], anchor[2], 12),
+                    new SegmentSpec(11, anchor[4], anchor[5], 12),
+                    new SegmentSpec(12, anchor[4], anchor[8], 12),
+                    new SegmentSpec(13, anchor[7], anchor[4], 12),
+                    new SegmentSpec(14, anchor[6], anchor[4], 12),
+                    new SegmentSpec(15, anchor[3], anchor[4], 12)
+                };
+
+                var mapping = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15 };
+                foreach (var sourceIndex in mapping)
+                {
+                    var button = CreateSegmentButton(segments[sourceIndex]);
+                    canvas.Children.Add(button);
+                    _segmentButtons.Add(button);
+                }
+
+                SegmentGrid.Children.Add(canvas);
+                return;
+            }
             case SixteenSegmentDisplayProfile:
             {
                 var canvas = new Canvas
