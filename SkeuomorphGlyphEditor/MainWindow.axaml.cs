@@ -195,6 +195,48 @@ public partial class MainWindow : Window
                 SegmentGrid.Children.Add(canvas);
                 return;
             }
+            case DotMatrix8x8DisplayProfile:
+            {
+                const int matrixRows = 8;
+                const int matrixColumns = 8;
+
+                for (var x = 0; x < matrixColumns; x++)
+                {
+                    SegmentGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+                }
+
+                for (var y = 0; y < matrixRows; y++)
+                {
+                    SegmentGrid.RowDefinitions.Add(new RowDefinition(GridLength.Star));
+                }
+
+                for (var index = 0; index < _segmentCount; index++)
+                {
+                    var row = index / matrixColumns;
+                    var column = index % matrixColumns;
+                    var button = new ToggleButton
+                    {
+                        Width = 16,
+                        Height = 16,
+                        IsChecked = false,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(1),
+                        Tag = index,
+                        Background = Brushes.Transparent,
+                        BorderThickness = new Thickness(0),
+                        Content = ""
+                    };
+
+                    button.Click += SegmentButton_Click;
+                    Grid.SetRow(button, row);
+                    Grid.SetColumn(button, column);
+                    SegmentGrid.Children.Add(button);
+                    _segmentButtons.Add(button);
+                }
+
+                return;
+            }
             case SixteenSegmentDisplayProfile:
             {
                 var canvas = new Canvas
