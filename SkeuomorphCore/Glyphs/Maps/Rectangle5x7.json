@@ -2,11 +2,22 @@
   "Name": "Rectangle5x7",
   "Kind": 0,
   "SegmentCount": 35,
+  "Layout": {
+    "Columns": 5,
+    "Rows": 7,
+    "CanvasWidth": 180,
+    "CanvasHeight": 200,
+    "OffsetX": 0,
+    "OffsetY": 0,
+    "Scale": 1,
+    "Segments": []
+  },
   "Characters": {
     " ": "0x0",
     "!": "0x100421084",
     "\u0022": "0x294A",
     "#": "0x15F57D40",
+    "$": "null",
     "%": "0x632222263",
     "\u0026": "0x59312AA2E",
     "\u0027": "0x84",
@@ -87,6 +98,7 @@
     "w": "0x2955AC400",
     "x": "0x454454400",
     "y": "0x3A1E8C400",
-    "z": "0x7C4447C00"
+    "z": "0x7C4447C00",
+    "{": "null"
   }
 }

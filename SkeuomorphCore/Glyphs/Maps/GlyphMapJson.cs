@@ -15,6 +15,10 @@ public enum GlyphMapKind
 
 public sealed class GlyphMapLayoutDefinition
 {
+    public int Columns { get; set; }
+
+    public int Rows { get; set; }
+
     public double CanvasWidth { get; set; } = 220;
 
     public double CanvasHeight { get; set; } = 260;

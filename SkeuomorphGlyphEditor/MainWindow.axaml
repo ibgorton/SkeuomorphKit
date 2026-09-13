@@ -43,11 +43,6 @@
                     </StackPanel>
 
                     <StackPanel Spacing="6">
-                        <TextBlock Text="Saved source preview" FontWeight="SemiBold" />
-                        <TextBox x:Name="CodePreview" Height="180" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" />
-                    </StackPanel>
-
-                    <StackPanel Spacing="6">
                         <TextBlock Text="Tips" FontWeight="SemiBold" />
                         <TextBlock Text="- click segment cells to toggle bits&#10;- choose a character to load it into the editor&#10;- the mask updates while you edit&#10;- save writes directly into the active map file" TextWrapping="Wrap" />
                     </StackPanel>

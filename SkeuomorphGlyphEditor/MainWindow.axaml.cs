@@ -313,33 +313,81 @@ public partial class MainWindow : Window
         var layoutDefinition = GetLayoutDefinition(profile.Name);
         if (layoutDefinition is not null)
         {
-            var canvas = new Canvas
+            if (layoutDefinition.Segments.Count > 0)
             {
-                Width = layoutDefinition.CanvasWidth,
-                Height = layoutDefinition.CanvasHeight,
-                Background = Brushes.Black,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+                var canvas = new Canvas
+                {
+                    Width = layoutDefinition.CanvasWidth,
+                    Height = layoutDefinition.CanvasHeight,
+                    Background = Brushes.Black,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
 
-            for (var index = 0; index < layoutDefinition.Segments.Count; index++)
+                for (var index = 0; index < layoutDefinition.Segments.Count; index++)
+                {
+                    var points = layoutDefinition.Segments[index]
+                        .Select(point => new Point(point[0], point[1]))
+                        .ToArray();
+
+                    var button = CreatePolygonSegmentButton(index, points, new Point(layoutDefinition.OffsetX, layoutDefinition.OffsetY), layoutDefinition.Scale);
+                    canvas.Children.Add(button);
+                    _segmentButtons.Add(button);
+                }
+
+                SegmentGrid.Children.Add(canvas);
+                return;
+            }
+
+            var gridColumns = layoutDefinition.Columns > 0 ? layoutDefinition.Columns : profile.Width;
+            var gridRows = layoutDefinition.Rows > 0 ? layoutDefinition.Rows : profile.Height;
+
+            for (var x = 0; x < gridColumns; x++)
             {
-                var points = layoutDefinition.Segments[index]
-                    .Select(point => new Point(point[0], point[1]))
-                    .ToArray();
+                SegmentGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+            }
 
-                var button = CreatePolygonSegmentButton(index, points, new Point(layoutDefinition.OffsetX, layoutDefinition.OffsetY), layoutDefinition.Scale);
-                canvas.Children.Add(button);
+            for (var y = 0; y < gridRows; y++)
+            {
+                SegmentGrid.RowDefinitions.Add(new RowDefinition(GridLength.Star));
+            }
+
+            for (var index = 0; index < _segmentCount; index++)
+            {
+                var row = index / gridColumns;
+                var column = index % gridColumns;
+                var button = new ToggleButton
+                {
+                    Width = 20,
+                    Height = 20,
+                    IsChecked = false,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(2),
+                    Tag = index,
+                    Content = string.Empty,
+                    Background = new SolidColorBrush(Color.FromArgb(28, 220, 220, 220)),
+                    BorderBrush = new SolidColorBrush(Color.FromArgb(110, 200, 200, 200)),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(2),
+                    Padding = new Thickness(0)
+                };
+
+                button.IsCheckedChanged += (_, _) => UpdateGridButtonVisual(button);
+                button.Click += SegmentButton_Click;
+                Grid.SetRow(button, row);
+                Grid.SetColumn(button, column);
+                UpdateGridButtonVisual(button);
+                SegmentGrid.Children.Add(button);
                 _segmentButtons.Add(button);
             }
 
-            SegmentGrid.Children.Add(canvas);
             return;
         }
 
-        switch (profile)
+        switch (profile.Name)
         {
-            case SevenSegmentDisplayProfile:
+            case "SevenSegment":
             {
                 var canvas = new Canvas
                 {
@@ -372,9 +420,10 @@ public partial class MainWindow : Window
                 SegmentGrid.Children.Add(canvas);
                 return;
             }
-            case NineSegmentDisplayProfile when profile.Name is "NineSegmentSlash" or "NineSegmentSlashAlt":
-            case NineSegmentDisplayProfile when profile.Name is "NineSegmentBackslash":
-            case NineSegmentDisplayProfile when profile.Name is "NineSegmentBackslashAlt":
+            case "NineSegmentSlash":
+            case "NineSegmentSlashAlt":
+            case "NineSegmentBackslash":
+            case "NineSegmentBackslashAlt":
             {
                 var canvas = new Canvas
                 {
@@ -424,7 +473,7 @@ public partial class MainWindow : Window
                 SegmentGrid.Children.Add(canvas);
                 return;
             }
-            case TenSegmentDisplayProfile:
+            case "TenSegment":
             {
                 var canvas = new Canvas
                 {
@@ -460,7 +509,7 @@ public partial class MainWindow : Window
                 SegmentGrid.Children.Add(canvas);
                 return;
             }
-            case FourteenSegmentDisplayProfile:
+            case "FourteenSegment":
             {
                 var canvas = new Canvas
                 {
@@ -500,7 +549,7 @@ public partial class MainWindow : Window
                 SegmentGrid.Children.Add(canvas);
                 return;
             }
-            case DotMatrix8x8DisplayProfile:
+            case "DotMatrix8x8":
             {
                 const int matrixRows = 8;
                 const int matrixColumns = 8;
@@ -547,7 +596,7 @@ public partial class MainWindow : Window
 
                 return;
             }
-            case SixteenSegmentDisplayProfile:
+            case "SixteenSegment":
             {
                 var canvas = new Canvas
                 {
@@ -580,7 +629,7 @@ public partial class MainWindow : Window
 
                 foreach (var segment in legacyClockwiseSegmentDefinitions)
                 {
-                    var button = CreatePolygonSegmentButton(segment.Index, segment.Points, new Point(18, 14), 18.0);
+                    var button = CreatePolygonSegmentButton(segment.Index, segment.Points, new Point(22, 18), 16.0);
                     canvas.Children.Add(button);
                     _segmentButtons.Add(button);
                 }
@@ -588,8 +637,6 @@ public partial class MainWindow : Window
                 SegmentGrid.Children.Add(canvas);
                 return;
             }
-            default:
-                break;
         }
 
         var rows = profile.Height;
@@ -942,13 +989,10 @@ public partial class MainWindow : Window
         var characterText = CharacterInput.Text ?? string.Empty;
         var character = characterText.Length > 0 ? characterText : "A";
         var text = character[0];
-        var width = profile.Width;
-        var height = profile.Height;
-        var bits = string.Join(", ", GetCurrentBits().Select(v => v ? "true" : "false"));
-        var maskExpression = BuildMaskExpression(selected, mask);
+        _ = profile;
+        _ = text;
 
         MaskValueText.Text = $"{text} :: mask = {mask} (0x{mask:X})";
-        CodePreview.Text = $"namespace SkeuomorphCore;\n\npublic static class GeneratedGlyphMaps\n{{\n    public static readonly CharacterMap {selected}Map = new({width}, {height});\n\n    static GeneratedGlyphMaps()\n    {{\n        {selected}Map.Set('{text}', {maskExpression});\n    }}\n}}\n\n// bits: [{bits}]";
         UpdateSegmentLegend();
     }
 
@@ -1041,7 +1085,6 @@ public partial class MainWindow : Window
        var filePath = ResolveMapFileForLayout(selected);
        if (filePath is null)
        {
-           CodePreview.Text = $"No map file is defined for {selected}. Save is only supported for the glyph maps that are registered in the library.";
            MaskValueText.Text = "Save skipped";
            return;
        }
@@ -1052,13 +1095,11 @@ public partial class MainWindow : Window
            PersistRuntimeMap(selected);
            RefreshLayout();
            ClearDirty();
-           CodePreview.Text = File.ReadAllText(filePath);
            var maskText = mask.HasValue ? $"{mask.Value} (0x{mask.Value:X})" : "null";
            MaskValueText.Text = $"Saved {character} :: mask = {maskText} to {System.IO.Path.GetFileName(filePath)}";
        }
        catch (Exception ex)
        {
-           CodePreview.Text = ex.Message;
            MaskValueText.Text = $"Save failed: {ex.Message}";
        }
    }

@@ -8,59 +8,100 @@ public static class DisplayCharacterProfiles
 {
     private sealed class GlyphMapDisplayProfile : IDisplayProfile
     {
-        private readonly ISegmentedGlyphMap? _segmentMap;
-        private readonly IBitmapGlyphMap? _bitmapMap;
-
-        public GlyphMapDisplayProfile(IGlyphMap map)
+        public GlyphMapDisplayProfile(string name)
         {
-            if (map is null)
-            {
-                throw new ArgumentNullException(nameof(map));
-            }
-
-            Name = map.Name;
-            if (map is ISegmentedGlyphMap segmented)
-            {
-                _segmentMap = segmented;
-                SegmentCount = segmented.MapSegmentCount;
-                Width = 1;
-                Height = Math.Max(1, segmented.MapSegmentCount);
-                return;
-            }
-
-            if (map is IBitmapGlyphMap bitmap)
-            {
-                _bitmapMap = bitmap;
-                SegmentCount = bitmap.Width * bitmap.Height;
-                Width = bitmap.Width;
-                Height = bitmap.Height;
-                return;
-            }
-
-            throw new NotSupportedException($"The glyph map type '{map.GetType().FullName}' is not supported as a display profile.");
+            Name = name;
         }
 
         public string Name { get; }
 
-        public int SegmentCount { get; }
+        private GlyphMapLayoutDefinition? GetLayoutDefinition()
+        {
+            return GlyphMapCatalog.BuiltInJson.TryGetValue(Name, out var json)
+                ? GlyphMapDefinition.FromJson(json, Name).Layout
+                : null;
+        }
 
-        public int Width { get; }
+        public int SegmentCount
+        {
+            get
+            {
+                var map = GetCurrentMap();
+                if (map is ISegmentedGlyphMap segmented)
+                {
+                    return segmented.MapSegmentCount;
+                }
 
-        public int Height { get; }
+                if (map is IBitmapGlyphMap bitmap)
+                {
+                    return bitmap.Width * bitmap.Height;
+                }
+
+                return 0;
+            }
+        }
+
+        public int Width
+        {
+            get
+            {
+                var layout = GetLayoutDefinition();
+                if (layout is not null)
+                {
+                    return layout.Columns > 0 ? layout.Columns : 1;
+                }
+
+                var map = GetCurrentMap();
+                if (map is IBitmapGlyphMap bitmap)
+                {
+                    return bitmap.Width;
+                }
+
+                return 1;
+            }
+        }
+
+        public int Height
+        {
+            get
+            {
+                var layout = GetLayoutDefinition();
+                if (layout is not null)
+                {
+                    return layout.Rows > 0 ? layout.Rows : Math.Max(1, SegmentCount);
+                }
+
+                var map = GetCurrentMap();
+                if (map is IBitmapGlyphMap bitmap)
+                {
+                    return bitmap.Height;
+                }
+
+                return Math.Max(1, SegmentCount);
+            }
+        }
+
+        private IGlyphMap GetCurrentMap()
+        {
+            return DisplayCharacterProfiles.GetMap(Name);
+        }
 
         public bool IsSupported(char c)
         {
-            return _segmentMap?.IsSupported(c) == true || _bitmapMap?.IsSupported(c) == true;
+            var map = GetCurrentMap();
+            return map is ISegmentedGlyphMap segmented && segmented.IsSupported(c)
+                || map is IBitmapGlyphMap bitmap && bitmap.IsSupported(c);
         }
 
         public bool[] GetBits(char c)
         {
-            if (_segmentMap is not null)
+            var map = GetCurrentMap();
+            if (map is ISegmentedGlyphMap segmented)
             {
-                return _segmentMap.GetBits(c);
+                return segmented.GetBits(c);
             }
 
-            if (_bitmapMap is not null && _bitmapMap.TryGetGlyph(c, out var glyph))
+            if (map is IBitmapGlyphMap bitmap && bitmap.TryGetGlyph(c, out var glyph))
             {
                 var bits = new bool[glyph.Width * glyph.Height];
                 for (var row = 0; row < glyph.Height; row++)
@@ -83,19 +124,13 @@ public static class DisplayCharacterProfiles
 
     private static Dictionary<string, IDisplayProfile> BuildProfiles()
     {
-        return new Dictionary<string, IDisplayProfile>(StringComparer.OrdinalIgnoreCase)
+        var profiles = new Dictionary<string, IDisplayProfile>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in BuildBuiltInMaps())
         {
-            ["SevenSegment"] = new SevenSegmentDisplayProfile(),
-            ["NineSegmentSlash"] = new NineSegmentDisplayProfile("NineSegmentSlash"),
-            ["NineSegmentBackslash"] = new NineSegmentDisplayProfile("NineSegmentBackslash"),
-            ["NineSegmentSlashAlt"] = new NineSegmentDisplayProfile("NineSegmentSlashAlt"),
-            ["NineSegmentBackslashAlt"] = new NineSegmentDisplayProfile("NineSegmentBackslashAlt"),
-            ["TenSegment"] = new TenSegmentDisplayProfile(),
-            ["FourteenSegment"] = new FourteenSegmentDisplayProfile(),
-            ["Rectangle5x7"] = new Rectangle5x7DisplayProfile(),
-            ["DotMatrix8x8"] = new DotMatrix8x8DisplayProfile(),
-            ["SixteenSegment"] = new SixteenSegmentDisplayProfile()
-        };
+            profiles[pair.Key] = new GlyphMapDisplayProfile(pair.Key);
+        }
+
+        return profiles;
     }
 
     private static Dictionary<string, IGlyphMap> BuildBuiltInMaps()
@@ -165,10 +200,7 @@ public static class DisplayCharacterProfiles
         }
 
         Maps[name] = map;
-        if (!Profiles.ContainsKey(name))
-        {
-            Profiles[name] = new GlyphMapDisplayProfile(map);
-        }
+        Profiles[name] = new GlyphMapDisplayProfile(name);
     }
 
     public static void RegisterMapJson(string name, string json)

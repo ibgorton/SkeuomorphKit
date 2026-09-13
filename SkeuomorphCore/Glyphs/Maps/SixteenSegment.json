@@ -100,11 +100,11 @@
     "~": "0x9048"
   },
   "Layout": {
-    "CanvasWidth": 260,
+    "CanvasWidth": 220,
     "CanvasHeight": 260,
-    "OffsetX": 18,
-    "OffsetY": 14,
-    "Scale": 18.0,
+    "OffsetX": 22,
+    "OffsetY": 18,
+    "Scale": 16.0,
     "Segments": [
       [
         [
