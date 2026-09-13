@@ -17,7 +17,7 @@ public abstract class SegmentMapBase
         .ToHashSet();
     public abstract IReadOnlyDictionary<char, ulong?> Masks { get; }
 
-    protected IReadOnlyCollection<char> GetSupportedCharacters()
+    protected virtual IReadOnlyCollection<char> GetSupportedCharacters()
     {
         return PrintableAsciiSet
             .Where(character => Masks.TryGetValue(character, out var value) && value.HasValue)

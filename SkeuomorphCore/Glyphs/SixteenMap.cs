@@ -101,10 +101,10 @@ public sealed class SixteenMap : SegmentMapBase
         ['^'] = Mask(SegmentM, SegmentO),
         ['_'] = Mask(SegmentE, SegmentF),
         ['`'] = Mask(SegmentA),
-        ['a'] = Mask(SegmentE, SegmentF, SegmentG, SegmentN, SegmentP),
+        ['a'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG, SegmentJ, SegmentN, SegmentP),
         ['b'] = Mask(SegmentF, SegmentG, SegmentH, SegmentN, SegmentP),
         ['c'] = Mask(SegmentF, SegmentG, SegmentP),
-        ['d'] = Mask(SegmentC, SegmentD, SegmentE, SegmentL, SegmentN),
+        ['d'] = Mask(SegmentF, SegmentG, SegmentJ, SegmentN, SegmentP),
         ['e'] = Mask(SegmentF, SegmentG, SegmentO, SegmentP),
         ['f'] = Mask(SegmentB, SegmentJ, SegmentL, SegmentN, SegmentP),
         ['g'] = Mask(SegmentA, SegmentF, SegmentH, SegmentJ, SegmentN, SegmentP),
@@ -120,7 +120,7 @@ public sealed class SixteenMap : SegmentMapBase
         ['q'] = Mask(SegmentA, SegmentH, SegmentJ, SegmentN, SegmentP),
         ['r'] = Mask(SegmentG, SegmentP),
         ['s'] = Mask(SegmentA, SegmentF, SegmentH, SegmentN, SegmentP),
-        ['t'] = Mask(SegmentF, SegmentG, SegmentH, SegmentP),
+        ['t'] = Mask(SegmentE, SegmentJ, SegmentL, SegmentN, SegmentP),
         ['u'] = Mask(SegmentF, SegmentG, SegmentN),
         ['v'] = Mask(SegmentG, SegmentO),
         ['w'] = Mask(SegmentD, SegmentG, SegmentM, SegmentO),
@@ -131,7 +131,7 @@ public sealed class SixteenMap : SegmentMapBase
         ['|'] = Mask(SegmentG, SegmentH),
         ['}'] = Mask(SegmentA, SegmentF, SegmentJ, SegmentL, SegmentN),
         ['~'] = Mask(SegmentD, SegmentG, SegmentM, SegmentP),
-    };
+};
 
     private static readonly Dictionary<char, ulong?> RuntimeMasks = new(DefaultMasks);
 

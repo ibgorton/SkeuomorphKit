@@ -28,10 +28,19 @@ public partial class MainWindow : Window
 
         LayoutPicker.ItemsSource = DisplayCharacterProfiles.AllNames;
         LayoutPicker.SelectedIndex = 1;
+        StylePicker.ItemsSource = DotMatrix8x8Map.SupportedStyles;
+        StylePicker.SelectedItem = DotMatrix8x8GlyphStyles.Default;
         CharacterInput.Text = "A";
         CharacterInput.TextChanged += CharacterInput_TextChanged;
         CharacterEnabledToggle!.IsCheckedChanged += CharacterEnabledToggle_IsCheckedChanged;
         LayoutPicker.SelectionChanged += (_, _) => RefreshLayout();
+        StylePicker.SelectionChanged += (_, _) =>
+        {
+            if (LayoutPicker.SelectedItem as string == "DotMatrix8x8")
+            {
+                RefreshLayout();
+            }
+        };
 
         Loaded += (_, _) => RefreshLayout();
         UpdateDirtyIndicator();
@@ -79,6 +88,35 @@ public partial class MainWindow : Window
         DirtyStateText.Foreground = new SolidColorBrush(Color.FromRgb(157, 231, 180));
         DirtyStateBorder.Background = new SolidColorBrush(Color.FromRgb(18, 52, 32));
         DirtyStateBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(43, 107, 61));
+    }
+
+    private string GetSelectedStyle()
+    {
+        if (LayoutPicker.SelectedItem as string != "DotMatrix8x8")
+        {
+            return DotMatrix8x8GlyphStyles.Default;
+        }
+
+        var selected = StylePicker.SelectedItem as string;
+        return DotMatrix8x8GlyphStyles.Normalize(selected ?? DotMatrix8x8GlyphStyles.Default);
+    }
+
+    private void UpdateStyleVisibility()
+    {
+        var isDotMatrix = LayoutPicker.SelectedItem as string == "DotMatrix8x8";
+        StylePickerStack.IsVisible = isDotMatrix;
+        if (isDotMatrix)
+        {
+            var normalized = DotMatrix8x8GlyphStyles.Normalize(GetSelectedStyle());
+            if (!DotMatrix8x8Map.SupportedStyles.Contains(normalized))
+            {
+                StylePicker.SelectedItem = DotMatrix8x8GlyphStyles.Default;
+            }
+            else
+            {
+                StylePicker.SelectedItem = normalized;
+            }
+        }
     }
 
     private void CharacterInput_TextChanged(object? sender, EventArgs e)
@@ -141,13 +179,14 @@ public partial class MainWindow : Window
         var nextCharacter = characters[nextIndex];
         CharacterInput.Text = nextCharacter == ' ' ? " " : nextCharacter.ToString();
         UpdateCharacterEnabledToggle();
-        LoadCharacterIntoGrid(selected, nextCharacter.ToString());
+        LoadCharacterIntoGrid(selected, nextCharacter.ToString(), GetSelectedStyle());
         UpdateMaskText();
     }
 
     private void RefreshLayout()
     {
         var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
+        UpdateStyleVisibility();
         var profile = DisplayCharacterProfiles.Get(selected);
         var inputText = CharacterInput.Text ?? string.Empty;
         var character = inputText.Length > 0 ? inputText[0] : 'A';
@@ -156,7 +195,7 @@ public partial class MainWindow : Window
         BuildSegmentGrid(profile);
         BuildCharacterMap(profile.Name);
         UpdateCharacterEnabledToggle();
-        LoadCharacterIntoGrid(profile.Name, character.ToString());
+        LoadCharacterIntoGrid(profile.Name, character.ToString(), GetSelectedStyle());
         UpdateMaskText();
         UpdateSegmentLegend();
         ClearDirty();
@@ -190,7 +229,7 @@ public partial class MainWindow : Window
             {
                 CharacterInput.Text = character == ' ' ? " " : character.ToString();
                 UpdateCharacterEnabledToggle();
-                LoadCharacterIntoGrid(layout, character.ToString());
+                LoadCharacterIntoGrid(layout, character.ToString(), GetSelectedStyle());
                 UpdateMaskText();
             };
 
@@ -200,7 +239,12 @@ public partial class MainWindow : Window
 
     private static object CreateCharacterMapContent(char character, bool isDisabled)
     {
-        var label = character == ' ' ? "space" : character.ToString();
+        var label = character switch
+        {
+            ' ' => "space",
+            _ when char.IsControl(character) => $"U+{(int)character:X4}",
+            _ => character.ToString()
+        };
         if (!isDisabled)
         {
             return label;
@@ -222,6 +266,13 @@ public partial class MainWindow : Window
 
     private static IReadOnlyList<char> GetCharactersForLayout(string layout)
     {
+        if (layout == "DotMatrix8x8")
+        {
+            return Enumerable.Range(0, 128)
+                .Select(static i => (char)i)
+                .ToArray();
+        }
+
         var candidates = " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!?.,:;+-/=\\_[](){}<>|#@%&*'\"$^~".ToCharArray();
         var characters = new List<char>();
 
@@ -415,21 +466,26 @@ public partial class MainWindow : Window
                     var column = index % matrixColumns;
                     var button = new ToggleButton
                     {
-                        Width = 16,
-                        Height = 16,
+                        Width = 18,
+                        Height = 18,
                         IsChecked = false,
                         HorizontalAlignment = HorizontalAlignment.Center,
                         VerticalAlignment = VerticalAlignment.Center,
                         Margin = new Thickness(1),
                         Tag = index,
-                        Background = Brushes.Transparent,
-                        BorderThickness = new Thickness(0),
-                        Content = ""
+                        Background = new SolidColorBrush(Color.FromArgb(30, 230, 230, 230)),
+                        BorderBrush = new SolidColorBrush(Color.FromArgb(120, 200, 200, 200)),
+                        BorderThickness = new Thickness(1),
+                        CornerRadius = new CornerRadius(2),
+                        Padding = new Thickness(0),
+                        Content = string.Empty
                     };
 
+                    button.IsCheckedChanged += (_, _) => UpdateGridButtonVisual(button);
                     button.Click += SegmentButton_Click;
                     Grid.SetRow(button, row);
                     Grid.SetColumn(button, column);
+                    UpdateGridButtonVisual(button);
                     SegmentGrid.Children.Add(button);
                     _segmentButtons.Add(button);
                 }
@@ -502,21 +558,26 @@ public partial class MainWindow : Window
             var column = index % columns;
             var button = new ToggleButton
             {
-                Width = 28,
-                Height = 28,
+                Width = 20,
+                Height = 20,
                 IsChecked = false,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(4),
+                Margin = new Thickness(2),
                 Tag = index,
-                Content = index.ToString(),
-                Background = Brushes.Transparent,
-                BorderThickness = new Thickness(0)
+                Content = string.Empty,
+                Background = new SolidColorBrush(Color.FromArgb(28, 220, 220, 220)),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(110, 200, 200, 200)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(2),
+                Padding = new Thickness(0)
             };
 
+            button.IsCheckedChanged += (_, _) => UpdateGridButtonVisual(button);
             button.Click += SegmentButton_Click;
             Grid.SetRow(button, row);
             Grid.SetColumn(button, column);
+            UpdateGridButtonVisual(button);
             SegmentGrid.Children.Add(button);
             _segmentButtons.Add(button);
         }
@@ -692,6 +753,7 @@ public partial class MainWindow : Window
         var path = button.Content as Avalonia.Controls.Shapes.Path;
         if (path is null)
         {
+            UpdateGridButtonVisual(button);
             return;
         }
 
@@ -718,6 +780,21 @@ public partial class MainWindow : Window
             : new SolidColorBrush(Color.FromArgb(10, 255, 255, 255));
         button.BorderBrush = lit ? new SolidColorBrush(Color.FromArgb(120, 255, 120, 120)) : new SolidColorBrush(Color.FromArgb(80, 120, 120, 120));
         button.BorderThickness = new Thickness(lit ? 1 : 0.5);
+    }
+
+    private static void UpdateGridButtonVisual(ToggleButton button)
+    {
+        var lit = button.IsChecked == true;
+        button.Background = lit
+            ? new SolidColorBrush(Color.FromArgb(200, 255, 120, 120))
+            : new SolidColorBrush(Color.FromArgb(28, 220, 220, 220));
+        button.BorderBrush = lit
+            ? new SolidColorBrush(Color.FromArgb(180, 255, 180, 180))
+            : new SolidColorBrush(Color.FromArgb(120, 180, 180, 180));
+        button.BorderThickness = new Thickness(1);
+        button.Padding = new Thickness(0);
+        button.Opacity = lit ? 1.0 : 0.85;
+        button.Content ??= string.Empty;
     }
 
     private readonly record struct SegmentSpec
@@ -763,11 +840,13 @@ public partial class MainWindow : Window
         public double Y => Math.Min(Start.Y, End.Y) - (Thickness / 2.0);
     }
 
-    private void LoadCharacterIntoGrid(string layout, string rawText)
+    private void LoadCharacterIntoGrid(string layout, string rawText, string? style = null)
     {
         var profile = DisplayCharacterProfiles.Get(layout);
         var character = rawText.Length > 0 ? rawText[0] : 'A';
-        var bits = profile.GetBits(character);
+        var bits = layout == "DotMatrix8x8"
+            ? DotMatrix8x8Map.GetBits(character, DotMatrix8x8GlyphStyles.Normalize(style ?? GetSelectedStyle()))
+            : profile.GetBits(character);
 
         for (var index = 0; index < _segmentButtons.Count; index++)
         {

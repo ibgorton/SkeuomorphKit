@@ -140,7 +140,7 @@ public static class DisplayCharacterProfiles
             "TenSegment" => "TenMap",
             "FourteenSegment" => "FourteenMap",
             "Rectangle5x7" => "RectangleMap",
-            "DotMatrix8x8" => "DotMatrix8x8",
+            "DotMatrix8x8" => "DotMatrix8x8Map",
             "SixteenSegment" => "SixteenMap",
             _ => null
         };

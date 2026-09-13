@@ -18,6 +18,11 @@
                         <ComboBox x:Name="LayoutPicker" Width="180" />
                     </StackPanel>
 
+                    <StackPanel x:Name="StylePickerStack" IsVisible="False">
+                        <TextBlock Text="Font style" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <ComboBox x:Name="StylePicker" Width="220" />
+                    </StackPanel>
+
                     <Button Content="Save to map" Click="SaveButton_Click" Width="140" Height="34" />
                 </StackPanel>
 

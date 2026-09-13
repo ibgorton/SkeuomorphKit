@@ -12,11 +12,11 @@ public sealed class DotMatrix8x8DisplayProfile : DisplayProfileBase
 
     public override bool[] GetBits(char c)
     {
-        return c.GetBitsDotMatrix8x8();
+        return DotMatrix8x8Map.GetBits(c, DotMatrix8x8GlyphStyles.Default);
     }
 
     private static HashSet<char> BuildDotMatrixSet()
     {
-        return [.. GlyphLibrary.PatternKeys];
+        return [.. DotMatrix8x8Map.SupportedCharacters];
     }
 }

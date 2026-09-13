@@ -203,7 +203,8 @@ public class DisplayValueFormatterTests
         Assert.True(dotMatrix.IsSupported('A'));
         Assert.True(dotMatrix.IsSupported('a'));
         Assert.True(dotMatrix.IsSupported('3'));
-        Assert.False(dotMatrix.IsSupported('$'));
+        Assert.True(dotMatrix.IsSupported('$'));
+        Assert.True(dotMatrix.IsSupported('\x7F'));
 
         Assert.True(sixteen.IsSupported('@'));
         Assert.True(sixteen.IsSupported('z'));
@@ -254,12 +255,111 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
-    public void DisplayCharacterProfiles_IgnoreStaticLayoutsThatAreNotSegmentMaps()
+    public void DotMatrix8x8Map_UsesOwnDefaultBitmapLayout()
+    {
+        var bits = DotMatrix8x8Map.GetBits('A');
+
+        Assert.Equal(64, bits.Length);
+        Assert.True(bits[2]);
+        Assert.True(bits[3]);
+        Assert.True(bits[4]);
+        Assert.True(bits[9]);
+        Assert.True(bits[13]);
+        Assert.True(bits[17]);
+        Assert.True(bits[21]);
+        Assert.True(bits[25]);
+        Assert.True(bits[26]);
+        Assert.True(bits[27]);
+        Assert.True(bits[28]);
+        Assert.True(bits[29]);
+        Assert.True(bits[33]);
+        Assert.True(bits[37]);
+        Assert.True(bits[41]);
+        Assert.True(bits[45]);
+        Assert.True(bits[49]);
+        Assert.True(bits[53]);
+        Assert.False(bits[0]);
+        Assert.False(bits[1]);
+        Assert.False(bits[5]);
+        Assert.False(bits[8]);
+    }
+
+    [Fact]
+    public void DotMatrix8x8Map_ProvidesAlternateStyleRegistrations()
+    {
+        Assert.Contains(DotMatrix8x8GlyphStyles.Default, DotMatrix8x8Map.SupportedStyles);
+        Assert.Contains(DotMatrix8x8GlyphStyles.FontinoClassic, DotMatrix8x8Map.SupportedStyles);
+        Assert.Contains(DotMatrix8x8GlyphStyles.FontinoAlternate, DotMatrix8x8Map.SupportedStyles);
+        Assert.Contains(DotMatrix8x8GlyphStyles.Serif, DotMatrix8x8Map.SupportedStyles);
+        Assert.Contains(DotMatrix8x8GlyphStyles.SansSerif, DotMatrix8x8Map.SupportedStyles);
+
+        Assert.True(DotMatrix8x8Map.TryGetMask('A', DotMatrix8x8GlyphStyles.FontinoClassic, out var classicMask));
+        Assert.True(DotMatrix8x8Map.TryGetMask('0', DotMatrix8x8GlyphStyles.FontinoClassic, out var zeroMask));
+        Assert.True(DotMatrix8x8Map.TryGetMask('J', DotMatrix8x8GlyphStyles.FontinoClassic, out var jMask));
+        Assert.True(DotMatrix8x8Map.TryGetMask('k', DotMatrix8x8GlyphStyles.FontinoClassic, out var lowercaseKMask));
+        Assert.True(DotMatrix8x8Map.TryGetMask('\x7F', DotMatrix8x8GlyphStyles.FontinoClassic, out var delMask));
+        Assert.True(DisplayCharacterProfiles.IsSupported("DotMatrix8x8", '\x7F'));
+        Assert.NotEqual(0UL, classicMask);
+        Assert.NotEqual(0UL, zeroMask);
+        Assert.NotEqual(0UL, jMask);
+        Assert.NotEqual(0UL, lowercaseKMask);
+        Assert.NotEqual(0UL, delMask);
+
+        var classicRows = DotMatrix8x8Map.GetBits('A', DotMatrix8x8GlyphStyles.FontinoClassic);
+        Assert.Equal(64, classicRows.Length);
+        Assert.True(classicRows[2]);
+        Assert.True(classicRows[3]);
+        Assert.True(classicRows[9]);
+        Assert.True(classicRows[10]);
+        Assert.True(classicRows[11]);
+        Assert.True(classicRows[12]);
+        Assert.True(classicRows[16]);
+        Assert.True(classicRows[17]);
+        Assert.True(classicRows[20]);
+        Assert.True(classicRows[21]);
+        Assert.True(classicRows[32]);
+        Assert.True(classicRows[33]);
+        Assert.True(classicRows[34]);
+        Assert.True(classicRows[35]);
+        Assert.True(classicRows[36]);
+        Assert.True(classicRows[37]);
+        Assert.True(classicRows[40]);
+        Assert.True(classicRows[41]);
+        Assert.True(classicRows[44]);
+        Assert.True(classicRows[45]);
+        Assert.True(classicRows[48]);
+        Assert.True(classicRows[49]);
+        Assert.True(classicRows[52]);
+        Assert.True(classicRows[53]);
+        Assert.False(classicRows[0]);
+        Assert.False(classicRows[1]);
+        Assert.False(classicRows[4]);
+        Assert.False(classicRows[5]);
+        Assert.False(classicRows[8]);
+        Assert.False(classicRows[14]);
+        Assert.False(classicRows[15]);
+
+        var defaultBits = DotMatrix8x8Map.GetBits('A', DotMatrix8x8GlyphStyles.Default);
+        var serifBits = DotMatrix8x8Map.GetBits('A', DotMatrix8x8GlyphStyles.Serif);
+        var sansBits = DotMatrix8x8Map.GetBits('A', DotMatrix8x8GlyphStyles.SansSerif);
+
+        Assert.Equal(defaultBits.Length, serifBits.Length);
+        Assert.Equal(defaultBits.Length, sansBits.Length);
+        Assert.Equal(defaultBits, serifBits);
+        Assert.Equal(defaultBits, sansBits);
+    }
+
+    [Fact]
+    public void DotMatrix8x8Map_AllowsNullAndEnabledStates()
     {
         Assert.True(DisplayCharacterProfiles.IsSupported("DotMatrix8x8", 'A'));
         Assert.True(DisplayCharacterProfiles.Get("DotMatrix8x8").IsSupported('A'));
 
         DisplayCharacterProfiles.SetCharacterEnabled("DotMatrix8x8", 'A', false);
+        Assert.False(DisplayCharacterProfiles.IsSupported("DotMatrix8x8", 'A'));
+        Assert.True(DisplayCharacterProfiles.Get("DotMatrix8x8").IsSupported('A'));
+
+        DisplayCharacterProfiles.SetCharacterEnabled("DotMatrix8x8", 'A', true);
         Assert.True(DisplayCharacterProfiles.IsSupported("DotMatrix8x8", 'A'));
         Assert.True(DisplayCharacterProfiles.Get("DotMatrix8x8").IsSupported('A'));
     }
@@ -373,12 +473,17 @@ public class DisplayValueFormatterTests
         var bits = 'A'.GetBitsDotMatrix8x8();
 
         Assert.Equal(64, bits.Length);
-        Assert.False(bits[9]);
-        Assert.True(bits[10]);
-        Assert.True(bits[11]);
-        Assert.True(bits[12]);
-        Assert.False(bits[13]);
+        Assert.True(bits[2]);
+        Assert.True(bits[3]);
+        Assert.True(bits[4]);
+        Assert.True(bits[9]);
+        Assert.True(bits[13]);
+        Assert.True(bits[17]);
+        Assert.True(bits[21]);
+        Assert.True(bits[25]);
         Assert.False(bits[0]);
+        Assert.False(bits[1]);
+        Assert.False(bits[5]);
         Assert.False(bits[7]);
     }
 
