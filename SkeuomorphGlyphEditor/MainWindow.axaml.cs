@@ -26,11 +26,14 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        var firstLayout = DisplayCharacterProfiles.AllNames.FirstOrDefault() ?? "SevenSegment";
+        var initialCharacter = GetDefaultCharacterForLayout(firstLayout);
+
         LayoutPicker.ItemsSource = DisplayCharacterProfiles.AllNames;
-        LayoutPicker.SelectedIndex = 1;
+        LayoutPicker.SelectedItem = firstLayout;
         StylePicker.ItemsSource = DotMatrix8x8Map.SupportedStyles;
         StylePicker.SelectedItem = DotMatrix8x8GlyphStyles.Default;
-        CharacterInput.Text = "A";
+        CharacterInput.Text = initialCharacter.ToString();
         CharacterInput.TextChanged += CharacterInput_TextChanged;
         CharacterEnabledToggle!.IsCheckedChanged += CharacterEnabledToggle_IsCheckedChanged;
         LayoutPicker.SelectionChanged += (_, _) => RefreshLayout();
@@ -124,11 +127,24 @@ public partial class MainWindow : Window
         UpdateCharacterEnabledToggle();
     }
 
+    private static char GetDefaultCharacterForLayout(string layout)
+    {
+        foreach (var character in GetCharactersForLayout(layout))
+        {
+            if (!char.IsControl(character) && character != '\0')
+            {
+                return character;
+            }
+        }
+
+        return 'A';
+    }
+
     private void UpdateCharacterEnabledToggle()
     {
         var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
         var inputText = CharacterInput.Text ?? string.Empty;
-        var character = inputText.Length > 0 ? inputText[0] : 'A';
+        var character = inputText.Length > 0 ? inputText[0] : GetDefaultCharacterForLayout(selected);
         CharacterEnabledToggle!.IsChecked = DisplayCharacterProfiles.IsCharacterEnabled(selected, character);
     }
 
@@ -136,7 +152,7 @@ public partial class MainWindow : Window
     {
         var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
         var inputText = CharacterInput.Text ?? string.Empty;
-        var character = inputText.Length > 0 ? inputText[0] : 'A';
+        var character = inputText.Length > 0 ? inputText[0] : GetDefaultCharacterForLayout(selected);
         var enabled = CharacterEnabledToggle!.IsChecked == true;
         DisplayCharacterProfiles.SetCharacterEnabled(selected, character, enabled);
         PersistCharacterAvailability(selected, character, enabled);
@@ -189,7 +205,7 @@ public partial class MainWindow : Window
         UpdateStyleVisibility();
         var profile = DisplayCharacterProfiles.Get(selected);
         var inputText = CharacterInput.Text ?? string.Empty;
-        var character = inputText.Length > 0 ? inputText[0] : 'A';
+        var character = inputText.Length > 0 ? inputText[0] : GetDefaultCharacterForLayout(selected);
         _segmentCount = profile.SegmentCount;
 
         BuildSegmentGrid(profile);
@@ -1083,19 +1099,38 @@ public partial class MainWindow : Window
    private static string? ResolveMapFileForLayout(string layout)
    {
        var repoRoot = ResolveRepositoryRoot();
-       var coreDirectory = System.IO.Path.Combine(repoRoot, "SkeuomorphCore", "Glyphs");
+       var candidateDirectories = new[]
+       {
+           System.IO.Path.Combine(repoRoot, "SkeuomorphCore", "Glyphs", "Maps"),
+           System.IO.Path.Combine(repoRoot, "SkeuomorphCore", "Glyphs")
+       };
+
        var fileName = layout switch
        {
            "SevenSegment" => "SevenMap.cs",
            "NineSegment" => "NineMap.cs",
            "TenSegment" => "TenMap.cs",
            "FourteenSegment" => "FourteenMap.cs",
-           "Rectangle5x7" => "GlyphLibrary.cs",
+           "Rectangle5x7" => "RectangleMap.cs",
            "SixteenSegment" => "SixteenMap.cs",
            _ => null
        };
 
-       return fileName is null ? null : System.IO.Path.Combine(coreDirectory, fileName);
+       if (fileName is null)
+       {
+           return null;
+       }
+
+       foreach (var directory in candidateDirectories)
+       {
+           var candidatePath = System.IO.Path.Combine(directory, fileName);
+           if (File.Exists(candidatePath))
+           {
+               return candidatePath;
+           }
+       }
+
+       return System.IO.Path.Combine(candidateDirectories[0], fileName);
    }
 
    private static string BuildMaskExpression(string layout, ulong? mask)
@@ -1147,17 +1182,47 @@ public partial class MainWindow : Window
            _ => throw new InvalidOperationException($"Unsupported layout: {layout}")
        };
 
-       var dictionaryPattern = @"(?<prefix>private\s+static\s+readonly\s+Dictionary<char,\s*[^>]+>\s*\w+\s*=\s*new\(\)\s*\{\s*)" +
-                               @"(?<body>.*?)" +
-                               @"(?<suffix>\s*\};)";
-
-       var match = Regex.Match(source, dictionaryPattern, RegexOptions.Singleline);
-       if (!match.Success)
+       const string defaultMaskMarker = "DefaultMasks";
+       var markerIndex = source.IndexOf(defaultMaskMarker, StringComparison.Ordinal);
+       if (markerIndex < 0)
        {
            throw new InvalidOperationException($"Could not locate the {mapName} dictionary in the map file.");
        }
 
-       var body = match.Groups["body"].Value;
+       var initializerIndex = source.IndexOf('{', markerIndex);
+       if (initializerIndex < 0)
+       {
+           throw new InvalidOperationException($"Could not locate the {mapName} dictionary in the map file.");
+       }
+
+       var depth = 0;
+       var bodyEnd = -1;
+       for (var index = initializerIndex; index < source.Length; index++)
+       {
+           var current = source[index];
+           if (current == '{')
+           {
+               depth++;
+           }
+           else if (current == '}')
+           {
+               depth--;
+               if (depth == 0)
+               {
+                   bodyEnd = index;
+                   break;
+               }
+           }
+       }
+
+       if (bodyEnd < 0)
+       {
+           throw new InvalidOperationException($"Could not locate the {mapName} dictionary in the map file.");
+       }
+
+       var prefix = source.Substring(0, initializerIndex + 1);
+       var suffix = source.Substring(bodyEnd);
+       var body = source.Substring(initializerIndex + 1, bodyEnd - initializerIndex - 1);
        var lines = body.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).ToList();
        var updatedLines = new List<string>();
        var replaced = false;
@@ -1200,16 +1265,14 @@ public partial class MainWindow : Window
            .Where(static line => !string.IsNullOrWhiteSpace(line.Trim()))
            .OrderBy(static line =>
            {
-               var match = Regex.Match(line.Trim(), @"^\[\s*'(?<literal>(?:\\'|[^'])*)'\s*\]\s*=", RegexOptions.Singleline);
+               var match = Regex.Match(line.Trim(), @"^\[\s*'(?<literal>(?:\\'|[^'])*)'\s*\]=", RegexOptions.Singleline);
                return match.Success ? ParseCharacterLiteral(match.Groups["literal"].Value) : char.MaxValue;
            })
            .ToList();
 
-       var prefix = match.Groups["prefix"].Value;
-       var suffix = match.Groups["suffix"].Value.TrimStart();
        var bodyText = string.Join(newline, updatedLines);
        var serializedBody = string.IsNullOrEmpty(bodyText) ? string.Empty : bodyText + newline;
-       return source.Substring(0, match.Index) + prefix + serializedBody + suffix + source.Substring(match.Index + match.Length);
+       return prefix + serializedBody + suffix;
    }
 
    private static char ParseCharacterLiteral(string literal)
