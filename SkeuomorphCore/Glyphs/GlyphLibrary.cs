@@ -135,12 +135,7 @@ public static class GlyphLibrary
 
     public static bool TryGetMask(char c, out ulong mask)
     {
-        if (Patterns.TryGetValue(c, out mask))
-        {
-            return true;
-        }
-
-        return Patterns.TryGetValue(char.ToUpperInvariant(c), out mask);
+        return Patterns.TryGetValue(c, out mask);
     }
 
     private static string[] DecodeMask(ulong mask)

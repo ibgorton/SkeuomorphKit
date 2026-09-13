@@ -8,12 +8,19 @@ public abstract class SegmentMapBase
 {
     public static IReadOnlySet<char> PrintableAsciiSet => PrintableAscii.Characters;
 
-    public abstract IReadOnlyDictionary<char, ulong> Masks { get; }
+    public abstract string MapName { get; }
+    public abstract int MapSegmentCount { get; }
+    public virtual IReadOnlyCollection<char> MapSupportedCharacters => GetSupportedCharacters();
+    public virtual IReadOnlySet<char> MapDisabledCharacters => Masks
+        .Where(static pair => !pair.Value.HasValue)
+        .Select(static pair => pair.Key)
+        .ToHashSet();
+    public abstract IReadOnlyDictionary<char, ulong?> Masks { get; }
 
     protected IReadOnlyCollection<char> GetSupportedCharacters()
     {
         return PrintableAsciiSet
-            .Where(character => Masks.ContainsKey(character))
+            .Where(character => Masks.TryGetValue(character, out var value) && value.HasValue)
             .OrderBy(static c => c)
             .ToArray();
     }
@@ -29,23 +36,22 @@ public abstract class SegmentMapBase
         return result;
     }
 
-    protected bool[] GetBits(char original, int segmentCount)
+    public virtual bool[] GetBits(char c)
     {
-        var normalized = char.ToUpperInvariant(original);
-        return TryGetMask(original, normalized, out var mask)
-            ? GetBits(mask, segmentCount)
-            : new bool[segmentCount];
+        return TryGetMask(c, out var mask)
+            ? GetBits(mask, MapSegmentCount)
+            : new bool[MapSegmentCount];
     }
 
-    protected bool TryGetMask(char original, char normalized, out ulong mask)
+    protected bool TryGetMask(char c, out ulong mask)
     {
-        if (Masks.TryGetValue(original, out mask))
+        if (Masks.TryGetValue(c, out var value) && value.HasValue)
         {
+            mask = value.Value;
             return true;
         }
 
-        return Masks.TryGetValue(normalized, out mask);
+        mask = 0;
+        return false;
     }
-
-    public abstract bool[] GetBits(char c);
 }

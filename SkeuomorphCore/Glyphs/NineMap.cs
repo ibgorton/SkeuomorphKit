@@ -20,20 +20,11 @@ public sealed class NineMap : SegmentMapBase
     public const ushort SegmentH = 0x0080;
     public const ushort SegmentI = 0x0100;
 
-    public static HashSet<char> DisabledCharacters = ['('];
+    public override string MapName => nameof(NineMap);
+    public override int MapSegmentCount => SegmentCount;
+    public override IReadOnlyCollection<char> MapSupportedCharacters => SupportedCharacters;
 
-    private static ushort Mask(params ushort[] segments)
-    {
-        ushort result = 0;
-        foreach (var segment in segments)
-        {
-            result |= segment;
-        }
-
-        return result;
-    }
-
-    private readonly Dictionary<char, ulong> _nineMasks = new()
+    private static readonly Dictionary<char, ulong?> DefaultMasks = new()
     {
         [' '] = 0x000,
         ['"'] = Mask(SegmentB, SegmentF),
@@ -108,16 +99,38 @@ public sealed class NineMap : SegmentMapBase
         ['|'] = Mask(SegmentH),
     };
 
-    public override IReadOnlyDictionary<char, ulong> Masks => _nineMasks;
+    private static readonly Dictionary<char, ulong?> RuntimeMasks = new(DefaultMasks);
+
+    private static ushort Mask(params ushort[] segments)
+    {
+        ushort result = 0;
+        foreach (var segment in segments)
+        {
+            result |= segment;
+        }
+
+        return result;
+    }
+
+    public override IReadOnlyDictionary<char, ulong?> Masks => RuntimeMasks;
 
     public static IReadOnlyCollection<char> SupportedCharacters => new NineMap().GetSupportedCharacters();
 
     public override bool[] GetBits(char c)
     {
-        var normalized = char.ToUpperInvariant(c);
-        return TryGetMask(c, normalized, out var mask)
-            ? GetBits(mask, SegmentCount)
-            : new bool[SegmentCount];
+        if (new SevenMap().Masks.ContainsKey(c))
+        {
+            var sevenBits = new SevenMap().GetBits(c);
+            var result = new bool[SegmentCount];
+            for (var i = 0; i < sevenBits.Length; i++)
+            {
+                result[i] = sevenBits[i];
+            }
+
+            return result;
+        }
+
+        return base.GetBits(c);
     }
 }
 

@@ -9,7 +9,10 @@ namespace SkeuomorphCore;
 public sealed class SevenMap : SegmentMapBase
 {
     public const int SegmentCount = 7;
-    public static HashSet<char> DisabledCharacters = ['#', '$', '%', '&', '*', '+', '.', '/', ':', 'K', 'M', 'T', 'V', 'W', 'X', '\\', '{', '}'];
+
+    public override string MapName => nameof(SevenMap);
+    public override int MapSegmentCount => SegmentCount;
+    public override IReadOnlyCollection<char> MapSupportedCharacters => SupportedCharacters;
 
     // The canonical bit ordering follows the common LED naming used by the 7-segment reference docs:    // A, B, C, D, E, F, G, DP. The value is stored in the same order as the hardware bitmask.
     public const byte SegmentA = 0x01;
@@ -21,24 +24,12 @@ public sealed class SevenMap : SegmentMapBase
     public const byte SegmentG = 0x40;
     public const byte SegmentDP = 0x80;
 
-
-    private static byte Mask(params byte[] segments)
-    {
-        byte result = 0;
-        foreach (var segment in segments)
-        {
-            result |= segment;
-        }
-
-        return result;
-    }
-
-    private readonly Dictionary<char, ulong> _sevenMasks = new()
+    private static readonly Dictionary<char, ulong?> DefaultMasks = new()
     {
         [' '] = 0x00,
-        ['-'] = SegmentG,
-        ['.'] = Mask(),
-        [':'] = Mask(),
+        ['-'] = Mask(SegmentG),
+        ['.'] = null,
+        [':'] = null,
         ['='] = Mask(SegmentD, SegmentG),
         ['_'] = Mask(SegmentD),
         ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
@@ -53,7 +44,7 @@ public sealed class SevenMap : SegmentMapBase
         ['9'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
         ['A'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
         ['B'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
-        ['C'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
+        ['c'] = Mask(SegmentD, SegmentE, SegmentG),
         ['D'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentG),
         ['E'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF, SegmentG),
         ['F'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG),
@@ -61,25 +52,25 @@ public sealed class SevenMap : SegmentMapBase
         ['H'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
         ['I'] = Mask(SegmentB, SegmentC),
         ['J'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
-        ['K'] = Mask(SegmentD, SegmentE, SegmentF, SegmentG),
+        ['K'] = null,
         ['L'] = Mask(SegmentD, SegmentE, SegmentF),
-        ['M'] = Mask(SegmentA, SegmentC, SegmentE, SegmentG),
+        ['M'] = null,
         ['N'] = Mask(SegmentC, SegmentE, SegmentG),
         ['O'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['P'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['P'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG),
         ['Q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG),
         ['R'] = Mask(SegmentE, SegmentG),
         ['S'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
-        ['T'] = Mask(SegmentA, SegmentB, SegmentC),
+        ['T'] = null,
         ['U'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['V'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['W'] = Mask(SegmentC, SegmentD, SegmentE),
-        ['X'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['V'] = null,
+        ['W'] = null,
+        ['X'] = null,
         ['Y'] = Mask(SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
         ['Z'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG),
-        ['a'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['a'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentG),
         ['b'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
-        ['c'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
+        ['c'] = Mask(SegmentD, SegmentE, SegmentG),
         ['d'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentG),
         ['e'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF, SegmentG),
         ['f'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG),
@@ -87,56 +78,62 @@ public sealed class SevenMap : SegmentMapBase
         ['h'] = Mask(SegmentC, SegmentE, SegmentF, SegmentG),
         ['i'] = Mask(SegmentC),
         ['j'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
-        ['k'] = Mask(SegmentD, SegmentE, SegmentF, SegmentG),
+        ['k'] = null,
         ['l'] = Mask(SegmentD, SegmentE, SegmentF),
-        ['m'] = Mask(SegmentA, SegmentC, SegmentE, SegmentG),
+        ['m'] = null,
         ['n'] = Mask(SegmentC, SegmentE, SegmentG),
         ['o'] = Mask(SegmentC, SegmentD, SegmentE, SegmentG),
         ['p'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG),
         ['q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG),
         ['r'] = Mask(SegmentE, SegmentG),
         ['s'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
-        ['t'] = Mask(SegmentA, SegmentB, SegmentC),
+        ['t'] = null,
         ['u'] = Mask(SegmentC, SegmentD, SegmentE),
-        ['v'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['w'] = Mask(SegmentC, SegmentD, SegmentE),
-        ['x'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['v'] = null,
+        ['w'] = null,
+        ['x'] = null,
         ['y'] = Mask(SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
         ['z'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG),
-        ['!'] = Mask(SegmentB, SegmentC),
+        ['!'] = null,
         ['"'] = Mask(SegmentB, SegmentF),
-        ['#'] = Mask(SegmentA, SegmentC, SegmentE, SegmentF, SegmentG),
-        ['$'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
-        ['%'] = Mask(SegmentA, SegmentB, SegmentD, SegmentF, SegmentG),
-        ['&'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['#'] = null,
+        ['$'] = null,
+        ['%'] = null,
+        ['&'] = null,
         ['\''] = Mask(SegmentF),
         ['('] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
         [')'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD),
-        ['*'] = Mask(SegmentA, SegmentC, SegmentE, SegmentF, SegmentG),
-        ['+'] = Mask(SegmentD, SegmentG),
+        ['*'] = null,
+        ['+'] = null,
         [','] = Mask(),
-        ['/'] = Mask(SegmentB, SegmentF),
+        ['/'] = null,
         ['?'] = Mask(SegmentA, SegmentB, SegmentE, SegmentG),
         ['['] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
-        ['\\'] = Mask(SegmentB, SegmentF),
+        ['\\'] = null,
         [']'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD),
         ['^'] = Mask(SegmentA, SegmentB, SegmentF),
-        ['{'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
+        ['{'] = null,
         ['|'] = Mask(SegmentE, SegmentF),
-        ['}'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
-        ['~'] = Mask(SegmentG)
+        ['}'] = null,
+        ['~'] = Mask(SegmentG),
+        ['C'] = null,
     };
 
-    public override IReadOnlyDictionary<char, ulong> Masks => _sevenMasks;
+    private static readonly Dictionary<char, ulong?> RuntimeMasks = new(DefaultMasks);
+
+    private static byte Mask(params byte[] segments)
+    {
+        byte result = 0;
+        foreach (var segment in segments)
+        {
+            result |= segment;
+        }
+
+        return result;
+    }
+
+    public override IReadOnlyDictionary<char, ulong?> Masks => RuntimeMasks;
 
     public static IReadOnlyCollection<char> SupportedCharacters => new SevenMap().GetSupportedCharacters();
-
-    public override bool[] GetBits(char c)
-    {
-        var normalized = char.ToUpperInvariant(c);
-        return TryGetMask(c, normalized, out var mask)
-            ? GetBits(mask, SegmentCount)
-            : new bool[SegmentCount];
-    }
 }
 

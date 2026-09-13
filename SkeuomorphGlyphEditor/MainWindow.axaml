@@ -18,7 +18,6 @@
                         <ComboBox x:Name="LayoutPicker" Width="180" />
                     </StackPanel>
 
-                    <Button Content="Load" Click="LoadButton_Click" Width="90" Height="34" />
                     <Button Content="Save to map" Click="SaveButton_Click" Width="140" Height="34" />
                 </StackPanel>
 

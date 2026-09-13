@@ -56,6 +56,8 @@ Both succeeded with 0 failing tests and 0 build errors.
 - Correct the 9-segment mapping and preview to the real A..I segment family rather than a generic 16-segment subset.
 - Tighten the 9-segment glyph rules so only explicit template-backed characters are supported; unsupported glyphs stay blank instead of rendering as an all-on generic fallback.
 - Fix the live disabled-character toggle regression by keeping `DisabledCharacters` mutable at runtime so the editor can update the current profile without triggering `FieldAccessException` during reflection-based synchronization.
+- Fix the editor’s candidate filter so disabled characters remain visible and render with the OFF styling instead of being eliminated before the disabled-state check runs.
+- Restore the canonical exact-case SevenMap entries so lowercase `k` remains enabled while uppercase `K` stays disabled, and correct the canonical `P`/`p` masks to include the proper center segment.
 
 ## Planned display-family roadmap
 

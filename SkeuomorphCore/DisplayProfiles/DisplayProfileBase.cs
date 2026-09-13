@@ -58,7 +58,7 @@ public abstract class DisplayProfileBase : IDisplayProfile
     /// <returns><c>true</c> if the character is supported; otherwise, <c>false</c>.</returns>
     public virtual bool IsSupported(char c)
     {
-        return _supportedCharacters.Contains(c) || _supportedCharacters.Contains(char.ToUpperInvariant(c));
+        return _supportedCharacters.Contains(c);
     }
 
     /// <summary>

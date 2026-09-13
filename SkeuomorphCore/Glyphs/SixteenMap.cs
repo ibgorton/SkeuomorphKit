@@ -7,7 +7,7 @@ namespace SkeuomorphCore;
 // are aligned to the upstream library's NDP table (A..P, with bit 0 = A, bit 15 = P).
 // See https://github.com/dmadison/led-segment-ascii
 // Licensed under the MIT license (Copyright © 2017 David Madison).
-public abstract class SixteenMap : SegmentMapBase
+public sealed class SixteenMap : SegmentMapBase
 {
     public const int SegmentCount = 16;
 
@@ -30,21 +30,11 @@ public abstract class SixteenMap : SegmentMapBase
     public const ushort SegmentO = 0x4000;
     public const ushort SegmentP = 0x8000;
 
-    public static HashSet<char> DisabledCharacters = ['.', ':'];
+    public override string MapName => nameof(SixteenMap);
+    public override int MapSegmentCount => SegmentCount;
+    public override IReadOnlyCollection<char> MapSupportedCharacters => SupportedCharacters;
 
-    private static ushort Mask(params ushort[] segments)
-    {
-        ushort result = 0;
-        foreach (var segment in segments)
-        {
-            result |= segment;
-        }
-
-        return result;
-    }
-
-    // Canonical NDP mask table from dmadison/led-segment-ascii.
-    private readonly Dictionary<char, ulong> _sixteenMasks = new()
+    private static readonly Dictionary<char, ulong?> DefaultMasks = new()
     {
         [' '] = 0x0000,
         ['!'] = Mask(SegmentJ, SegmentN),
@@ -60,7 +50,7 @@ public abstract class SixteenMap : SegmentMapBase
         ['+'] = Mask(SegmentJ, SegmentL, SegmentN, SegmentP),
         [','] = Mask(SegmentO),
         ['-'] = Mask(SegmentL, SegmentP),
-        ['.'] = Mask(),
+        ['.'] = null,
         ['/'] = Mask(SegmentK, SegmentO),
         ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH, SegmentK, SegmentO),
         ['1'] = Mask(SegmentA, SegmentE, SegmentF, SegmentJ, SegmentN),
@@ -72,7 +62,7 @@ public abstract class SixteenMap : SegmentMapBase
         ['7'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD),
         ['8'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH, SegmentL, SegmentP),
         ['9'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentH, SegmentL, SegmentP),
-        [':'] = Mask(),
+        [':'] = null,
         [';'] = Mask(SegmentA, SegmentO),
         ['<'] = Mask(SegmentK, SegmentM, SegmentP),
         ['='] = Mask(SegmentE, SegmentF, SegmentL, SegmentP),
@@ -143,19 +133,20 @@ public abstract class SixteenMap : SegmentMapBase
         ['~'] = Mask(SegmentD, SegmentG, SegmentM, SegmentP),
     };
 
-    public override IReadOnlyDictionary<char, ulong> Masks => _sixteenMasks;
+    private static readonly Dictionary<char, ulong?> RuntimeMasks = new(DefaultMasks);
 
-    public static IReadOnlyCollection<char> SupportedCharacters => new SixteenMapImplementation().GetSupportedCharacters();
-
-    public override bool[] GetBits(char c)
+    private static ushort Mask(params ushort[] segments)
     {
-        var normalized = char.ToUpperInvariant(c);
-        return TryGetMask(c, normalized, out var mask)
-            ? GetBits(mask, SegmentCount)
-            : new bool[SegmentCount];
+        ushort result = 0;
+        foreach (var segment in segments)
+        {
+            result |= segment;
+        }
+
+        return result;
     }
 
-    private sealed class SixteenMapImplementation : SixteenMap
-    {
-    }
+    public override IReadOnlyDictionary<char, ulong?> Masks => RuntimeMasks;
+
+    public static IReadOnlyCollection<char> SupportedCharacters => new SixteenMap().GetSupportedCharacters();
 }

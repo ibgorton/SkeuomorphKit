@@ -94,17 +94,6 @@ public partial class MainWindow : Window
         CharacterEnabledToggle!.IsChecked = DisplayCharacterProfiles.IsCharacterEnabled(selected, character);
     }
 
-    private void LoadButton_Click(object? sender, RoutedEventArgs e)
-    {
-        var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
-        var inputText = CharacterInput.Text ?? string.Empty;
-        var character = inputText.Length > 0 ? inputText[0] : 'A';
-        var enabled = CharacterEnabledToggle!.IsChecked == true;
-        DisplayCharacterProfiles.SetCharacterEnabled(selected, character, enabled);
-        PersistCharacterAvailability(selected, character, enabled);
-        RefreshLayout();
-    }
-
     private void CharacterEnabledToggle_IsCheckedChanged(object? sender, RoutedEventArgs e)
     {
         var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
@@ -238,9 +227,7 @@ public partial class MainWindow : Window
 
         foreach (var character in candidates)
         {
-            var supported = DisplayCharacterProfiles.Get(layout).IsSupported(character);
-
-            if (supported && !characters.Contains(character))
+            if (!characters.Contains(character))
             {
                 characters.Add(character);
             }
@@ -881,13 +868,19 @@ public partial class MainWindow : Window
        }
 
        var character = characterText[0];
-       var mask = 0UL;
-       for (var index = 0; index < _segmentButtons.Count; index++)
+       ulong? mask = null;
+       if (CharacterEnabledToggle!.IsChecked == true)
        {
-           if (_segmentButtons[index].IsChecked == true)
+           var bitsMask = 0UL;
+           for (var index = 0; index < _segmentButtons.Count; index++)
            {
-               mask |= 1UL << index;
+               if (_segmentButtons[index].IsChecked == true)
+               {
+                   bitsMask |= 1UL << index;
+               }
            }
+
+           mask = bitsMask;
        }
 
        var filePath = ResolveMapFileForLayout(selected);
@@ -907,7 +900,8 @@ public partial class MainWindow : Window
            RefreshLayout();
            ClearDirty();
            CodePreview.Text = updated;
-           MaskValueText.Text = $"Saved {character} :: mask = {mask} (0x{mask:X}) to {System.IO.Path.GetFileName(filePath)}";
+           var maskText = mask.HasValue ? $"{mask.Value} (0x{mask.Value:X})" : "null";
+           MaskValueText.Text = $"Saved {character} :: mask = {maskText} to {System.IO.Path.GetFileName(filePath)}";
        }
        catch (Exception ex)
        {
@@ -916,7 +910,7 @@ public partial class MainWindow : Window
        }
    }
 
-   private static void ApplyRuntimeMapUpdate(string layout, char character, ulong mask)
+   private static void ApplyRuntimeMapUpdate(string layout, char character, ulong? mask)
    {
        var mapTypeName = layout switch
        {
@@ -924,7 +918,7 @@ public partial class MainWindow : Window
            "NineSegment" => "NineMap",
            "TenSegment" => "TenMap",
            "FourteenSegment" => "FourteenMap",
-           "Rectangle5x7" => "GlyphLibrary",
+           "Rectangle5x7" => "RectangleMap",
            "SixteenSegment" => "SixteenMap",
            _ => null
        };
@@ -935,41 +929,25 @@ public partial class MainWindow : Window
        }
 
        var mapType = typeof(DisplayCharacterProfiles).Assembly.GetType($"SkeuomorphCore.{mapTypeName}");
-       if (mapType is null)
+       if (mapType is null || mapType.IsAbstract || !typeof(SegmentMapBase).IsAssignableFrom(mapType))
        {
            return;
        }
 
-       var fieldName = mapTypeName switch
-       {
-           "SevenMap" => "SevenMasks",
-           "NineMap" => "NineMasks",
-           "TenMap" => "TenMasks",
-           "FourteenMap" => "FourteenMasks",
-           "GlyphLibrary" => "Patterns",
-           "SixteenMap" => "SixteenMasks",
-           _ => null
-       };
-
-       if (fieldName is null)
+       var mapInstance = Activator.CreateInstance(mapType);
+       var masksProperty = mapType.GetProperty("Masks", BindingFlags.Public | BindingFlags.Instance);
+       if (masksProperty is null || masksProperty.GetValue(mapInstance) is not IDictionary dictionary)
        {
            return;
        }
 
-       var field = mapType.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static);
-       if (field is null)
+       if (mask.HasValue)
        {
+           dictionary[character] = mask.Value;
            return;
        }
 
-       var dictionary = field.GetValue(null) as IDictionary;
-       if (dictionary is null)
-       {
-           return;
-       }
-
-       var value = Convert.ChangeType(mask, field.FieldType.GetGenericArguments()[1]);
-       dictionary[character] = value;
+       dictionary[character] = null;
    }
 
    private static void PersistCharacterAvailability(string layout, char character, bool enabled)
@@ -986,7 +964,35 @@ public partial class MainWindow : Window
        }
 
        var source = File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
-       var updated = UpdateMapDisabledCharacters(source, layout, character, enabled);
+       ulong? mask = null;
+       if (enabled)
+       {
+           var mapTypeName = layout switch
+           {
+               "SevenSegment" => "SevenMap",
+               "NineSegment" => "NineMap",
+               "TenSegment" => "TenMap",
+               "FourteenSegment" => "FourteenMap",
+               "SixteenSegment" => "SixteenMap",
+               _ => null
+           };
+
+           if (mapTypeName is not null)
+           {
+               var mapType = typeof(DisplayCharacterProfiles).Assembly.GetType($"SkeuomorphCore.{mapTypeName}");
+               var defaultMasksField = mapType?.GetField("DefaultMasks", BindingFlags.NonPublic | BindingFlags.Static);
+               if (defaultMasksField is not null && defaultMasksField.GetValue(null) is System.Collections.IDictionary defaults && defaults.Contains(character))
+               {
+                   var defaultValue = defaults[character];
+                   if (defaultValue is ulong ulongValue)
+                   {
+                       mask = ulongValue;
+                   }
+               }
+           }
+       }
+
+       var updated = UpdateMapFileCharacterEntry(source, character, mask, layout);
        File.WriteAllText(filePath, updated);
    }
 
@@ -1008,8 +1014,14 @@ public partial class MainWindow : Window
        return fileName is null ? null : System.IO.Path.Combine(coreDirectory, fileName);
    }
 
-   private static string BuildMaskExpression(string layout, ulong mask)
+   private static string BuildMaskExpression(string layout, ulong? mask)
    {
+       if (!mask.HasValue)
+       {
+           return "null";
+       }
+
+       var value = mask.Value;
        var segments = layout switch
        {
            "SevenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentDP" },
@@ -1023,13 +1035,13 @@ public partial class MainWindow : Window
 
        if (segments is null)
        {
-           return layout == "Rectangle5x7" ? $"0x{mask:X}UL" : mask.ToString();
+           return layout == "Rectangle5x7" ? $"0x{value:X}UL" : value.ToString();
        }
 
        var active = new List<string>();
        for (var index = 0; index < segments.Length; index++)
        {
-           if ((mask & (1UL << index)) != 0)
+           if ((value & (1UL << index)) != 0)
            {
                active.Add(segments[index]);
            }
@@ -1038,100 +1050,7 @@ public partial class MainWindow : Window
        return active.Count == 0 ? "Mask()" : $"Mask({string.Join(", ", active)})";
    }
 
-   private static string UpdateMapDisabledCharacters(string source, string layout, char character, bool enabled)
-   {
-       if (layout == "Rectangle5x7")
-       {
-           return source;
-       }
-
-       var mapName = layout switch
-       {
-           "SevenSegment" => "SevenMap",
-           "NineSegment" => "NineMap",
-           "TenSegment" => "TenMap",
-           "FourteenSegment" => "FourteenMap",
-           "SixteenSegment" => "SixteenMap",
-           _ => throw new InvalidOperationException($"Unsupported layout: {layout}")
-       };
-
-       var fieldPattern = @"(?ms)^\s*public\s+static\s+(?:readonly\s+)?HashSet<char>\s+DisabledCharacters\s*=\s*(?<value>\[[^\]]*\]|new\s*\(\)|new\s*HashSet<char>\s*\{[^}]*\})\s*;";
-       var matches = Regex.Matches(source, fieldPattern);
-
-       var currentValue = matches.Count > 0 ? matches[0].Groups["value"].Value : "[]";
-       var chars = ParseHashSetCharacters(currentValue);
-       var normalized = NormalizeCharacterLiteral(character);
-       if (enabled)
-       {
-           chars.Remove(normalized);
-       }
-       else
-       {
-           chars.Add(normalized);
-       }
-
-       var newline = DetectNewline(source);
-       var cleanedSource = Regex.Replace(source, fieldPattern, string.Empty);
-       var insertionIndex = cleanedSource.IndexOf("public const int SegmentCount", StringComparison.Ordinal);
-       if (insertionIndex < 0)
-       {
-           throw new InvalidOperationException($"Could not locate the segment count in {mapName}.");
-       }
-
-       var segmentIndex = cleanedSource.IndexOf(";", insertionIndex);
-       if (segmentIndex < 0)
-       {
-           throw new InvalidOperationException($"Could not insert disabled-character tracking into {mapName}.");
-       }
-
-       var before = cleanedSource.Substring(0, segmentIndex + 1);
-       var after = cleanedSource.Substring(segmentIndex + 1);
-       var serialized = chars.Count == 0 ? "[]" : $"[{string.Join(", ", chars.OrderBy(c => c).Select(c => $"'{EscapeCharacterLiteral(c)}'"))}]";
-       return before + newline + "    public static readonly HashSet<char> DisabledCharacters = " + serialized + ";" + newline + after;
-   }
-
-   private static HashSet<char> ParseHashSetCharacters(string literal)
-   {
-       var result = new HashSet<char>();
-       if (string.IsNullOrWhiteSpace(literal) || literal == "[]" || literal == "new()" || literal == "new HashSet<char>()")
-       {
-           return result;
-       }
-
-       var match = Regex.Match(literal, @"\[(?<items>.*)\]|new\s*HashSet<char>\s*\{(?<items>.*)\}", RegexOptions.Singleline);
-       if (!match.Success)
-       {
-           return result;
-       }
-
-       var body = match.Groups["items"].Value;
-       var entries = body.Split(',');
-       foreach (var entry in entries)
-       {
-           var text = entry.Trim();
-           if (text.Length == 0)
-           {
-               continue;
-           }
-
-           var literalMatch = Regex.Match(text, @"^'(?<value>(?:\\'|\\\\|\\n|\\r|\\t|[^'])*)'$", RegexOptions.Singleline);
-           if (!literalMatch.Success)
-           {
-               continue;
-           }
-
-           result.Add(ParseCharacterLiteral(literalMatch.Groups["value"].Value));
-       }
-
-       return result;
-   }
-
-   private static char NormalizeCharacterLiteral(char character)
-   {
-       return char.ToUpperInvariant(character);
-   }
-
-   private static string UpdateMapFileCharacterEntry(string source, char character, ulong mask, string layout)
+   private static string UpdateMapFileCharacterEntry(string source, char character, ulong? mask, string layout)
    {
        var mapName = layout switch
        {

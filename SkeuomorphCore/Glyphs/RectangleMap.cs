@@ -8,19 +8,25 @@ public sealed class RectangleMap : SegmentMapBase
     public const int Height = GlyphLibrary.Height;
     public const int SegmentCount = Width * Height;
 
-    private static readonly IReadOnlyDictionary<char, ulong> RectangleMasks = GlyphLibrary.CreateRectangleMap().Masks;
+    public override string MapName => nameof(RectangleMap);
+    public override int MapSegmentCount => SegmentCount;
+    public override IReadOnlyCollection<char> MapSupportedCharacters => SupportedCharacters;
 
-    public override IReadOnlyDictionary<char, ulong> Masks => RectangleMasks;
+    private static readonly Dictionary<char, ulong?> DefaultMasks = new();
 
-    public static IReadOnlyCollection<char> SupportedCharacters => new RectangleMap().GetSupportedCharacters();
-
-    public override bool[] GetBits(char c)
+    static RectangleMap()
     {
-        if (!DisplayCharacterProfiles.IsSupported("Rectangle5x7", c))
+        foreach (var pair in GlyphLibrary.CreateRectangleMap().Masks)
         {
-            return new bool[SegmentCount];
+            DefaultMasks[pair.Key] = pair.Value;
         }
 
-        return GlyphLibrary.GetMatrixBits(c);
+        RuntimeMasks = new Dictionary<char, ulong?>(DefaultMasks);
     }
+
+    private static readonly Dictionary<char, ulong?> RuntimeMasks;
+
+    public override IReadOnlyDictionary<char, ulong?> Masks => RuntimeMasks;
+
+    public static IReadOnlyCollection<char> SupportedCharacters => new RectangleMap().GetSupportedCharacters();
 }

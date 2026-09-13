@@ -59,8 +59,26 @@ public static class DisplayCharacterProfiles
             return false;
         }
 
-        var normalized = NormalizeCharacter(c);
-        return profile.IsSupported(normalized) && !GetDisabledCharacters(profileName).Contains(normalized);
+        var mapType = GetMapType(profileName);
+        if (mapType is null || mapType.IsAbstract || !typeof(SegmentMapBase).IsAssignableFrom(mapType))
+        {
+            return profile.IsSupported(c);
+        }
+
+        var mapInstance = Activator.CreateInstance(mapType);
+        var masksProperty = mapType.GetProperty("Masks", BindingFlags.Public | BindingFlags.Instance);
+        if (masksProperty is null || masksProperty.GetValue(mapInstance) is not System.Collections.IDictionary dictionary)
+        {
+            return profile.IsSupported(c);
+        }
+
+        if (!dictionary.Contains(c))
+        {
+            return false;
+        }
+
+        var value = dictionary[c];
+        return value is not null;
     }
 
     public static void SetCharacterEnabled(string profileName, char c, bool enabled)
@@ -70,28 +88,35 @@ public static class DisplayCharacterProfiles
             throw new KeyNotFoundException($"Display profile '{profileName}' was not found.");
         }
 
-        var normalized = NormalizeCharacter(c);
-        var disabled = GetDisabledCharacters(profileName);
-        if (enabled)
-        {
-            disabled.Remove(normalized);
-        }
-        else
-        {
-            disabled.Add(normalized);
-        }
-
         var mapType = GetMapType(profileName);
-        if (mapType is null)
+        if (mapType is null || mapType.IsAbstract || !typeof(SegmentMapBase).IsAssignableFrom(mapType))
         {
             return;
         }
 
-        var field = mapType.GetField("DisabledCharacters", BindingFlags.Public | BindingFlags.Static);
-        if (field is not null && field.FieldType == typeof(HashSet<char>))
+        var mapInstance = Activator.CreateInstance(mapType);
+        var masksProperty = mapType.GetProperty("Masks", BindingFlags.Public | BindingFlags.Instance);
+        if (masksProperty is null || masksProperty.GetValue(mapInstance) is not System.Collections.IDictionary dictionary)
         {
-            field.SetValue(null, disabled);
+            return;
         }
+
+        var defaultMasksField = mapType.GetField("DefaultMasks", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+        if (enabled)
+        {
+            if (defaultMasksField is not null && defaultMasksField.GetValue(null) is System.Collections.IDictionary defaults && defaults.Contains(c))
+            {
+                dictionary[c] = defaults[c];
+            }
+            else
+            {
+                dictionary.Remove(c);
+            }
+
+            return;
+        }
+
+        dictionary[c] = null;
     }
 
     public static bool IsSupported(string profileName, char c)
@@ -102,23 +127,6 @@ public static class DisplayCharacterProfiles
     public static bool IsSupported(IDisplayProfile profile, char c)
     {
         return profile is not null && IsCharacterEnabled(profile.Name, c);
-    }
-
-    private static HashSet<char> GetDisabledCharacters(string profileName)
-    {
-        var mapType = GetMapType(profileName);
-        if (mapType is null)
-        {
-            return new HashSet<char>();
-        }
-
-        var field = mapType.GetField("DisabledCharacters", BindingFlags.Public | BindingFlags.Static);
-        if (field is null || field.GetValue(null) is not IEnumerable<char> values)
-        {
-            return new HashSet<char>();
-        }
-
-        return new HashSet<char>(values.Select(NormalizeCharacter));
     }
 
     private static Type GetMapType(string profileName)
@@ -143,8 +151,4 @@ public static class DisplayCharacterProfiles
         return typeof(DisplayCharacterProfiles).Assembly.GetType($"SkeuomorphCore.{typeName}");
     }
 
-    private static char NormalizeCharacter(char c)
-    {
-        return char.ToUpperInvariant(c);
-    }
 }

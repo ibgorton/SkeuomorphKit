@@ -30,7 +30,7 @@ namespace SkeuomorphDisplay
                 return;
             }
 
-            ApplyBitPattern(character.GetBits("SevenSegment"));
+            ApplyBitPattern(character.GetBits<SevenMap>());
         }
     }
 }

@@ -27,7 +27,7 @@ namespace SkeuomorphDisplay
                 return;
             }
 
-            ApplyBitPattern(char.ToUpperInvariant(character).GetBits("SixteenSegment"));
+            ApplyBitPattern(character.GetBits<SixteenMap>());
         }
     }
 }

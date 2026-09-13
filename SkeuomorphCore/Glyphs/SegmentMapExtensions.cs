@@ -14,13 +14,8 @@ public static class SegmentMapExtensions
         return profile.GetBits(c);
     }
 
-    public static bool[] GetBits(this char c, string profileName)
+    public static bool[] GetBits<TMap>(this char c) where TMap : SegmentMapBase, new()
     {
-        if (string.IsNullOrWhiteSpace(profileName))
-        {
-            throw new ArgumentException("A display profile name is required.", nameof(profileName));
-        }
-
-        return DisplayCharacterProfiles.Get(profileName).GetBits(c);
+        return new TMap().GetBits(c);
     }
 }

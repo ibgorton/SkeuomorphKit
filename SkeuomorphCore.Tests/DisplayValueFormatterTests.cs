@@ -33,7 +33,7 @@ public class DisplayValueFormatterTests
 
         public bool IsSupported(char c)
         {
-            return SupportedCharacters.Contains(c) || SupportedCharacters.Contains(char.ToUpperInvariant(c));
+            return SupportedCharacters.Contains(c);
         }
 
         public bool[] GetBits(char c)
@@ -116,7 +116,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void RectangleMap_GetBitsRectangle_UsesSevenByFiveGlyphPattern()
     {
-        var bits = 'A'.GetBits("Rectangle5x7");
+        var bits = 'A'.GetBits<RectangleMap>();
 
         Assert.Equal(35, bits.Length);
         Assert.False(bits[0]);
@@ -133,7 +133,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void SixteenMap_GetBitsSixteen_UsesReferenceGlyphPattern()
     {
-        var bits = 'A'.GetBits("SixteenSegment");
+        var bits = 'A'.GetBits<SixteenMap>();
 
         Assert.Equal(16, bits.Length);
         Assert.True(bits[0]);
@@ -157,8 +157,8 @@ public class DisplayValueFormatterTests
     [Fact]
     public void SegmentMaps_MatchDmadsionReferencePatternsForCommonChars()
     {
-        var seven = '1'.GetBits("SevenSegment");
-        var sixteen = 'A'.GetBits("SixteenSegment");
+        var seven = '1'.GetBits<SevenMap>();
+        var sixteen = 'A'.GetBits<SixteenMap>();
 
         Assert.Equal(new[] { false, true, true, false, false, false, false }, seven);
         Assert.Equal(new[] { true, true, true, true, false, false, true, true, false, false, false, true, false, false, false, true }, sixteen);
@@ -214,7 +214,7 @@ public class DisplayValueFormatterTests
     public void DisplayCharacterProfiles_SetCharacterEnabled_ExcludesCharacterFromUseWithoutRemovingMapDefinition()
     {
         Assert.True(DisplayCharacterProfiles.IsSupported("SevenSegment", 'A'));
-        Assert.True('A'.GetBits("SevenSegment").Length > 0);
+        Assert.True('A'.GetBits<SevenMap>().Length > 0);
 
         DisplayCharacterProfiles.SetCharacterEnabled("SevenSegment", 'A', false);
         Assert.False(DisplayCharacterProfiles.IsSupported("SevenSegment", 'A'));
@@ -225,9 +225,28 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
+    public void SevenMap_LowercaseK_UsesExactLowercaseEntryWithoutUppercaseFallback()
+    {
+        Assert.True('k'.GetBits<SevenMap>().Length > 0);
+        Assert.False(DisplayCharacterProfiles.IsSupported("SevenSegment", 'K'));
+        Assert.True(DisplayCharacterProfiles.IsSupported("SevenSegment", 'k'));
+    }
+
+    [Fact]
+    public void DisplayCharacterProfiles_IgnoreStaticLayoutsThatAreNotSegmentMaps()
+    {
+        Assert.True(DisplayCharacterProfiles.IsSupported("DotMatrix8x8", 'A'));
+        Assert.True(DisplayCharacterProfiles.Get("DotMatrix8x8").IsSupported('A'));
+
+        DisplayCharacterProfiles.SetCharacterEnabled("DotMatrix8x8", 'A', false);
+        Assert.True(DisplayCharacterProfiles.IsSupported("DotMatrix8x8", 'A'));
+        Assert.True(DisplayCharacterProfiles.Get("DotMatrix8x8").IsSupported('A'));
+    }
+
+    [Fact]
     public void TenMap_GetBitsTen_UsesCanonicalTenSegmentOrder()
     {
-        var bits = 'A'.GetBits("TenSegment");
+        var bits = 'A'.GetBits<TenMap>();
 
         Assert.Equal(10, bits.Length);
         Assert.Equal(new[]
@@ -241,7 +260,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void NineMap_GetBitsNine_UsesCanonicalNineSegmentOrder()
     {
-        var bits = 'A'.GetBits("NineSegment");
+        var bits = 'A'.GetBits<NineMap>();
 
         Assert.Equal(9, bits.Length);
         Assert.Equal(new[]
@@ -255,8 +274,8 @@ public class DisplayValueFormatterTests
     [Fact]
     public void TenMap_UsesSevenSegmentGlyphsForSharedCharacters()
     {
-        var sevenBits = 'I'.GetBits("SevenSegment");
-        var tenBits = 'I'.GetBits("TenSegment");
+        var sevenBits = 'I'.GetBits<SevenMap>();
+        var tenBits = 'I'.GetBits<TenMap>();
 
         Assert.Equal(10, tenBits.Length);
         Assert.Equal(sevenBits[0], tenBits[0]);
@@ -274,8 +293,8 @@ public class DisplayValueFormatterTests
     [Fact]
     public void NineMap_UsesSevenSegmentGlyphsForSharedCharacters()
     {
-        var sevenBits = 'I'.GetBits("SevenSegment");
-        var nineBits = 'I'.GetBits("NineSegment");
+        var sevenBits = 'I'.GetBits<SevenMap>();
+        var nineBits = 'I'.GetBits<NineMap>();
 
         Assert.Equal(9, nineBits.Length);
         Assert.Equal(sevenBits[0], nineBits[0]);
@@ -292,7 +311,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void NineMap_UnsupportedCharacters_AreBlank()
     {
-        var bits = ';'.GetBits("NineSegment");
+        var bits = ';'.GetBits<NineMap>();
 
         Assert.Equal(9, bits.Length);
         Assert.Equal(new[]
@@ -306,8 +325,8 @@ public class DisplayValueFormatterTests
     [Fact]
     public void FourteenMap_GetBitsFourteen_UsesCanonicalHardwareGlyphs()
     {
-        var bits = 'A'.GetBits("FourteenSegment");
-        var mBits = 'M'.GetBits("FourteenSegment");
+        var bits = 'A'.GetBits<FourteenMap>();
+        var mBits = 'M'.GetBits<FourteenMap>();
 
         Assert.Equal(14, bits.Length);
         Assert.Equal(new[]
@@ -427,9 +446,9 @@ public class DisplayValueFormatterTests
     [Fact]
     public void SevenMap_GetBitsSeven_UsesWpfSegmentOrdering()
     {
-        var one = '1'.GetBits("SevenSegment");
-        var two = '2'.GetBits("SevenSegment");
-        var zero = '0'.GetBits("SevenSegment");
+        var one = '1'.GetBits<SevenMap>();
+        var two = '2'.GetBits<SevenMap>();
+        var zero = '0'.GetBits<SevenMap>();
 
         Assert.Equal(7, one.Length);
         Assert.False(one[0]);
@@ -460,7 +479,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void SevenMap_GetBitSeven_ExpandsReadableAlphaSubset()
     {
-        var bits = 'P'.GetBits("SevenSegment");
+        var bits = 'P'.GetBits<SevenMap>();
 
         Assert.Equal(7, bits.Length);
         Assert.True(bits[0]);
@@ -475,7 +494,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void SevenMap_GetBitSeven_UnsupportedCharacter_BlanksSegmentArray()
     {
-        var bits = '@'.GetBits("SevenSegment");
+        var bits = '@'.GetBits<SevenMap>();
 
         Assert.All(bits, value => Assert.False(value));
     }

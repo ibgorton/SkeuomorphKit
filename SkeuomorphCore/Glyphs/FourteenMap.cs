@@ -25,22 +25,11 @@ public sealed class FourteenMap : SegmentMapBase
     public const ushort SegmentN = 0x1000;
     public const ushort SegmentP = 0x2000;
 
-    public static HashSet<char> DisabledCharacters = [];
+    public override string MapName => nameof(FourteenMap);
+    public override int MapSegmentCount => SegmentCount;
+    public override IReadOnlyCollection<char> MapSupportedCharacters => SupportedCharacters;
 
-    private static ushort Mask(params ushort[] segments)
-    {
-        ushort result = 0;
-        foreach (var segment in segments)
-        {
-            result |= segment;
-        }
-
-        return result;
-    }
-
-    // Common letter mappings for real 14-segment displays. These follow the canonical letters used by
-    // the hardware reference and intentionally differ from the generic 16-seg subset mapping.
-    private readonly Dictionary<char, ulong> _fourteenMasks = new()
+    private static readonly Dictionary<char, ulong?> DefaultMasks = new()
     {
         [' '] = 0x0000,
         ['-'] = Mask(SegmentG),
@@ -135,16 +124,21 @@ public sealed class FourteenMap : SegmentMapBase
         ['~'] = Mask(SegmentK, SegmentL, SegmentP),
     };
 
-    public override IReadOnlyDictionary<char, ulong> Masks => _fourteenMasks;
+    private static readonly Dictionary<char, ulong?> RuntimeMasks = new(DefaultMasks);
+
+    private static ushort Mask(params ushort[] segments)
+    {
+        ushort result = 0;
+        foreach (var segment in segments)
+        {
+            result |= segment;
+        }
+
+        return result;
+    }
+
+    public override IReadOnlyDictionary<char, ulong?> Masks => RuntimeMasks;
 
     public static IReadOnlyCollection<char> SupportedCharacters => new FourteenMap().GetSupportedCharacters();
-
-    public override bool[] GetBits(char c)
-    {
-        var normalized = char.ToUpperInvariant(c);
-        return TryGetMask(c, normalized, out var mask)
-            ? GetBits(mask, SegmentCount)
-            : new bool[SegmentCount];
-    }
 }
 
