@@ -20,6 +20,7 @@ public partial class MainWindow : Window
 {
     private readonly List<ToggleButton> _segmentButtons = new();
     private int _segmentCount;
+    private bool _isDirty;
 
     public MainWindow()
     {
@@ -33,6 +34,51 @@ public partial class MainWindow : Window
         LayoutPicker.SelectionChanged += (_, _) => RefreshLayout();
 
         Loaded += (_, _) => RefreshLayout();
+        UpdateDirtyIndicator();
+    }
+
+    private void MarkDirty()
+    {
+        if (_isDirty)
+        {
+            return;
+        }
+
+        _isDirty = true;
+        UpdateDirtyIndicator();
+    }
+
+    private void ClearDirty()
+    {
+        if (!_isDirty)
+        {
+            return;
+        }
+
+        _isDirty = false;
+        UpdateDirtyIndicator();
+    }
+
+    private void UpdateDirtyIndicator()
+    {
+        if (DirtyStateText is null || DirtyStateBorder is null)
+        {
+            return;
+        }
+
+        if (_isDirty)
+        {
+            DirtyStateText.Text = "Unsaved";
+            DirtyStateText.Foreground = new SolidColorBrush(Color.FromRgb(255, 170, 170));
+            DirtyStateBorder.Background = new SolidColorBrush(Color.FromRgb(54, 24, 24));
+            DirtyStateBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(180, 76, 76));
+            return;
+        }
+
+        DirtyStateText.Text = "Saved";
+        DirtyStateText.Foreground = new SolidColorBrush(Color.FromRgb(157, 231, 180));
+        DirtyStateBorder.Background = new SolidColorBrush(Color.FromRgb(18, 52, 32));
+        DirtyStateBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(43, 107, 61));
     }
 
     private void CharacterInput_TextChanged(object? sender, EventArgs e)
@@ -124,6 +170,7 @@ public partial class MainWindow : Window
         LoadCharacterIntoGrid(profile.Name, character.ToString());
         UpdateMaskText();
         UpdateSegmentLegend();
+        ClearDirty();
     }
 
     private void BuildCharacterMap(string layout)
@@ -498,6 +545,7 @@ public partial class MainWindow : Window
 
     private void SegmentButton_Click(object? sender, RoutedEventArgs e)
     {
+        MarkDirty();
         UpdateMaskText();
     }
 
@@ -865,6 +913,7 @@ public partial class MainWindow : Window
            File.WriteAllText(filePath, updated);
            ApplyRuntimeMapUpdate(selected, character, mask);
            RefreshLayout();
+           ClearDirty();
            CodePreview.Text = updated;
            MaskValueText.Text = $"Saved {character} :: mask = {mask} (0x{mask:X}) to {System.IO.Path.GetFileName(filePath)}";
        }
@@ -883,6 +932,7 @@ public partial class MainWindow : Window
            "NineSegment" => "NineMap",
            "TenSegment" => "TenMap",
            "FourteenSegment" => "FourteenMap",
+           "Rectangle5x7" => "GlyphLibrary",
            "SixteenSegment" => "SixteenMap",
            _ => null
        };
@@ -904,6 +954,7 @@ public partial class MainWindow : Window
            "NineMap" => "NineMasks",
            "TenMap" => "TenMasks",
            "FourteenMap" => "FourteenMasks",
+           "GlyphLibrary" => "Patterns",
            "SixteenMap" => "SixteenMasks",
            _ => null
        };
@@ -931,6 +982,11 @@ public partial class MainWindow : Window
 
    private static void PersistCharacterAvailability(string layout, char character, bool enabled)
    {
+       if (layout == "Rectangle5x7")
+       {
+           return;
+       }
+
        var filePath = ResolveMapFileForLayout(layout);
        if (filePath is null)
        {
@@ -952,6 +1008,7 @@ public partial class MainWindow : Window
            "NineSegment" => "NineMap.cs",
            "TenSegment" => "TenMap.cs",
            "FourteenSegment" => "FourteenMap.cs",
+           "Rectangle5x7" => "GlyphLibrary.cs",
            "SixteenSegment" => "SixteenMap.cs",
            _ => null
        };
@@ -967,13 +1024,14 @@ public partial class MainWindow : Window
            "NineSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentI" },
            "TenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentI", "SegmentJ" },
            "FourteenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentJ", "SegmentK", "SegmentL", "SegmentM", "SegmentN", "SegmentP" },
+           "Rectangle5x7" => null,
            "SixteenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentI", "SegmentJ", "SegmentK", "SegmentL", "SegmentM", "SegmentN", "SegmentO", "SegmentP" },
            _ => null
        };
 
        if (segments is null)
        {
-           return mask.ToString();
+           return layout == "Rectangle5x7" ? $"0x{mask:X}UL" : mask.ToString();
        }
 
        var active = new List<string>();
@@ -990,6 +1048,11 @@ public partial class MainWindow : Window
 
    private static string UpdateMapDisabledCharacters(string source, string layout, char character, bool enabled)
    {
+       if (layout == "Rectangle5x7")
+       {
+           return source;
+       }
+
        var mapName = layout switch
        {
            "SevenSegment" => "SevenMap",
@@ -1000,28 +1063,11 @@ public partial class MainWindow : Window
            _ => throw new InvalidOperationException($"Unsupported layout: {layout}")
        };
 
-       var pattern = @"(?<prefix>public\s+static\s+readonly\s+HashSet<char>\s+DisabledCharacters\s*=\s*)(?<value>\[[^\]]*\]|new\s*\(\)|new\s*HashSet<char>\s*\{[^}]*\})\s*;";
-       var match = Regex.Match(source, pattern, RegexOptions.Singleline);
-       if (!match.Success)
-       {
-           var insertionIndex = source.IndexOf("public static readonly string[] SegmentLetters", StringComparison.Ordinal);
-           if (insertionIndex < 0)
-           {
-               throw new InvalidOperationException($"Could not locate the segment letters in {mapName}.");
-           }
+       var fieldPattern = @"(?ms)^\s*public\s+static\s+(?:readonly\s+)?HashSet<char>\s+DisabledCharacters\s*=\s*(?<value>\[[^\]]*\]|new\s*\(\)|new\s*HashSet<char>\s*\{[^}]*\})\s*;";
+       var matches = Regex.Matches(source, fieldPattern);
 
-           var segmentIndex = source.IndexOf(";", insertionIndex);
-           if (segmentIndex < 0)
-           {
-               throw new InvalidOperationException($"Could not insert disabled-character tracking into {mapName}.");
-           }
-
-           var before = source.Substring(0, segmentIndex + 1);
-           var after = source.Substring(segmentIndex + 1);
-           return before + Environment.NewLine + "    public static readonly HashSet<char> DisabledCharacters = [];" + Environment.NewLine + after;
-       }
-
-       var chars = ParseHashSetCharacters(match.Groups["value"].Value);
+       var currentValue = matches.Count > 0 ? matches[0].Groups["value"].Value : "[]";
+       var chars = ParseHashSetCharacters(currentValue);
        var normalized = NormalizeCharacterLiteral(character);
        if (enabled)
        {
@@ -1032,8 +1078,23 @@ public partial class MainWindow : Window
            chars.Add(normalized);
        }
 
+       var cleanedSource = Regex.Replace(source, fieldPattern, string.Empty);
+       var insertionIndex = cleanedSource.IndexOf("public static readonly string[] SegmentLetters", StringComparison.Ordinal);
+       if (insertionIndex < 0)
+       {
+           throw new InvalidOperationException($"Could not locate the segment letters in {mapName}.");
+       }
+
+       var segmentIndex = cleanedSource.IndexOf(";", insertionIndex);
+       if (segmentIndex < 0)
+       {
+           throw new InvalidOperationException($"Could not insert disabled-character tracking into {mapName}.");
+       }
+
+       var before = cleanedSource.Substring(0, segmentIndex + 1);
+       var after = cleanedSource.Substring(segmentIndex + 1);
        var serialized = chars.Count == 0 ? "[]" : $"[{string.Join(", ", chars.OrderBy(c => c).Select(c => $"'{EscapeCharacterLiteral(c)}'"))}]";
-       return source.Substring(0, match.Index) + match.Groups["prefix"].Value + serialized + ";" + source.Substring(match.Index + match.Length);
+       return before + Environment.NewLine + "    public static readonly HashSet<char> DisabledCharacters = " + serialized + ";" + Environment.NewLine + after;
    }
 
    private static HashSet<char> ParseHashSetCharacters(string literal)
@@ -1085,6 +1146,7 @@ public partial class MainWindow : Window
            "NineSegment" => "NineMap",
            "TenSegment" => "TenMap",
            "FourteenSegment" => "FourteenMap",
+           "Rectangle5x7" => "GlyphLibrary",
            "SixteenSegment" => "SixteenMap",
            _ => throw new InvalidOperationException($"Unsupported layout: {layout}")
        };

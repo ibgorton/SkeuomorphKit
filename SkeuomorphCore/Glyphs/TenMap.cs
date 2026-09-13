@@ -35,9 +35,6 @@ public static class TenMap
         return result;
     }
 
-    // Canonical bit ordering follows the common A..J layout used by the 10-segment reference.
-    // Any character that a 7-segment display can render should render identically on the 10-segment
-    // family, with the extra H/I/J segments left blank unless a specific glyph needs them.
     private static readonly Dictionary<char, ushort> TenMasks = new()
     {
         [' '] = 0x000,
@@ -66,12 +63,15 @@ public static class TenMap
         ['F'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG),
         ['G'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF),
         ['H'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['I'] = Mask(SegmentB, SegmentC),
         ['J'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
         ['K'] = Mask(SegmentE, SegmentF, SegmentH, SegmentI),
         ['L'] = Mask(SegmentD, SegmentE, SegmentF),
-        ['M'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG, SegmentJ),
+        ['M'] = Mask(SegmentA, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
         ['N'] = Mask(SegmentB, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
         ['O'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['P'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG, SegmentI),
+        ['Q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
         ['R'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG, SegmentI),
         ['S'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
         ['T'] = Mask(SegmentA, SegmentB),
@@ -107,7 +107,7 @@ public static class TenMap
         ['!'] = Mask(SegmentH),
         ['?'] = Mask(SegmentE, SegmentG, SegmentH),
         ['@'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
-        ['\u00B4'] = Mask(SegmentH),
+        ['´'] = Mask(SegmentH),
         ['`'] = Mask(SegmentH),
         ['|'] = Mask(SegmentH)
     };
@@ -148,7 +148,6 @@ public static class TenMap
         {
             var sevenBits = normalized.GetBitsSeven();
             mask = 0;
-
             for (var i = 0; i < sevenBits.Length; i++)
             {
                 if (sevenBits[i])

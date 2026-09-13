@@ -35,11 +35,6 @@ public static class NineMap
         return result;
     }
 
-    // Canonical bit order matches the A..I naming in the reference layout:
-    // A=bit0, B=bit1, C=bit2, D=bit3, E=bit4, F=bit5, G=bit6, H=bit7, I=bit8.
-    // These masks are taken from the canonical 9-segment template used in the reference SVG.
-    // Any character that a 7-segment display can render should render identically on the 9-segment
-    // family, with the extra H/I segments left blank.
     private static readonly Dictionary<char, ushort> NineMasks = new()
     {
         [' '] = 0x000,
@@ -68,11 +63,15 @@ public static class NineMap
         ['F'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG),
         ['G'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF),
         ['H'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['I'] = Mask(SegmentB, SegmentC),
         ['J'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
         ['K'] = Mask(SegmentE, SegmentF, SegmentH, SegmentI),
         ['L'] = Mask(SegmentD, SegmentE, SegmentF),
+        ['M'] = Mask(SegmentA, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
         ['N'] = Mask(SegmentB, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
         ['O'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['P'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG, SegmentI),
+        ['Q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
         ['R'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG, SegmentI),
         ['S'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
         ['T'] = Mask(SegmentA, SegmentB),
@@ -108,7 +107,7 @@ public static class NineMap
         ['!'] = Mask(SegmentH),
         ['?'] = Mask(SegmentE, SegmentG, SegmentH),
         ['@'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
-        ['\u00B4'] = Mask(SegmentH),
+        ['´'] = Mask(SegmentH),
         ['`'] = Mask(SegmentH),
         ['|'] = Mask(SegmentH)
     };
@@ -149,7 +148,6 @@ public static class NineMap
         {
             var sevenBits = normalized.GetBitsSeven();
             mask = 0;
-
             for (var i = 0; i < sevenBits.Length; i++)
             {
                 if (sevenBits[i])

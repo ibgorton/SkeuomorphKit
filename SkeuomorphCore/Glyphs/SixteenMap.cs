@@ -31,7 +31,15 @@ public static class SixteenMap
     public const ushort SegmentP = 0x8000;
 
     public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
-    public static HashSet<char> DisabledCharacters = [];
+    public static readonly HashSet<char> DisabledCharacters = ['.', ':'];
+
+
+
+
+
+
+
+
 
     private static ushort Mask(params ushort[] segments)
     {
@@ -48,23 +56,23 @@ public static class SixteenMap
     private static readonly Dictionary<char, ushort> SixteenMasks = new()
     {
         [' '] = 0x0000,
-        ['!'] = Mask(SegmentC, SegmentD),
-        ['"'] = Mask(SegmentB, SegmentN),
+        ['!'] = Mask(SegmentJ, SegmentN),
+        ['"'] = Mask(SegmentH, SegmentJ),
         ['#'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentJ, SegmentL, SegmentN, SegmentP),
         ['$'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentF, SegmentH, SegmentJ, SegmentL, SegmentN, SegmentP),
         ['%'] = Mask(SegmentA, SegmentD, SegmentE, SegmentH, SegmentJ, SegmentK, SegmentL, SegmentN, SegmentO, SegmentP),
         ['&'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG, SegmentI, SegmentJ, SegmentM, SegmentP),
-        ['\''] = Mask(SegmentJ),
-        ['('] = Mask(SegmentA, SegmentB, SegmentE, SegmentF),
-        [')'] = Mask(SegmentC, SegmentD, SegmentG, SegmentH),
+        ['\''] = Mask(SegmentH),
+        ['('] = Mask(SegmentK, SegmentM),
+        [')'] = Mask(SegmentI, SegmentO),
         ['*'] = Mask(SegmentI, SegmentJ, SegmentK, SegmentL, SegmentM, SegmentN, SegmentO, SegmentP),
         ['+'] = Mask(SegmentJ, SegmentL, SegmentN, SegmentP),
-        [','] = Mask(SegmentN),
-        ['-'] = Mask(SegmentD, SegmentG, SegmentK, SegmentO),
-        ['.'] = Mask(SegmentA),
-        ['/'] = Mask(SegmentB, SegmentF),
+        [','] = Mask(SegmentO),
+        ['-'] = Mask(SegmentL, SegmentP),
+        ['.'] = Mask(),
+        ['/'] = Mask(SegmentK, SegmentO),
         ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH, SegmentK, SegmentO),
-        ['1'] = Mask(SegmentB, SegmentC),
+        ['1'] = Mask(SegmentA, SegmentE, SegmentF, SegmentJ, SegmentN),
         ['2'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG, SegmentL, SegmentP),
         ['3'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentL),
         ['4'] = Mask(SegmentC, SegmentD, SegmentH, SegmentL, SegmentP),
@@ -73,8 +81,8 @@ public static class SixteenMap
         ['7'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD),
         ['8'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH, SegmentL, SegmentP),
         ['9'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentH, SegmentL, SegmentP),
-        [':'] = Mask(SegmentB, SegmentN),
-        [';'] = Mask(SegmentB, SegmentK),
+        [':'] = Mask(),
+        [';'] = Mask(SegmentA, SegmentO),
         ['<'] = Mask(SegmentK, SegmentM, SegmentP),
         ['='] = Mask(SegmentE, SegmentF, SegmentL, SegmentP),
         ['>'] = Mask(SegmentI, SegmentL, SegmentO),
@@ -139,9 +147,24 @@ public static class SixteenMap
         ['y'] = Mask(SegmentC, SegmentD, SegmentE, SegmentJ, SegmentL),
         ['z'] = Mask(SegmentF, SegmentO, SegmentP),
         ['{'] = Mask(SegmentB, SegmentE, SegmentJ, SegmentN, SegmentP),
-        ['|'] = Mask(SegmentJ, SegmentN),
+        ['|'] = Mask(SegmentG, SegmentH),
         ['}'] = Mask(SegmentA, SegmentF, SegmentJ, SegmentL, SegmentN),
-        ['~'] = Mask(SegmentK, SegmentL, SegmentO, SegmentP),
+        ['~'] = Mask(SegmentD, SegmentG, SegmentM, SegmentP),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     };
 
     public static bool[] GetBitsSixteen(this char c)

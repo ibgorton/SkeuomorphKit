@@ -62,6 +62,10 @@
                                 <TextBox x:Name="CharacterInput" Width="60" MaxLength="1" Text="A" />
                                 <Button Content="⟩" Click="NextCharacterButton_Click" Width="34" Height="34" />
                                 <CheckBox x:Name="CharacterEnabledToggle" Content="Enabled" IsChecked="True" VerticalAlignment="Center" />
+                                <Border x:Name="DirtyStateBorder" Padding="8,4" CornerRadius="6" BorderThickness="1" BorderBrush="#2b6b3d" Background="#123420">
+                                    <TextBlock x:Name="DirtyStateText" Text="Saved" FontSize="12" FontWeight="SemiBold" Foreground="#9de7b4" />
+                                </Border>
+                                <Button Content="Save to map" Click="SaveButton_Click" Width="140" Height="34" />
                             </StackPanel>
                         </Grid>
                     </Border>
