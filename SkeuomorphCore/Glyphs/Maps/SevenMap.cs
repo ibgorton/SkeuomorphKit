@@ -79,7 +79,7 @@ public sealed class SevenMap : SegmentMapBase
         ['j'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
         ['k'] = Mask(SegmentD, SegmentE, SegmentF, SegmentG),
         ['l'] = Mask(SegmentD, SegmentE, SegmentF),
-        ['m'] = Mask(SegmentA, SegmentC, SegmentE, SegmentG),
+        ['m'] = null,
         ['n'] = Mask(SegmentC, SegmentE, SegmentG),
         ['o'] = Mask(SegmentC, SegmentD, SegmentE, SegmentG),
         ['p'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
