@@ -18,7 +18,7 @@ namespace SkeuomorphDisplay
                 return;
             }
 
-            ApplyBitPattern(char.ToUpperInvariant(character).GetBitsRectangle());
+            ApplyBitPattern(char.ToUpperInvariant(character).GetBits("Rectangle5x7"));
         }
     }
 }

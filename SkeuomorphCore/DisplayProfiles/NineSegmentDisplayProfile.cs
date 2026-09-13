@@ -12,7 +12,7 @@ public sealed class NineSegmentDisplayProfile : DisplayProfileBase
 
     public override bool[] GetBits(char c)
     {
-        return c.GetBitsNine();
+        return new NineMap().GetBits(c);
     }
 
     private static HashSet<char> BuildNineSegmentSet()

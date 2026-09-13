@@ -1072,10 +1072,10 @@ public partial class MainWindow : Window
 
        var newline = DetectNewline(source);
        var cleanedSource = Regex.Replace(source, fieldPattern, string.Empty);
-       var insertionIndex = cleanedSource.IndexOf("public static readonly string[] SegmentLetters", StringComparison.Ordinal);
+       var insertionIndex = cleanedSource.IndexOf("public const int SegmentCount", StringComparison.Ordinal);
        if (insertionIndex < 0)
        {
-           throw new InvalidOperationException($"Could not locate the segment letters in {mapName}.");
+           throw new InvalidOperationException($"Could not locate the segment count in {mapName}.");
        }
 
        var segmentIndex = cleanedSource.IndexOf(";", insertionIndex);

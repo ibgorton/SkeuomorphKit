@@ -1,38 +1,51 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SkeuomorphCore;
 
 public abstract class SegmentMapBase
 {
-    protected static bool[] ToBits(byte mask, int segmentCount)
+    public static IReadOnlySet<char> PrintableAsciiSet => PrintableAscii.Characters;
+
+    public abstract IReadOnlyDictionary<char, ulong> Masks { get; }
+
+    protected IReadOnlyCollection<char> GetSupportedCharacters()
+    {
+        return PrintableAsciiSet
+            .Where(character => Masks.ContainsKey(character))
+            .OrderBy(static c => c)
+            .ToArray();
+    }
+
+    protected bool[] GetBits(ulong mask, int segmentCount)
     {
         var result = new bool[segmentCount];
         for (var i = 0; i < segmentCount; i++)
         {
-            result[i] = ((mask >> i) & 1) == 1;
+            result[i] = ((mask >> i) & 1UL) == 1UL;
         }
 
         return result;
     }
 
-    protected static bool[] ToBits(ushort mask, int segmentCount)
+    protected bool[] GetBits(char original, int segmentCount)
     {
-        var result = new bool[segmentCount];
-        for (var i = 0; i < segmentCount; i++)
-        {
-            result[i] = ((mask >> i) & 1) == 1;
-        }
-
-        return result;
+        var normalized = char.ToUpperInvariant(original);
+        return TryGetMask(original, normalized, out var mask)
+            ? GetBits(mask, segmentCount)
+            : new bool[segmentCount];
     }
 
-    protected static bool TryGetMask<TMask>(IReadOnlyDictionary<char, TMask> masks, char original, char normalized, out TMask mask)
+    protected bool TryGetMask(char original, char normalized, out ulong mask)
     {
-        if (masks.TryGetValue(original, out mask))
+        if (Masks.TryGetValue(original, out mask))
         {
             return true;
         }
 
-        return masks.TryGetValue(normalized, out mask);
+        return Masks.TryGetValue(normalized, out mask);
     }
+
+    public abstract bool[] GetBits(char c);
 }

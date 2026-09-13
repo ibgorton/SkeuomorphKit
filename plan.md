@@ -1,6 +1,6 @@
 # Performance fix plan
 
-Status: Active — the 16-segment editor preview geometry was corrected, and the 14-segment preview now uses the same anchored segment lattice without the two unused bits so the editor matches the canonical layout model.
+Status: Active — the canonical printable-ASCII map model, the shared segment-map base, and the direct static GetBits dispatch are in place; the 16-segment map edits are being kept aligned with the canonical hardware ordering while the project remains .NET 10 clean.
 
 ## Goal
 Reduce repeated allocations and improve maintainability in the shared display logic while preserving the existing runtime behavior and test coverage.

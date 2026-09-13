@@ -12,7 +12,11 @@ public sealed class SixteenSegmentDisplayProfile : DisplayProfileBase
 
     public override bool[] GetBits(char c)
     {
-        return c.GetBitsSixteen();
+        return new SixteenMapImplementation().GetBits(c);
+    }
+
+    private sealed class SixteenMapImplementation : SixteenMap
+    {
     }
 
     private static HashSet<char> BuildSixteenSegmentSet()

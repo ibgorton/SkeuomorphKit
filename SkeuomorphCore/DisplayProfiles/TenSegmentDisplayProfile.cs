@@ -12,7 +12,7 @@ public sealed class TenSegmentDisplayProfile : DisplayProfileBase
 
     public override bool[] GetBits(char c)
     {
-        return c.GetBitsTen();
+        return new TenMap().GetBits(c);
     }
 
     private static HashSet<char> BuildTenSegmentSet()

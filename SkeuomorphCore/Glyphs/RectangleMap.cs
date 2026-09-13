@@ -1,12 +1,20 @@
+using System.Collections.Generic;
+
 namespace SkeuomorphCore;
 
-public abstract class RectangleMap : SegmentMapBase
+public sealed class RectangleMap : SegmentMapBase
 {
     public const int Width = GlyphLibrary.Width;
     public const int Height = GlyphLibrary.Height;
     public const int SegmentCount = Width * Height;
 
-    public static bool[] GetBitsRectangle(char c)
+    private static readonly IReadOnlyDictionary<char, ulong> RectangleMasks = GlyphLibrary.CreateRectangleMap().Masks;
+
+    public override IReadOnlyDictionary<char, ulong> Masks => RectangleMasks;
+
+    public static IReadOnlyCollection<char> SupportedCharacters => new RectangleMap().GetSupportedCharacters();
+
+    public override bool[] GetBits(char c)
     {
         if (!DisplayCharacterProfiles.IsSupported("Rectangle5x7", c))
         {
@@ -14,13 +22,5 @@ public abstract class RectangleMap : SegmentMapBase
         }
 
         return GlyphLibrary.GetMatrixBits(c);
-    }
-}
-
-public static class RectangleMapExtensions
-{
-    public static bool[] GetBitsRectangle(this char c)
-    {
-        return RectangleMap.GetBitsRectangle(c);
     }
 }

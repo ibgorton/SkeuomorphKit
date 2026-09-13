@@ -12,7 +12,7 @@ public sealed class FourteenSegmentDisplayProfile : DisplayProfileBase
 
     public override bool[] GetBits(char c)
     {
-        return c.GetBitsFourteen();
+        return new FourteenMap().GetBits(c);
     }
 
     private static HashSet<char> BuildFourteenSegmentSet()

@@ -6,10 +6,9 @@ namespace SkeuomorphCore;
 // A, B, C, D, E, F, G, H, I. H and I are the two extra segments beyond the seven-segment core.
 // Reference: https://7seg.fandom.com/wiki/7-segment_display and the canonical 9-seg template naming used by the SVG reference.
 // This is not a 16-segment subset; it is a distinct display family with its own bit ordering.
-public abstract class NineMap : SegmentMapBase
+public sealed class NineMap : SegmentMapBase
 {
     public const int SegmentCount = 9;
-    private static readonly HashSet<char> SevenSegmentCharacters = [.. SevenMap.SupportedCharacters];
 
     public const ushort SegmentA = 0x0001;
     public const ushort SegmentB = 0x0002;
@@ -21,7 +20,6 @@ public abstract class NineMap : SegmentMapBase
     public const ushort SegmentH = 0x0080;
     public const ushort SegmentI = 0x0100;
 
-    public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
     public static HashSet<char> DisabledCharacters = ['('];
 
     private static ushort Mask(params ushort[] segments)
@@ -35,7 +33,7 @@ public abstract class NineMap : SegmentMapBase
         return result;
     }
 
-    private static readonly Dictionary<char, ushort> NineMasks = new()
+    private readonly Dictionary<char, ulong> _nineMasks = new()
     {
         [' '] = 0x000,
         ['"'] = Mask(SegmentB, SegmentF),
@@ -107,69 +105,19 @@ public abstract class NineMap : SegmentMapBase
         ['!'] = Mask(SegmentH),
         ['?'] = Mask(SegmentE, SegmentG, SegmentH),
         ['@'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
-        ['´'] = Mask(SegmentH),
-        ['`'] = Mask(SegmentH),
-        ['|'] = Mask(SegmentH)
-
-
+        ['|'] = Mask(SegmentH),
     };
 
-    public static IReadOnlyCollection<char> SupportedCharacters => NineMasks.Keys;
+    public override IReadOnlyDictionary<char, ulong> Masks => _nineMasks;
 
-    public static bool[] GetBitsNine(char c)
+    public static IReadOnlyCollection<char> SupportedCharacters => new NineMap().GetSupportedCharacters();
+
+    public override bool[] GetBits(char c)
     {
-        var original = c;
         var normalized = char.ToUpperInvariant(c);
-        if (!TryGetMask(original, normalized, out var mask))
-        {
-            return new bool[SegmentCount];
-        }
-
-        var result = new bool[SegmentCount];
-        for (var i = 0; i < SegmentCount; i++)
-        {
-            result[i] = ((mask >> i) & 1) == 1;
-        }
-
-        return result;
-    }
-
-    internal static bool TryGetMask(char original, char normalized, out ushort mask)
-    {
-        if (NineMasks.TryGetValue(original, out mask))
-        {
-            return true;
-        }
-
-        if (NineMasks.TryGetValue(normalized, out mask))
-        {
-            return true;
-        }
-
-        if (SevenSegmentCharacters.Contains(original) || SevenSegmentCharacters.Contains(normalized))
-        {
-            var sevenBits = normalized.GetBitsSeven();
-            mask = 0;
-            for (var i = 0; i < sevenBits.Length; i++)
-            {
-                if (sevenBits[i])
-                {
-                    mask |= (ushort)(1 << i);
-                }
-            }
-
-            return true;
-        }
-
-        mask = 0;
-        return false;
+        return TryGetMask(c, normalized, out var mask)
+            ? GetBits(mask, SegmentCount)
+            : new bool[SegmentCount];
     }
 }
 
-public static class NineMapExtensions
-{
-    public static bool[] GetBitsNine(this char c)
-    {
-        return NineMap.GetBitsNine(c);
-    }
-}

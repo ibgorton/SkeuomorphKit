@@ -116,7 +116,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void RectangleMap_GetBitsRectangle_UsesSevenByFiveGlyphPattern()
     {
-        var bits = 'A'.GetBitsRectangle();
+        var bits = 'A'.GetBits("Rectangle5x7");
 
         Assert.Equal(35, bits.Length);
         Assert.False(bits[0]);
@@ -133,7 +133,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void SixteenMap_GetBitsSixteen_UsesReferenceGlyphPattern()
     {
-        var bits = 'A'.GetBitsSixteen();
+        var bits = 'A'.GetBits("SixteenSegment");
 
         Assert.Equal(16, bits.Length);
         Assert.True(bits[0]);
@@ -157,8 +157,8 @@ public class DisplayValueFormatterTests
     [Fact]
     public void SegmentMaps_MatchDmadsionReferencePatternsForCommonChars()
     {
-        var seven = '1'.GetBitsSeven();
-        var sixteen = 'A'.GetBitsSixteen();
+        var seven = '1'.GetBits("SevenSegment");
+        var sixteen = 'A'.GetBits("SixteenSegment");
 
         Assert.Equal(new[] { false, true, true, false, false, false, false }, seven);
         Assert.Equal(new[] { true, true, true, true, false, false, true, true, false, false, false, true, false, false, false, true }, sixteen);
@@ -214,7 +214,7 @@ public class DisplayValueFormatterTests
     public void DisplayCharacterProfiles_SetCharacterEnabled_ExcludesCharacterFromUseWithoutRemovingMapDefinition()
     {
         Assert.True(DisplayCharacterProfiles.IsSupported("SevenSegment", 'A'));
-        Assert.True('A'.GetBitsSeven().Length > 0);
+        Assert.True('A'.GetBits("SevenSegment").Length > 0);
 
         DisplayCharacterProfiles.SetCharacterEnabled("SevenSegment", 'A', false);
         Assert.False(DisplayCharacterProfiles.IsSupported("SevenSegment", 'A'));
@@ -227,7 +227,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void TenMap_GetBitsTen_UsesCanonicalTenSegmentOrder()
     {
-        var bits = 'A'.GetBitsTen();
+        var bits = 'A'.GetBits("TenSegment");
 
         Assert.Equal(10, bits.Length);
         Assert.Equal(new[]
@@ -241,7 +241,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void NineMap_GetBitsNine_UsesCanonicalNineSegmentOrder()
     {
-        var bits = 'A'.GetBitsNine();
+        var bits = 'A'.GetBits("NineSegment");
 
         Assert.Equal(9, bits.Length);
         Assert.Equal(new[]
@@ -255,8 +255,8 @@ public class DisplayValueFormatterTests
     [Fact]
     public void TenMap_UsesSevenSegmentGlyphsForSharedCharacters()
     {
-        var sevenBits = 'I'.GetBitsSeven();
-        var tenBits = 'I'.GetBitsTen();
+        var sevenBits = 'I'.GetBits("SevenSegment");
+        var tenBits = 'I'.GetBits("TenSegment");
 
         Assert.Equal(10, tenBits.Length);
         Assert.Equal(sevenBits[0], tenBits[0]);
@@ -274,8 +274,8 @@ public class DisplayValueFormatterTests
     [Fact]
     public void NineMap_UsesSevenSegmentGlyphsForSharedCharacters()
     {
-        var sevenBits = 'I'.GetBitsSeven();
-        var nineBits = 'I'.GetBitsNine();
+        var sevenBits = 'I'.GetBits("SevenSegment");
+        var nineBits = 'I'.GetBits("NineSegment");
 
         Assert.Equal(9, nineBits.Length);
         Assert.Equal(sevenBits[0], nineBits[0]);
@@ -292,7 +292,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void NineMap_UnsupportedCharacters_AreBlank()
     {
-        var bits = ';'.GetBitsNine();
+        var bits = ';'.GetBits("NineSegment");
 
         Assert.Equal(9, bits.Length);
         Assert.Equal(new[]
@@ -306,8 +306,8 @@ public class DisplayValueFormatterTests
     [Fact]
     public void FourteenMap_GetBitsFourteen_UsesCanonicalHardwareGlyphs()
     {
-        var bits = 'A'.GetBitsFourteen();
-        var mBits = 'M'.GetBitsFourteen();
+        var bits = 'A'.GetBits("FourteenSegment");
+        var mBits = 'M'.GetBits("FourteenSegment");
 
         Assert.Equal(14, bits.Length);
         Assert.Equal(new[]
@@ -427,9 +427,9 @@ public class DisplayValueFormatterTests
     [Fact]
     public void SevenMap_GetBitsSeven_UsesWpfSegmentOrdering()
     {
-        var one = '1'.GetBitsSeven();
-        var two = '2'.GetBitsSeven();
-        var zero = '0'.GetBitsSeven();
+        var one = '1'.GetBits("SevenSegment");
+        var two = '2'.GetBits("SevenSegment");
+        var zero = '0'.GetBits("SevenSegment");
 
         Assert.Equal(7, one.Length);
         Assert.False(one[0]);
@@ -460,7 +460,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void SevenMap_GetBitSeven_ExpandsReadableAlphaSubset()
     {
-        var bits = 'P'.GetBitsSeven();
+        var bits = 'P'.GetBits("SevenSegment");
 
         Assert.Equal(7, bits.Length);
         Assert.True(bits[0]);
@@ -475,9 +475,7 @@ public class DisplayValueFormatterTests
     [Fact]
     public void SevenMap_GetBitSeven_UnsupportedCharacter_BlanksSegmentArray()
     {
-        bool[] bits = new bool[7];
-
-        bits.GetBitSeven('@');
+        var bits = '@'.GetBits("SevenSegment");
 
         Assert.All(bits, value => Assert.False(value));
     }

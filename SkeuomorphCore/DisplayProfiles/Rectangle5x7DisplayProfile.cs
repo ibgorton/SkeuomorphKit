@@ -12,7 +12,7 @@ public sealed class Rectangle5x7DisplayProfile : DisplayProfileBase
 
     public override bool[] GetBits(char c)
     {
-        return c.GetBitsRectangle();
+        return new RectangleMap().GetBits(c);
     }
 
     private static HashSet<char> BuildRectangle5x7Set()

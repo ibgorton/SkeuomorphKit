@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace SkeuomorphCore;
@@ -7,12 +6,12 @@ namespace SkeuomorphCore;
 // 7-segment: DP-G-F-E-D-C-B-A
 // See https://github.com/dmadison/led-segment-ascii and https://7seg.fandom.com/wiki/7-segment_display
 // Licensed under the MIT license (Copyright © 2017 David Madison).
-public abstract class SevenMap : SegmentMapBase
+public sealed class SevenMap : SegmentMapBase
 {
     public const int SegmentCount = 7;
+    public static HashSet<char> DisabledCharacters = ['#', '$', '%', '&', '*', '+', '.', '/', ':', 'K', 'M', 'T', 'V', 'W', 'X', '\\', '{', '}'];
 
-    // The canonical bit ordering follows the common LED naming used by the 7-segment reference docs:
-    // A, B, C, D, E, F, G, DP. The value is stored in the same order as the hardware bitmask.
+    // The canonical bit ordering follows the common LED naming used by the 7-segment reference docs:    // A, B, C, D, E, F, G, DP. The value is stored in the same order as the hardware bitmask.
     public const byte SegmentA = 0x01;
     public const byte SegmentB = 0x02;
     public const byte SegmentC = 0x04;
@@ -21,9 +20,6 @@ public abstract class SevenMap : SegmentMapBase
     public const byte SegmentF = 0x20;
     public const byte SegmentG = 0x40;
     public const byte SegmentDP = 0x80;
-
-    public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "DP"];
-    public static HashSet<char> DisabledCharacters = ['#', '$', '%', '&', '*', '+', '.', '/', ':', 'K', 'M', 'T', 'V', 'W', 'X', '\\', '{', '}'];
 
 
     private static byte Mask(params byte[] segments)
@@ -37,7 +33,7 @@ public abstract class SevenMap : SegmentMapBase
         return result;
     }
 
-    private static readonly Dictionary<char, byte> SevenMasks = new()
+    private readonly Dictionary<char, ulong> _sevenMasks = new()
     {
         [' '] = 0x00,
         ['-'] = SegmentG,
@@ -131,67 +127,16 @@ public abstract class SevenMap : SegmentMapBase
         ['~'] = Mask(SegmentG)
     };
 
-    public static IReadOnlyCollection<char> SupportedCharacters => SevenMasks.Keys;
+    public override IReadOnlyDictionary<char, ulong> Masks => _sevenMasks;
 
-    public static bool[] GetBitsSeven(char c)
+    public static IReadOnlyCollection<char> SupportedCharacters => new SevenMap().GetSupportedCharacters();
+
+    public override bool[] GetBits(char c)
     {
-        var result = new bool[SegmentCount];
-        GetBitsSeven(c, result.AsSpan());
-        return result;
-    }
-
-    public static bool GetBitsSeven(char c, Span<bool> destination)
-    {
-        if (destination.Length < SegmentCount)
-        {
-            throw new ArgumentException($"Destination span must hold at least {SegmentCount} values.", nameof(destination));
-        }
-
         var normalized = char.ToUpperInvariant(c);
-        if (!TryGetMask(c, normalized, out var mask))
-        {
-            destination.Clear();
-            return false;
-        }
-
-        for (var i = 0; i < SegmentCount; i++)
-        {
-            destination[i] = ((mask >> i) & 1) == 1;
-        }
-
-        return true;
-    }
-
-    internal static bool TryGetMask(char original, char normalized, out byte mask)
-    {
-        if (SevenMasks.TryGetValue(original, out mask))
-        {
-            return true;
-        }
-
-        return SevenMasks.TryGetValue(normalized, out mask);
+        return TryGetMask(c, normalized, out var mask)
+            ? GetBits(mask, SegmentCount)
+            : new bool[SegmentCount];
     }
 }
 
-public static class SevenMapExtensions
-{
-    public static bool[] GetBitsSeven(this char c)
-    {
-        return SevenMap.GetBitsSeven(c);
-    }
-
-    public static bool GetBitsSeven(char c, Span<bool> destination)
-    {
-        return SevenMap.GetBitsSeven(c, destination);
-    }
-
-    public static void GetBitSeven(this bool[] t, char c)
-    {
-        if (t is null)
-        {
-            throw new ArgumentNullException(nameof(t));
-        }
-
-        SevenMap.GetBitsSeven(c, t.AsSpan());
-    }
-}

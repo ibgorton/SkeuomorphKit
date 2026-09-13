@@ -30,7 +30,6 @@ public abstract class SixteenMap : SegmentMapBase
     public const ushort SegmentO = 0x4000;
     public const ushort SegmentP = 0x8000;
 
-    public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
     public static HashSet<char> DisabledCharacters = ['.', ':'];
 
     private static ushort Mask(params ushort[] segments)
@@ -45,7 +44,7 @@ public abstract class SixteenMap : SegmentMapBase
     }
 
     // Canonical NDP mask table from dmadison/led-segment-ascii.
-    private static readonly Dictionary<char, ushort> SixteenMasks = new()
+    private readonly Dictionary<char, ulong> _sixteenMasks = new()
     {
         [' '] = 0x0000,
         ['!'] = Mask(SegmentJ, SegmentN),
@@ -90,19 +89,19 @@ public abstract class SixteenMap : SegmentMapBase
         ['H'] = Mask(SegmentC, SegmentD, SegmentG, SegmentH, SegmentL, SegmentP),
         ['I'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentJ, SegmentN),
         ['J'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
-        ['K'] = Mask(SegmentG, SegmentH, SegmentK, SegmentM, SegmentP),
+        ['K'] = Mask(SegmentD, SegmentG, SegmentH, SegmentK, SegmentL, SegmentP),
         ['L'] = Mask(SegmentE, SegmentF, SegmentG, SegmentH),
-        ['M'] = Mask(SegmentC, SegmentD, SegmentG, SegmentH, SegmentI, SegmentK),
+        ['M'] = Mask(SegmentC, SegmentD, SegmentG, SegmentH, SegmentI, SegmentK, SegmentN),
         ['N'] = Mask(SegmentC, SegmentD, SegmentG, SegmentH, SegmentI, SegmentM),
         ['O'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH),
         ['P'] = Mask(SegmentA, SegmentB, SegmentC, SegmentG, SegmentH, SegmentL, SegmentP),
         ['Q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH, SegmentM),
         ['R'] = Mask(SegmentA, SegmentB, SegmentC, SegmentG, SegmentH, SegmentL, SegmentM, SegmentP),
-        ['S'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentF, SegmentH, SegmentL, SegmentP),
+        ['S'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentF, SegmentI, SegmentL),
         ['T'] = Mask(SegmentA, SegmentB, SegmentJ, SegmentN),
         ['U'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH),
-        ['V'] = Mask(SegmentC, SegmentD, SegmentI, SegmentM),
-        ['W'] = Mask(SegmentC, SegmentD, SegmentG, SegmentH, SegmentM, SegmentO),
+        ['V'] = Mask(SegmentG, SegmentH, SegmentK, SegmentO),
+        ['W'] = Mask(SegmentC, SegmentD, SegmentG, SegmentH, SegmentJ, SegmentM, SegmentO),
         ['X'] = Mask(SegmentI, SegmentK, SegmentM, SegmentO),
         ['Y'] = Mask(SegmentC, SegmentH, SegmentL, SegmentN, SegmentP),
         ['Z'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentK, SegmentO),
@@ -144,43 +143,19 @@ public abstract class SixteenMap : SegmentMapBase
         ['~'] = Mask(SegmentD, SegmentG, SegmentM, SegmentP),
     };
 
-    public static bool[] GetBitsSixteen(char c)
+    public override IReadOnlyDictionary<char, ulong> Masks => _sixteenMasks;
+
+    public static IReadOnlyCollection<char> SupportedCharacters => new SixteenMapImplementation().GetSupportedCharacters();
+
+    public override bool[] GetBits(char c)
     {
-        var key = char.ToUpperInvariant(c);
-        if (!DisplayCharacterProfiles.IsSupported("SixteenSegment", key))
-        {
-            return new bool[SegmentCount];
-        }
-
-        if (TryGetMask(c, key, out var mask))
-        {
-            var result = new bool[SegmentCount];
-            for (var i = 0; i < SegmentCount; i++)
-            {
-                result[i] = ((mask >> i) & 1) == 1;
-            }
-
-            return result;
-        }
-
-        return new bool[SegmentCount];
+        var normalized = char.ToUpperInvariant(c);
+        return TryGetMask(c, normalized, out var mask)
+            ? GetBits(mask, SegmentCount)
+            : new bool[SegmentCount];
     }
 
-    internal static bool TryGetMask(char original, char normalized, out ushort mask)
+    private sealed class SixteenMapImplementation : SixteenMap
     {
-        if (SixteenMasks.TryGetValue(original, out mask))
-        {
-            return true;
-        }
-
-        return SixteenMasks.TryGetValue(normalized, out mask);
-    }
-}
-
-public static class SixteenMapExtensions
-{
-    public static bool[] GetBitsSixteen(this char c)
-    {
-        return SixteenMap.GetBitsSixteen(c);
     }
 }

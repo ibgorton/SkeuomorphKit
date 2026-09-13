@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace SkeuomorphCore;
@@ -5,10 +6,9 @@ namespace SkeuomorphCore;
 // Canonical 10-segment layout follows the common A..J naming used by alphanumeric LED references:
 // A, B, C, D, E, F, G, H, I, J. J is the additional center segment beyond the standard 9-seg family.
 // Reference: https://7seg.fandom.com/wiki/10-segment_display
-public abstract class TenMap : SegmentMapBase
+public sealed class TenMap : SegmentMapBase
 {
     public const int SegmentCount = 10;
-    private static readonly HashSet<char> SevenSegmentCharacters = [.. SevenMap.SupportedCharacters];
 
     public const ushort SegmentA = 0x0001;
     public const ushort SegmentB = 0x0002;
@@ -21,7 +21,6 @@ public abstract class TenMap : SegmentMapBase
     public const ushort SegmentI = 0x0100;
     public const ushort SegmentJ = 0x0200;
 
-    public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     public static HashSet<char> DisabledCharacters = [];
 
     private static ushort Mask(params ushort[] segments)
@@ -35,7 +34,7 @@ public abstract class TenMap : SegmentMapBase
         return result;
     }
 
-    private static readonly Dictionary<char, ushort> TenMasks = new()
+    private readonly Dictionary<char, ulong> _tenMasks = new()
     {
         [' '] = 0x000,
         ['"'] = Mask(SegmentF, SegmentI),
@@ -107,125 +106,21 @@ public abstract class TenMap : SegmentMapBase
         ['!'] = Mask(SegmentI, SegmentJ),
         ['?'] = Mask(SegmentA, SegmentB, SegmentH, SegmentJ),
         ['@'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentG, SegmentH),
-        ['´'] = Mask(SegmentH),
-        ['`'] = Mask(SegmentH),
         ['|'] = Mask(SegmentE, SegmentF),
         ['m'] = Mask(SegmentC, SegmentE, SegmentG, SegmentH, SegmentJ),
         ['q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG, SegmentH),
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     };
 
-    public static IReadOnlyCollection<char> SupportedCharacters => TenMasks.Keys;
+    public override IReadOnlyDictionary<char, ulong> Masks => _tenMasks;
 
-    public static bool[] GetBitsTen(char c)
+    public static IReadOnlyCollection<char> SupportedCharacters => new TenMap().GetSupportedCharacters();
+
+    public override bool[] GetBits(char c)
     {
-        var original = c;
-        var normalized = char.ToUpperInvariant(c);
-        if (!TryGetMask(original, normalized, out var mask))
-        {
-            return new bool[SegmentCount];
-        }
-
+        var bits = new SevenMap().GetBits(c);
         var result = new bool[SegmentCount];
-        for (var i = 0; i < SegmentCount; i++)
-        {
-            result[i] = ((mask >> i) & 1) == 1;
-        }
-
+        Array.Copy(bits, result, bits.Length);
         return result;
     }
-
-    internal static bool TryGetMask(char original, char normalized, out ushort mask)
-    {
-        if (SevenSegmentCharacters.Contains(original) || SevenSegmentCharacters.Contains(normalized))
-        {
-            var sevenBits = normalized.GetBitsSeven();
-            mask = 0;
-            for (var i = 0; i < sevenBits.Length; i++)
-            {
-                if (sevenBits[i])
-                {
-                    mask |= (ushort)(1 << i);
-                }
-            }
-
-            return true;
-        }
-
-        if (TenMasks.TryGetValue(original, out mask))
-        {
-            return true;
-        }
-
-        if (TenMasks.TryGetValue(normalized, out mask))
-        {
-            return true;
-        }
-
-        mask = 0;
-        return false;
-    }
 }
 
-public static class TenMapExtensions
-{
-    public static bool[] GetBitsTen(this char c)
-    {
-        return TenMap.GetBitsTen(c);
-    }
-}
