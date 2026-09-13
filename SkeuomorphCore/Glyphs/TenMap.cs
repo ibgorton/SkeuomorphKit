@@ -47,7 +47,7 @@ public sealed class TenMap : SegmentMapBase
         ['='] = Mask(SegmentD, SegmentG, SegmentH),
         ['?'] = Mask(SegmentA, SegmentB, SegmentH, SegmentJ),
         ['@'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentG, SegmentH),
-        ['A'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG, SegmentH),
+        ['A'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
         ['B'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentH, SegmentI, SegmentJ),
         ['C'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
         ['D'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentI, SegmentJ),
@@ -55,7 +55,7 @@ public sealed class TenMap : SegmentMapBase
         ['F'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG),
         ['G'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF, SegmentH),
         ['H'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG, SegmentH),
-        ['I'] = Mask(SegmentA, SegmentD, SegmentI, SegmentJ),
+        ['I'] = Mask(SegmentB, SegmentC),
         ['J'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
         ['K'] = Mask(SegmentC, SegmentE, SegmentF, SegmentG, SegmentH, SegmentI),
         ['L'] = Mask(SegmentD, SegmentE, SegmentF),
@@ -101,12 +101,6 @@ public sealed class TenMap : SegmentMapBase
         ['y'] = Mask(SegmentB, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH),
         ['z'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG, SegmentH),
         ['|'] = Mask(SegmentE, SegmentF),
-
-
-
-
-
-
     };
 
     private static readonly Dictionary<char, ulong?> RuntimeMasks = new(DefaultMasks);

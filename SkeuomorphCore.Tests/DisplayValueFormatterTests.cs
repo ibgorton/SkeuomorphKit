@@ -235,18 +235,20 @@ public class DisplayValueFormatterTests
     [Fact]
     public void DisplayCharacterProfiles_SetCharacterEnabled_AllowsNullAndEnabledStates()
     {
-        Assert.False(DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
-        DisplayCharacterProfiles.SetCharacterEnabled("TenSegment", 'p', true);
-        Assert.True(DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
-        DisplayCharacterProfiles.SetCharacterEnabled("TenSegment", 'p', false);
-        Assert.False(DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
+        Assert.True(DisplayCharacterProfiles.IsSupported("TenSegment", 'A'));
+        DisplayCharacterProfiles.SetCharacterEnabled("TenSegment", 'A', false);
+        Assert.False(DisplayCharacterProfiles.IsSupported("TenSegment", 'A'));
+        DisplayCharacterProfiles.SetCharacterEnabled("TenSegment", 'A', true);
+        Assert.True(DisplayCharacterProfiles.IsSupported("TenSegment", 'A'));
     }
 
     [Fact]
     public void TenMap_LowercaseP_IsEnabledAndEditable()
     {
+        Assert.True(DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
+        Assert.True('p'.GetBits<TenMap>().Length > 0);
+        DisplayCharacterProfiles.SetCharacterEnabled("TenSegment", 'p', false);
         Assert.False(DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
-        Assert.True('p'.GetBits<TenMap>().Length == 10 || !DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
         DisplayCharacterProfiles.SetCharacterEnabled("TenSegment", 'p', true);
         Assert.True(DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
     }

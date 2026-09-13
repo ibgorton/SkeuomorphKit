@@ -1127,8 +1127,10 @@ public partial class MainWindow : Window
            .ToList();
 
        var prefix = match.Groups["prefix"].Value;
-       var suffix = match.Groups["suffix"].Value;
-       return source.Substring(0, match.Index) + prefix + string.Join(newline, updatedLines) + newline + suffix + source.Substring(match.Index + match.Length);
+       var suffix = match.Groups["suffix"].Value.TrimStart();
+       var bodyText = string.Join(newline, updatedLines);
+       var serializedBody = string.IsNullOrEmpty(bodyText) ? string.Empty : bodyText + newline;
+       return source.Substring(0, match.Index) + prefix + serializedBody + suffix + source.Substring(match.Index + match.Length);
    }
 
    private static char ParseCharacterLiteral(string literal)
