@@ -460,39 +460,31 @@ public partial class MainWindow : Window
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                // 3x3 anchor lattice: each segment must touch exactly two adjacent reference points.
-                var anchor = new[]
+                // Physical center order as described by the hardware layout:
+                // a1, a2, b, c, d1, d2, e, f, j, h, k, g2, l, i, m, g1.
+                var legacyClockwiseSegmentDefinitions = new[]
                 {
-                    new Point(70, 35), new Point(130, 35), new Point(190, 35),
-                    new Point(70, 130), new Point(130, 130), new Point(190, 130),
-                    new Point(70, 225), new Point(130, 225), new Point(190, 225)
+                    (Index: 0, Name: "a1", Points: new[] { new Point(1, 1), new Point(2, 0), new Point(4, 0), new Point(5, 1), new Point(4, 2), new Point(2, 2) }),
+                    (Index: 1, Name: "a2", Points: new[] { new Point(5, 1), new Point(6, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(6, 2) }),
+                    (Index: 2, Name: "b", Points: new[] { new Point(9, 1), new Point(10, 2), new Point(10, 8), new Point(9, 9), new Point(8, 8), new Point(8, 2) }),
+                    (Index: 3, Name: "c", Points: new[] { new Point(9, 9), new Point(10, 10), new Point(10, 16), new Point(9, 17), new Point(8, 16), new Point(8, 10) }),
+                    (Index: 4, Name: "d1", Points: new[] { new Point(9, 17), new Point(8, 18), new Point(6, 18), new Point(5, 17), new Point(6, 16), new Point(8, 16) }),
+                    (Index: 5, Name: "d2", Points: new[] { new Point(5, 17), new Point(4, 18), new Point(2, 18), new Point(1, 17), new Point(2, 16), new Point(4, 16) }),
+                    (Index: 6, Name: "e", Points: new[] { new Point(1, 17), new Point(0, 16), new Point(0, 10), new Point(1, 9), new Point(2, 10), new Point(2, 16) }),
+                    (Index: 7, Name: "f", Points: new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) }),
+                    (Index: 8, Name: "j", Points: new[] { new Point(2, 2), new Point(3, 2), new Point(4, 7), new Point(4, 8), new Point(3, 8), new Point(2, 3) }),
+                    (Index: 9, Name: "h", Points: new[] { new Point(5, 1), new Point(6, 2), new Point(6, 8), new Point(5, 9), new Point(4, 8), new Point(4, 2) }),
+                    (Index: 10, Name: "k", Points: new[] { new Point(8, 2), new Point(8, 3), new Point(7, 8), new Point(6, 8), new Point(6, 7), new Point(7, 2) }),
+                    (Index: 11, Name: "g2", Points: new[] { new Point(5, 9), new Point(6, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(6, 10) }),
+                    (Index: 12, Name: "l", Points: new[] { new Point(6, 10), new Point(7, 10), new Point(8, 15), new Point(8, 16), new Point(7, 16), new Point(6, 11) }),
+                    (Index: 13, Name: "i", Points: new[] { new Point(5, 9), new Point(6, 10), new Point(6, 16), new Point(5, 17), new Point(4, 16), new Point(4, 10) }),
+                    (Index: 14, Name: "m", Points: new[] { new Point(4, 10), new Point(4, 11), new Point(3, 16), new Point(2, 16), new Point(2, 15), new Point(3, 10) }),
+                    (Index: 15, Name: "g1", Points: new[] { new Point(1, 9), new Point(2, 8), new Point(4, 8), new Point(5, 9), new Point(4, 10), new Point(2, 10) })
                 };
 
-                // Keep the segment numbering aligned to the actual 16-seg lattice:
-                // 0..7 are the outer perimeter; 8..15 are the center-to-corner and center-cross segments.
-                var segments = new[]
+                foreach (var segment in legacyClockwiseSegmentDefinitions)
                 {
-                    new SegmentSpec(0, anchor[0], anchor[1], 12),
-                    new SegmentSpec(1, anchor[1], anchor[2], 12),
-                    new SegmentSpec(2, anchor[2], anchor[5], 12),
-                    new SegmentSpec(3, anchor[5], anchor[8], 12),
-                    new SegmentSpec(4, anchor[7], anchor[8], 12),
-                    new SegmentSpec(5, anchor[6], anchor[7], 12),
-                    new SegmentSpec(6, anchor[3], anchor[6], 12),
-                    new SegmentSpec(7, anchor[0], anchor[3], 12),
-                    new SegmentSpec(8, anchor[0], anchor[4], 12),
-                    new SegmentSpec(9, anchor[1], anchor[4], 12),
-                    new SegmentSpec(10, anchor[4], anchor[2], 12),
-                    new SegmentSpec(11, anchor[4], anchor[5], 12),
-                    new SegmentSpec(12, anchor[4], anchor[8], 12),
-                    new SegmentSpec(13, anchor[7], anchor[4], 12),
-                    new SegmentSpec(14, anchor[6], anchor[4], 12),
-                    new SegmentSpec(15, anchor[3], anchor[4], 12)
-                };
-
-                foreach (var segment in segments)
-                {
-                    var button = CreateSegmentButton(segment);
+                    var button = CreatePolygonSegmentButton(segment.Index, segment.Points, new Point(18, 14), 18.0);
                     canvas.Children.Add(button);
                     _segmentButtons.Add(button);
                 }

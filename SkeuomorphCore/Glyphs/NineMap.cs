@@ -22,7 +22,7 @@ public abstract class NineMap : SegmentMapBase
     public const ushort SegmentI = 0x0100;
 
     public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
-    public static HashSet<char> DisabledCharacters = [];
+    public static HashSet<char> DisabledCharacters = ['('];
 
     private static ushort Mask(params ushort[] segments)
     {
@@ -45,8 +45,8 @@ public abstract class NineMap : SegmentMapBase
         ['_'] = Mask(SegmentD),
         ['<'] = Mask(SegmentH, SegmentI),
         ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['1'] = Mask(SegmentB, SegmentC, SegmentH),
-        ['2'] = Mask(SegmentA, SegmentB, SegmentD, SegmentI),
+        ['1'] = Mask(SegmentB, SegmentC),
+        ['2'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG),
         ['3'] = Mask(SegmentA, SegmentG, SegmentH, SegmentI),
         ['4'] = Mask(SegmentB, SegmentC, SegmentG, SegmentH),
         ['5'] = Mask(SegmentA, SegmentF, SegmentG, SegmentI),
@@ -110,6 +110,8 @@ public abstract class NineMap : SegmentMapBase
         ['´'] = Mask(SegmentH),
         ['`'] = Mask(SegmentH),
         ['|'] = Mask(SegmentH)
+
+
     };
 
     public static IReadOnlyCollection<char> SupportedCharacters => NineMasks.Keys;

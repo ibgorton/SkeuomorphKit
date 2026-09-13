@@ -23,7 +23,7 @@ public abstract class SevenMap : SegmentMapBase
     public const byte SegmentDP = 0x80;
 
     public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "DP"];
-    public static readonly HashSet<char> DisabledCharacters = ['#', '$', '%', '&', '*', '+', '.', '/', ':', 'K', 'M', 'T', 'V', 'W', 'X', '\\', '{', '}'];
+    public static HashSet<char> DisabledCharacters = ['#', '$', '%', '&', '*', '+', '.', '/', ':', 'K', 'M', 'T', 'V', 'W', 'X', '\\', '{', '}'];
 
 
     private static byte Mask(params byte[] segments)
@@ -70,7 +70,7 @@ public abstract class SevenMap : SegmentMapBase
         ['M'] = Mask(SegmentA, SegmentC, SegmentE, SegmentG),
         ['N'] = Mask(SegmentC, SegmentE, SegmentG),
         ['O'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['P'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG),
+        ['P'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
         ['Q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG),
         ['R'] = Mask(SegmentE, SegmentG),
         ['S'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
