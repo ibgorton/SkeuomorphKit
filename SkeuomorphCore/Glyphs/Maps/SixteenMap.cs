@@ -35,8 +35,7 @@ public sealed class SixteenMap : SegmentMapBase
     public override IReadOnlyCollection<char> MapSupportedCharacters => SupportedCharacters;
 
     private static readonly Dictionary<char, ulong?> DefaultMasks = new()
-    {
-        [' '] = 0x0000,
+    {        [' '] = 0x0000,
         ['!'] = Mask(SegmentJ, SegmentN),
         ['"'] = Mask(SegmentH, SegmentJ),
         ['#'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentJ, SegmentL, SegmentN, SegmentP),

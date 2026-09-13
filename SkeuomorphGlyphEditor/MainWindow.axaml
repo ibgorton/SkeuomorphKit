@@ -5,7 +5,8 @@
         mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="650"
         x:Class="SkeuomorphGlyphEditor.MainWindow"
         Title="Glyph Map Editor"
-        Width="980" Height="680"
+        Width="1180" Height="820"
+        MinWidth="1040" MinHeight="720"
         WindowStartupLocation="CenterScreen">
     <DockPanel Margin="18">
         <Border DockPanel.Dock="Top" BorderBrush="#3b3b3b" BorderThickness="1" CornerRadius="10" Padding="12" Background="#1f1f1f">

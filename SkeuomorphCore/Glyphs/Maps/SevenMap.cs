@@ -25,8 +25,7 @@ public sealed class SevenMap : SegmentMapBase
     public const byte SegmentDP = 0x80;
 
     private static readonly Dictionary<char, ulong?> DefaultMasks = new()
-    {
-        [' '] = 0x00,
+    {        [' '] = 0x00,
         ['-'] = Mask(SegmentG),
         ['.'] = null,
         [':'] = null,
@@ -116,7 +115,7 @@ public sealed class SevenMap : SegmentMapBase
         ['|'] = Mask(SegmentE, SegmentF),
         ['}'] = null,
         ['~'] = Mask(SegmentG),
-    };
+};
 
     private static readonly Dictionary<char, ulong?> RuntimeMasks = new(DefaultMasks);
 
