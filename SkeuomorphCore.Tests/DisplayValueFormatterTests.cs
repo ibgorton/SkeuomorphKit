@@ -168,20 +168,63 @@ public class DisplayValueFormatterTests
     public void DisplayCharacterProfiles_Registry_ProvidesBuiltInLayouts()
     {
         var seven = DisplayCharacterProfiles.Get("SevenSegment");
+        var fourteen = DisplayCharacterProfiles.Get("FourteenSegment");
         var rectangle = DisplayCharacterProfiles.Get("Rectangle5x7");
+        var dotMatrix = DisplayCharacterProfiles.Get("DotMatrix8x8");
         var sixteen = DisplayCharacterProfiles.Get("SixteenSegment");
 
         Assert.True(seven.IsSupported('A'));
         Assert.True(seven.IsSupported('3'));
         Assert.False(seven.IsSupported('@'));
 
+        Assert.True(fourteen.IsSupported('A'));
+        Assert.True(fourteen.IsSupported('a'));
+        Assert.True(fourteen.IsSupported('3'));
+        Assert.True(fourteen.IsSupported('$'));
+
         Assert.True(rectangle.IsSupported('a'));
         Assert.True(rectangle.IsSupported('?'));
         Assert.False(rectangle.IsSupported('$'));
 
+        Assert.True(dotMatrix.IsSupported('A'));
+        Assert.True(dotMatrix.IsSupported('a'));
+        Assert.True(dotMatrix.IsSupported('3'));
+        Assert.False(dotMatrix.IsSupported('$'));
+
         Assert.True(sixteen.IsSupported('@'));
         Assert.True(sixteen.IsSupported('z'));
         Assert.True(sixteen.IsSupported('~'));
+    }
+
+    [Fact]
+    public void FourteenMap_GetBitsFourteen_UsesSevenSegmentBaseWithSecondarySegments()
+    {
+        var bits = 'A'.GetBitsFourteen();
+
+        Assert.Equal(14, bits.Length);
+        Assert.Equal(new[]
+        {
+            true, true, true, true,
+            false, false, true,
+            true, false, false,
+            true, false, false,
+            true
+        }, bits);
+    }
+
+    [Fact]
+    public void DotMatrix8x8_GetBitsDotMatrix8x8_UsesExpandedGlyphMatrix()
+    {
+        var bits = 'A'.GetBitsDotMatrix8x8();
+
+        Assert.Equal(64, bits.Length);
+        Assert.False(bits[9]);
+        Assert.True(bits[10]);
+        Assert.True(bits[11]);
+        Assert.True(bits[12]);
+        Assert.False(bits[13]);
+        Assert.False(bits[0]);
+        Assert.False(bits[7]);
     }
 
     [Fact]

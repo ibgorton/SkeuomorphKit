@@ -10,7 +10,9 @@ public static class DisplayCharacterProfiles
     private static readonly Dictionary<string, IDisplayProfile> Profiles = new(StringComparer.OrdinalIgnoreCase)
     {
         ["SevenSegment"] = new SevenSegmentDisplayProfile(),
+        ["FourteenSegment"] = new FourteenSegmentDisplayProfile(),
         ["Rectangle5x7"] = new Rectangle5x7DisplayProfile(),
+        ["DotMatrix8x8"] = new DotMatrix8x8DisplayProfile(),
         ["SixteenSegment"] = new SixteenSegmentDisplayProfile()
     };
 
