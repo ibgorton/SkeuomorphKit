@@ -6,6 +6,11 @@ Project: https://github.com/dmadison/led-segment-ascii
 License: MIT
 Copyright: Copyright (c) 2017 David Madison
 
+This project also uses the Fontino 8x8 bitmap font project as a reference for the dot-matrix glyph set and character coverage.
+
+Project: https://github.com/rene-d/fontino
+Reference purpose: 8x8 bitmap glyph layouts and extended ASCII coverage for the dot-matrix family.
+
 The MIT license text is reproduced below:
 
 MIT License

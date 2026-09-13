@@ -1,10 +1,8 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace SkeuomorphCore;
 
@@ -232,13 +230,13 @@ public static class BdfBitmapFontImporter
 public static class DotMatrix8x8GlyphStyles
 {
     public const string Default = "default";
-    public const string FontinoClassic = "fontino-classic";
-    public const string FontinoAlternate = "fontino-ic8x8u";
-    public const string FontinoCompact = "fontino-icl8x8u";
     public const string Serif = "serif";
     public const string SansSerif = "sans-serif";
+    public const string Classic = "classic";
+    public const string Alternate = "ic8x8u";
+    public const string Compact = "icl8x8u";
 
-    public static IReadOnlyCollection<string> All => new[] { Default, FontinoClassic, FontinoAlternate, FontinoCompact, Serif, SansSerif };
+    public static IReadOnlyCollection<string> All => new[] { Default, Serif, SansSerif, Classic, Alternate, Compact };
 
     public static string Normalize(string style)
     {
@@ -248,24 +246,28 @@ public static class DotMatrix8x8GlyphStyles
         }
 
         var normalized = style.Trim();
-        if (normalized.Equals("sans serif", StringComparison.OrdinalIgnoreCase))
+
+        if (normalized.Equals("default", StringComparison.OrdinalIgnoreCase)
+            || normalized.Equals("serif", StringComparison.OrdinalIgnoreCase)
+            || normalized.Equals("sans-serif", StringComparison.OrdinalIgnoreCase)
+            || normalized.Equals("sans serif", StringComparison.OrdinalIgnoreCase))
         {
-            return SansSerif;
+            return Default;
         }
 
-        if (normalized.Equals("fontino", StringComparison.OrdinalIgnoreCase) || normalized.Equals("fontino-ib8x8u", StringComparison.OrdinalIgnoreCase))
+        if (normalized.Equals("classic", StringComparison.OrdinalIgnoreCase) || normalized.Equals("ib8x8u", StringComparison.OrdinalIgnoreCase))
         {
-            return FontinoClassic;
+            return Classic;
         }
 
-        if (normalized.Equals("fontino-ic8x8u", StringComparison.OrdinalIgnoreCase) || normalized.Equals("fontino-alt", StringComparison.OrdinalIgnoreCase))
+        if (normalized.Equals("ic8x8u", StringComparison.OrdinalIgnoreCase) || normalized.Equals("alt", StringComparison.OrdinalIgnoreCase))
         {
-            return FontinoAlternate;
+            return Alternate;
         }
 
-        if (normalized.Equals("fontino-icl8x8u", StringComparison.OrdinalIgnoreCase) || normalized.Equals("fontino-compact", StringComparison.OrdinalIgnoreCase))
+        if (normalized.Equals("icl8x8u", StringComparison.OrdinalIgnoreCase) || normalized.Equals("compact", StringComparison.OrdinalIgnoreCase))
         {
-            return FontinoCompact;
+            return Compact;
         }
 
         return normalized;
@@ -341,17 +343,17 @@ public sealed class DotMatrix8x8Map : SegmentMapBase
     private static Dictionary<string, IBitmapGlyphSource> CreateSources()
     {
         var defaultSource = BuildDefaultSource();
-        var classicSource = BuildFontinoSource("font8x8_ib8x8u.ino", DotMatrix8x8GlyphStyles.FontinoClassic);
-        var alternateSource = BuildFontinoSource("font8x8_ic8x8u.ino", DotMatrix8x8GlyphStyles.FontinoAlternate);
-        var compactSource = BuildFontinoSource("font8x8_icl8x8u.ino", DotMatrix8x8GlyphStyles.FontinoCompact);
+        var classicSource = BuildBitmapSource(BitmapGlyphSources.IbmBios8x8, DotMatrix8x8GlyphStyles.Classic);
+        var alternateSource = BuildBitmapSource(BitmapGlyphSources.IbmCga8x8, DotMatrix8x8GlyphStyles.Alternate);
+        var compactSource = BuildBitmapSource(BitmapGlyphSources.IbmCgaLight8x8, DotMatrix8x8GlyphStyles.Compact);
         return new Dictionary<string, IBitmapGlyphSource>(StringComparer.OrdinalIgnoreCase)
         {
             [DotMatrix8x8GlyphStyles.Default] = defaultSource,
-            [DotMatrix8x8GlyphStyles.FontinoClassic] = classicSource,
-            [DotMatrix8x8GlyphStyles.FontinoAlternate] = alternateSource,
-            [DotMatrix8x8GlyphStyles.FontinoCompact] = compactSource,
             [DotMatrix8x8GlyphStyles.Serif] = defaultSource,
             [DotMatrix8x8GlyphStyles.SansSerif] = defaultSource,
+            [DotMatrix8x8GlyphStyles.Classic] = classicSource,
+            [DotMatrix8x8GlyphStyles.Alternate] = alternateSource,
+            [DotMatrix8x8GlyphStyles.Compact] = compactSource,
         };
     }
 
@@ -396,16 +398,16 @@ public sealed class DotMatrix8x8Map : SegmentMapBase
                 continue;
             }
 
-            foreach (var candidate in new[]
+            foreach (var candidate in new IReadOnlyDictionary<char, BitmapGlyph>[]
                      {
-                         BuildFontinoSource("font8x8_ib8x8u.ino", DotMatrix8x8GlyphStyles.FontinoClassic),
-                         BuildFontinoSource("font8x8_ic8x8u.ino", DotMatrix8x8GlyphStyles.FontinoAlternate),
-                         BuildFontinoSource("font8x8_icl8x8u.ino", DotMatrix8x8GlyphStyles.FontinoCompact),
+                         BitmapGlyphSources.IbmBios8x8,
+                         BitmapGlyphSources.IbmCga8x8,
+                         BitmapGlyphSources.IbmCgaLight8x8,
                      })
             {
-                if (candidate.TryGetGlyph(character, out var fontinoGlyph))
+                if (candidate.TryGetValue(character, out var bitmapGlyph))
                 {
-                    glyphs[character] = fontinoGlyph;
+                    glyphs[character] = bitmapGlyph;
                     break;
                 }
             }
@@ -414,113 +416,9 @@ public sealed class DotMatrix8x8Map : SegmentMapBase
         return new SimpleBitmapGlyphSource(DotMatrix8x8GlyphStyles.Default, glyphs);
     }
 
-    private static IBitmapGlyphSource BuildFontinoSource(string fileName, string styleName)
+    private static IBitmapGlyphSource BuildBitmapSource(IReadOnlyDictionary<char, BitmapGlyph> glyphs, string styleName)
     {
-        var glyphs = new Dictionary<char, BitmapGlyph>();
-        using var reader = CreateFontinoReader(fileName);
-        if (reader is null)
-        {
-            return new SimpleBitmapGlyphSource(styleName, glyphs);
-        }
-
-        var source = reader.ReadToEnd();
-        var lines = source.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-        foreach (var rawLine in lines)
-        {
-            var line = rawLine.Trim();
-            if (!line.StartsWith('{'))
-            {
-                continue;
-            }
-
-            var bytesMatch = Regex.Match(line, @"\{\s*(.*?)\s*\}", RegexOptions.Singleline);
-            if (!bytesMatch.Success)
-            {
-                continue;
-            }
-
-            var commentMatch = Regex.Match(line, @"\/\/\s*([0-9A-Fa-f]+)\s*\(([^)]*)\)", RegexOptions.CultureInvariant);
-            if (!commentMatch.Success)
-            {
-                continue;
-            }
-
-            var bytesText = bytesMatch.Groups[1].Value;
-            var indexText = commentMatch.Groups[1].Value;
-            var label = commentMatch.Groups[2].Value.Trim();
-            var values = Regex.Matches(bytesText, @"0x[0-9A-Fa-f]+")
-                .Cast<Match>()
-                .Select(m => byte.Parse(m.Value[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture))
-                .ToArray();
-
-            if (values.Length != 8)
-            {
-                continue;
-            }
-
-            if (!TryResolveFontinoCharacter(label, indexText, out var mappedCharacter))
-            {
-                continue;
-            }
-
-            glyphs[mappedCharacter] = new BitmapGlyph(Width, Height, values);
-        }
-
-        return new SimpleBitmapGlyphSource(styleName, glyphs);
-    }
-
-    private static bool TryResolveFontinoCharacter(string label, string numericText, out char mappedCharacter)
-    {
-        mappedCharacter = '\0';
-
-        if (!string.IsNullOrWhiteSpace(label))
-        {
-            if (label.Length == 1)
-            {
-                mappedCharacter = label[0];
-                return true;
-            }
-
-            if (label.StartsWith("uni", StringComparison.OrdinalIgnoreCase))
-            {
-                var codeText = label[3..].Split('.', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)[0];
-                if (int.TryParse(codeText, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var unicodeValue))
-                {
-                    mappedCharacter = (char)unicodeValue;
-                    return true;
-                }
-            }
-        }
-
-        if (int.TryParse(numericText, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var numericValue))
-        {
-            mappedCharacter = (char)numericValue;
-            return true;
-        }
-
-        return false;
-    }
-
-    private static StringReader? CreateFontinoReader(string fileName)
-    {
-        var candidates = new[]
-        {
-            Path.Combine(AppContext.BaseDirectory, "Glyphs", "Fontino", fileName),
-            Path.Combine(AppContext.BaseDirectory, fileName),
-            Path.Combine(Directory.GetCurrentDirectory(), "SkeuomorphCore", "Glyphs", "Fontino", fileName),
-            Path.Combine(Directory.GetCurrentDirectory(), fileName),
-            Path.Combine(Directory.GetCurrentDirectory(), "..", "SkeuomorphCore", "Glyphs", "Fontino", fileName),
-        };
-
-        foreach (var candidate in candidates)
-        {
-            if (File.Exists(candidate))
-            {
-                return new StringReader(File.ReadAllText(candidate));
-            }
-        }
-
-        return null;
+        return new SimpleBitmapGlyphSource(styleName, new Dictionary<char, BitmapGlyph>(glyphs));
     }
 
     private static BitmapGlyph BitmapGlyphFromMask(ulong sourceMask, int width, int height)

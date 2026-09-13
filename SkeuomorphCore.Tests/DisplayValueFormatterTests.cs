@@ -288,16 +288,16 @@ public class DisplayValueFormatterTests
     public void DotMatrix8x8Map_ProvidesAlternateStyleRegistrations()
     {
         Assert.Contains(DotMatrix8x8GlyphStyles.Default, DotMatrix8x8Map.SupportedStyles);
-        Assert.Contains(DotMatrix8x8GlyphStyles.FontinoClassic, DotMatrix8x8Map.SupportedStyles);
-        Assert.Contains(DotMatrix8x8GlyphStyles.FontinoAlternate, DotMatrix8x8Map.SupportedStyles);
+        Assert.Contains(DotMatrix8x8GlyphStyles.Classic, DotMatrix8x8Map.SupportedStyles);
+        Assert.Contains(DotMatrix8x8GlyphStyles.Alternate, DotMatrix8x8Map.SupportedStyles);
         Assert.Contains(DotMatrix8x8GlyphStyles.Serif, DotMatrix8x8Map.SupportedStyles);
         Assert.Contains(DotMatrix8x8GlyphStyles.SansSerif, DotMatrix8x8Map.SupportedStyles);
 
-        Assert.True(DotMatrix8x8Map.TryGetMask('A', DotMatrix8x8GlyphStyles.FontinoClassic, out var classicMask));
-        Assert.True(DotMatrix8x8Map.TryGetMask('0', DotMatrix8x8GlyphStyles.FontinoClassic, out var zeroMask));
-        Assert.True(DotMatrix8x8Map.TryGetMask('J', DotMatrix8x8GlyphStyles.FontinoClassic, out var jMask));
-        Assert.True(DotMatrix8x8Map.TryGetMask('k', DotMatrix8x8GlyphStyles.FontinoClassic, out var lowercaseKMask));
-        Assert.True(DotMatrix8x8Map.TryGetMask('\x7F', DotMatrix8x8GlyphStyles.FontinoClassic, out var delMask));
+        Assert.True(DotMatrix8x8Map.TryGetMask('A', DotMatrix8x8GlyphStyles.Classic, out var classicMask));
+        Assert.True(DotMatrix8x8Map.TryGetMask('0', DotMatrix8x8GlyphStyles.Classic, out var zeroMask));
+        Assert.True(DotMatrix8x8Map.TryGetMask('J', DotMatrix8x8GlyphStyles.Classic, out var jMask));
+        Assert.True(DotMatrix8x8Map.TryGetMask('k', DotMatrix8x8GlyphStyles.Classic, out var lowercaseKMask));
+        Assert.True(DotMatrix8x8Map.TryGetMask('\x7F', DotMatrix8x8GlyphStyles.Classic, out var delMask));
         Assert.True(DisplayCharacterProfiles.IsSupported("DotMatrix8x8", '\x7F'));
         Assert.NotEqual(0UL, classicMask);
         Assert.NotEqual(0UL, zeroMask);
@@ -305,7 +305,7 @@ public class DisplayValueFormatterTests
         Assert.NotEqual(0UL, lowercaseKMask);
         Assert.NotEqual(0UL, delMask);
 
-        var classicRows = DotMatrix8x8Map.GetBits('A', DotMatrix8x8GlyphStyles.FontinoClassic);
+        var classicRows = DotMatrix8x8Map.GetBits('A', DotMatrix8x8GlyphStyles.Classic);
         Assert.Equal(64, classicRows.Length);
         Assert.True(classicRows[2]);
         Assert.True(classicRows[3]);

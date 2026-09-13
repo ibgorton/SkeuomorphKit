@@ -16,6 +16,11 @@ https://github.com/dmadison/led-segment-ascii
 
 This project intentionally matches the upstream 7-segment and 16-segment bit order so the same ASCII glyph conventions can be shared across hardware-oriented display implementations. The upstream project is licensed under the MIT License (Copyright © 2017 David Madison), and its source is used here as a reference model.
 
+The 8x8 dot-matrix bitmap glyphs are also informed by the Fontino project:
+https://github.com/rene-d/fontino
+
+Fontino provided a useful reference for 8x8 bitmap layouts and extended character coverage, and the embedded glyph data in this library was adapted into the project’s own C# source model rather than used as a runtime dependency.
+
 ## TODO:
 
 * Add negative value support
