@@ -117,6 +117,11 @@ public sealed class NineMap : SegmentMapBase
 
     public override IReadOnlyDictionary<char, ulong?> Masks => RuntimeMasks;
 
+    protected override IReadOnlyDictionary<char, ulong?> GetDefaultMasks()
+    {
+        return DefaultMasks;
+    }
+
     public static IReadOnlyCollection<char> SupportedCharacters => new NineMap().GetSupportedCharacters();
 }
 

@@ -4,7 +4,18 @@ using System.Linq;
 
 namespace SkeuomorphCore;
 
-public abstract class SegmentMapBase
+public interface IGlyphMap
+{
+    string Name { get; }
+    int MapSegmentCount { get; }
+    bool IsSupported(char c);
+    bool TryGetMask(char c, out ulong mask);
+    bool[] GetBits(char c);
+    IReadOnlyDictionary<char, ulong?> Masks { get; }
+    bool SetCharacterEnabled(char c, bool enabled);
+}
+
+public abstract class SegmentMapBase : IGlyphMap
 {
     public static IReadOnlySet<char> PrintableAsciiSet => PrintableAscii.Characters;
 
@@ -16,6 +27,41 @@ public abstract class SegmentMapBase
         .Select(static pair => pair.Key)
         .ToHashSet();
     public abstract IReadOnlyDictionary<char, ulong?> Masks { get; }
+
+    public string Name => MapName;
+
+    public virtual bool IsSupported(char c)
+    {
+        return Masks.TryGetValue(c, out var value) && value.HasValue;
+    }
+
+    public virtual bool SetCharacterEnabled(char c, bool enabled)
+    {
+        if (Masks is not IDictionary<char, ulong?> dictionary)
+        {
+            return false;
+        }
+
+        if (!enabled)
+        {
+            dictionary[c] = null;
+            return true;
+        }
+
+        if (GetDefaultMasks().TryGetValue(c, out var defaultMask))
+        {
+            dictionary[c] = defaultMask;
+            return true;
+        }
+
+        dictionary[c] = 0UL;
+        return true;
+    }
+
+    protected virtual IReadOnlyDictionary<char, ulong?> GetDefaultMasks()
+    {
+        return Masks;
+    }
 
     protected virtual IReadOnlyCollection<char> GetSupportedCharacters()
     {
@@ -43,7 +89,7 @@ public abstract class SegmentMapBase
             : new bool[MapSegmentCount];
     }
 
-    protected bool TryGetMask(char c, out ulong mask)
+    public virtual bool TryGetMask(char c, out ulong mask)
     {
         if (Masks.TryGetValue(c, out var value) && value.HasValue)
         {

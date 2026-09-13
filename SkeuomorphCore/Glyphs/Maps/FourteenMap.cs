@@ -142,6 +142,11 @@ public sealed class FourteenMap : SegmentMapBase
 
     public override IReadOnlyDictionary<char, ulong?> Masks => RuntimeMasks;
 
+    protected override IReadOnlyDictionary<char, ulong?> GetDefaultMasks()
+    {
+        return DefaultMasks;
+    }
+
     public static IReadOnlyCollection<char> SupportedCharacters => new FourteenMap().GetSupportedCharacters();
 }
 

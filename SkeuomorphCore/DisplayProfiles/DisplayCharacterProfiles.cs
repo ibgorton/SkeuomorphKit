@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace SkeuomorphCore;
 
@@ -16,6 +15,17 @@ public static class DisplayCharacterProfiles
         ["Rectangle5x7"] = new Rectangle5x7DisplayProfile(),
         ["DotMatrix8x8"] = new DotMatrix8x8DisplayProfile(),
         ["SixteenSegment"] = new SixteenSegmentDisplayProfile()
+    };
+
+    private static readonly Dictionary<string, IGlyphMap> Maps = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["SevenSegment"] = new SevenMap(),
+        ["NineSegment"] = new NineMap(),
+        ["TenSegment"] = new TenMap(),
+        ["FourteenSegment"] = new FourteenMap(),
+        ["Rectangle5x7"] = new RectangleMap(),
+        ["DotMatrix8x8"] = new DotMatrix8x8Map(),
+        ["SixteenSegment"] = new SixteenMap()
     };
 
     public static IReadOnlyCollection<string> AllNames => Profiles.Keys.ToArray();
@@ -54,31 +64,12 @@ public static class DisplayCharacterProfiles
 
     public static bool IsCharacterEnabled(string profileName, char c)
     {
-        if (!TryGet(profileName, out var profile))
+        if (Maps.TryGetValue(profileName ?? string.Empty, out var map))
         {
-            return false;
+            return map.IsSupported(c);
         }
 
-        var mapType = GetMapType(profileName);
-        if (mapType is null || mapType.IsAbstract || !typeof(SegmentMapBase).IsAssignableFrom(mapType))
-        {
-            return profile.IsSupported(c);
-        }
-
-        var mapInstance = Activator.CreateInstance(mapType);
-        var masksProperty = mapType.GetProperty("Masks", BindingFlags.Public | BindingFlags.Instance);
-        if (masksProperty is null || masksProperty.GetValue(mapInstance) is not System.Collections.IDictionary dictionary)
-        {
-            return profile.IsSupported(c);
-        }
-
-        if (!dictionary.Contains(c))
-        {
-            return false;
-        }
-
-        var value = dictionary[c];
-        return value is not null;
+        return TryGet(profileName, out var profile) && profile.IsSupported(c);
     }
 
     public static void SetCharacterEnabled(string profileName, char c, bool enabled)
@@ -88,37 +79,12 @@ public static class DisplayCharacterProfiles
             throw new KeyNotFoundException($"Display profile '{profileName}' was not found.");
         }
 
-        var mapType = GetMapType(profileName);
-        if (mapType is null || mapType.IsAbstract || !typeof(SegmentMapBase).IsAssignableFrom(mapType))
+        if (!Maps.TryGetValue(profileName ?? string.Empty, out var map))
         {
             return;
         }
 
-        var mapInstance = Activator.CreateInstance(mapType);
-        var masksProperty = mapType.GetProperty("Masks", BindingFlags.Public | BindingFlags.Instance);
-        if (masksProperty is null || masksProperty.GetValue(mapInstance) is not System.Collections.IDictionary dictionary)
-        {
-            return;
-        }
-
-        var defaultMasksField = mapType.GetField("DefaultMasks", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-        if (enabled)
-        {
-            if (defaultMasksField is not null && defaultMasksField.GetValue(null) is System.Collections.IDictionary defaults && defaults.Contains(c))
-            {
-                var defaultValue = defaults[c];
-                if (defaultValue is ulong ulongValue)
-                {
-                    dictionary[c] = ulongValue;
-                    return;
-                }
-            }
-
-            dictionary[c] = 0UL;
-            return;
-        }
-
-        dictionary[c] = null;
+        map.SetCharacterEnabled(c, enabled);
     }
 
     public static bool IsSupported(string profileName, char c)
@@ -130,27 +96,4 @@ public static class DisplayCharacterProfiles
     {
         return profile is not null && IsCharacterEnabled(profile.Name, c);
     }
-
-    private static Type GetMapType(string profileName)
-    {
-        var typeName = profileName switch
-        {
-            "SevenSegment" => "SevenMap",
-            "NineSegment" => "NineMap",
-            "TenSegment" => "TenMap",
-            "FourteenSegment" => "FourteenMap",
-            "Rectangle5x7" => "RectangleMap",
-            "DotMatrix8x8" => "DotMatrix8x8Map",
-            "SixteenSegment" => "SixteenMap",
-            _ => null
-        };
-
-        if (typeName is null)
-        {
-            return null;
-        }
-
-        return typeof(DisplayCharacterProfiles).Assembly.GetType($"SkeuomorphCore.{typeName}");
-    }
-
 }

@@ -281,12 +281,18 @@ public sealed class DotMatrix8x8Map : SegmentMapBase
     public const int SegmentCount = Width * Height;
 
     private static readonly Dictionary<string, IBitmapGlyphSource> Sources = CreateSources();
-    private static readonly Dictionary<char, ulong?> RuntimeMasks = BuildRuntimeMasks();
+    private static readonly Dictionary<char, ulong?> DefaultMasks = BuildRuntimeMasks();
+    private static readonly Dictionary<char, ulong?> RuntimeMasks = new(DefaultMasks);
 
     public override string MapName => nameof(DotMatrix8x8Map);
     public override int MapSegmentCount => SegmentCount;
     public override IReadOnlyCollection<char> MapSupportedCharacters => SupportedCharacters;
     public override IReadOnlyDictionary<char, ulong?> Masks => RuntimeMasks;
+
+    protected override IReadOnlyDictionary<char, ulong?> GetDefaultMasks()
+    {
+        return DefaultMasks;
+    }
 
     public static IReadOnlyCollection<string> SupportedStyles => Sources.Keys;
     public static IReadOnlyCollection<char> SupportedCharacters => new DotMatrix8x8Map().GetSupportedCharacters();
