@@ -86,7 +86,7 @@ public static class GlyphLibrary
         ['X'] = 0x00462A22A31UL,
         ['Y'] = 0x00108422A31UL,
         ['Z'] = 0x007C222221FUL,
-        ['a'] = 0x792E83800UL,
+        ['a'] = 0x7A3E83800UL,
         ['b'] = 0x36719B421UL,
         ['c'] = 0x003A218B800UL,
         ['d'] = 0x7A31F4210UL,

@@ -7,9 +7,9 @@ namespace SkeuomorphCore;
 // 7-segment: DP-G-F-E-D-C-B-A
 // See https://github.com/dmadison/led-segment-ascii and https://7seg.fandom.com/wiki/7-segment_display
 // Licensed under the MIT license (Copyright © 2017 David Madison).
-public static class SevenMap
+public abstract class SevenMap : SegmentMapBase
 {
-    private const int SegmentCount = 7;
+    public const int SegmentCount = 7;
 
     // The canonical bit ordering follows the common LED naming used by the 7-segment reference docs:
     // A, B, C, D, E, F, G, DP. The value is stored in the same order as the hardware bitmask.
@@ -23,7 +23,8 @@ public static class SevenMap
     public const byte SegmentDP = 0x80;
 
     public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "DP"];
-    public static HashSet<char> DisabledCharacters = [];
+    public static readonly HashSet<char> DisabledCharacters = ['#', '$', '%', '&', '*', '+', '.', '/', ':', 'K', 'M', 'T', 'V', 'W', 'X', '\\', '{', '}'];
+
 
     private static byte Mask(params byte[] segments)
     {
@@ -69,8 +70,8 @@ public static class SevenMap
         ['M'] = Mask(SegmentA, SegmentC, SegmentE, SegmentG),
         ['N'] = Mask(SegmentC, SegmentE, SegmentG),
         ['O'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['P'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
-        ['Q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['P'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG),
+        ['Q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG),
         ['R'] = Mask(SegmentE, SegmentG),
         ['S'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
         ['T'] = Mask(SegmentA, SegmentB, SegmentC),
@@ -86,21 +87,21 @@ public static class SevenMap
         ['d'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentG),
         ['e'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF, SegmentG),
         ['f'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG),
-        ['g'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['h'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
-        ['i'] = Mask(SegmentB, SegmentC),
+        ['g'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['h'] = Mask(SegmentC, SegmentE, SegmentF, SegmentG),
+        ['i'] = Mask(SegmentC),
         ['j'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
         ['k'] = Mask(SegmentD, SegmentE, SegmentF, SegmentG),
         ['l'] = Mask(SegmentD, SegmentE, SegmentF),
         ['m'] = Mask(SegmentA, SegmentC, SegmentE, SegmentG),
         ['n'] = Mask(SegmentC, SegmentE, SegmentG),
         ['o'] = Mask(SegmentC, SegmentD, SegmentE, SegmentG),
-        ['p'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
-        ['q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['p'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG),
+        ['q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG),
         ['r'] = Mask(SegmentE, SegmentG),
         ['s'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
         ['t'] = Mask(SegmentA, SegmentB, SegmentC),
-        ['u'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['u'] = Mask(SegmentC, SegmentD, SegmentE),
         ['v'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
         ['w'] = Mask(SegmentC, SegmentD, SegmentE),
         ['x'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
@@ -114,28 +115,28 @@ public static class SevenMap
         ['&'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
         ['\''] = Mask(SegmentF),
         ['('] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
-        [')'] = Mask(SegmentB, SegmentC, SegmentD, SegmentG),
+        [')'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD),
         ['*'] = Mask(SegmentA, SegmentC, SegmentE, SegmentF, SegmentG),
         ['+'] = Mask(SegmentD, SegmentG),
         [','] = Mask(),
         ['/'] = Mask(SegmentB, SegmentF),
-        ['?'] = Mask(SegmentA, SegmentB, SegmentC, SegmentG),
+        ['?'] = Mask(SegmentA, SegmentB, SegmentE, SegmentG),
         ['['] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
         ['\\'] = Mask(SegmentB, SegmentF),
-        [']'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
+        [']'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD),
         ['^'] = Mask(SegmentA, SegmentB, SegmentF),
         ['{'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
-        ['|'] = Mask(SegmentB, SegmentC),
+        ['|'] = Mask(SegmentE, SegmentF),
         ['}'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
         ['~'] = Mask(SegmentG)
     };
 
     public static IReadOnlyCollection<char> SupportedCharacters => SevenMasks.Keys;
 
-    public static bool[] GetBitsSeven(this char c)
+    public static bool[] GetBitsSeven(char c)
     {
         var result = new bool[SegmentCount];
-        GetBitsSeven(c, result);
+        GetBitsSeven(c, result.AsSpan());
         return result;
     }
 
@@ -161,7 +162,7 @@ public static class SevenMap
         return true;
     }
 
-    private static bool TryGetMask(char original, char normalized, out byte mask)
+    internal static bool TryGetMask(char original, char normalized, out byte mask)
     {
         if (SevenMasks.TryGetValue(original, out mask))
         {
@@ -169,6 +170,19 @@ public static class SevenMap
         }
 
         return SevenMasks.TryGetValue(normalized, out mask);
+    }
+}
+
+public static class SevenMapExtensions
+{
+    public static bool[] GetBitsSeven(this char c)
+    {
+        return SevenMap.GetBitsSeven(c);
+    }
+
+    public static bool GetBitsSeven(char c, Span<bool> destination)
+    {
+        return SevenMap.GetBitsSeven(c, destination);
     }
 
     public static void GetBitSeven(this bool[] t, char c)
@@ -178,6 +192,6 @@ public static class SevenMap
             throw new ArgumentNullException(nameof(t));
         }
 
-        GetBitsSeven(c, t.AsSpan());
+        SevenMap.GetBitsSeven(c, t.AsSpan());
     }
 }

@@ -1078,6 +1078,7 @@ public partial class MainWindow : Window
            chars.Add(normalized);
        }
 
+       var newline = DetectNewline(source);
        var cleanedSource = Regex.Replace(source, fieldPattern, string.Empty);
        var insertionIndex = cleanedSource.IndexOf("public static readonly string[] SegmentLetters", StringComparison.Ordinal);
        if (insertionIndex < 0)
@@ -1094,7 +1095,7 @@ public partial class MainWindow : Window
        var before = cleanedSource.Substring(0, segmentIndex + 1);
        var after = cleanedSource.Substring(segmentIndex + 1);
        var serialized = chars.Count == 0 ? "[]" : $"[{string.Join(", ", chars.OrderBy(c => c).Select(c => $"'{EscapeCharacterLiteral(c)}'"))}]";
-       return before + Environment.NewLine + "    public static readonly HashSet<char> DisabledCharacters = " + serialized + ";" + Environment.NewLine + after;
+       return before + newline + "    public static readonly HashSet<char> DisabledCharacters = " + serialized + ";" + newline + after;
    }
 
    private static HashSet<char> ParseHashSetCharacters(string literal)
@@ -1166,6 +1167,7 @@ public partial class MainWindow : Window
        var updatedLines = new List<string>();
        var replaced = false;
        var maskExpression = BuildMaskExpression(layout, mask);
+       var newline = DetectNewline(source);
 
        foreach (var line in lines)
        {
@@ -1201,19 +1203,39 @@ public partial class MainWindow : Window
 
        var prefix = match.Groups["prefix"].Value;
        var suffix = match.Groups["suffix"].Value;
-       return source.Substring(0, match.Index) + prefix + string.Join(Environment.NewLine, updatedLines) + Environment.NewLine + suffix + source.Substring(match.Index + match.Length);
+       return source.Substring(0, match.Index) + prefix + string.Join(newline, updatedLines) + newline + suffix + source.Substring(match.Index + match.Length);
    }
 
    private static char ParseCharacterLiteral(string literal)
    {
-       var value = literal
-           .Replace("\\'", "'")
-           .Replace("\\\\", "\\")
-           .Replace("\\n", "\n")
-           .Replace("\\r", "\r")
-           .Replace("\\t", "\t");
+       if (string.IsNullOrEmpty(literal))
+       {
+           return ' ';
+       }
 
-       return value.Length > 0 ? value[0] : ' ';
+       var result = new List<char>();
+       for (var index = 0; index < literal.Length; index++)
+       {
+           var ch = literal[index];
+           if (ch != '\\' || index + 1 >= literal.Length)
+           {
+               result.Add(ch);
+               continue;
+           }
+
+           var next = literal[++index];
+           result.Add(next switch
+           {
+               '\'' => '\'',
+               '\\' => '\\',
+               'n' => '\n',
+               'r' => '\r',
+               't' => '\t',
+               _ => next
+           });
+       }
+
+       return result.Count > 0 ? result[0] : ' ';
    }
 
    private static string EscapeCharacterLiteral(char character)
@@ -1227,6 +1249,21 @@ public partial class MainWindow : Window
            '\t' => "\\t",
            _ => character.ToString()
        };
+   }
+
+   private static string DetectNewline(string source)
+   {
+       if (source.Contains("\r\n", StringComparison.Ordinal))
+       {
+           return "\r\n";
+       }
+
+       if (source.Contains('\n'))
+       {
+           return "\n";
+       }
+
+       return Environment.NewLine;
    }
 
    private static string ResolveRepositoryRoot()

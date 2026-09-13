@@ -6,9 +6,9 @@ namespace SkeuomorphCore;
 // A, B, C, D, E, F, G, H, I. H and I are the two extra segments beyond the seven-segment core.
 // Reference: https://7seg.fandom.com/wiki/7-segment_display and the canonical 9-seg template naming used by the SVG reference.
 // This is not a 16-segment subset; it is a distinct display family with its own bit ordering.
-public static class NineMap
+public abstract class NineMap : SegmentMapBase
 {
-    private const int SegmentCount = 9;
+    public const int SegmentCount = 9;
     private static readonly HashSet<char> SevenSegmentCharacters = [.. SevenMap.SupportedCharacters];
 
     public const ushort SegmentA = 0x0001;
@@ -114,7 +114,7 @@ public static class NineMap
 
     public static IReadOnlyCollection<char> SupportedCharacters => NineMasks.Keys;
 
-    public static bool[] GetBitsNine(this char c)
+    public static bool[] GetBitsNine(char c)
     {
         var original = c;
         var normalized = char.ToUpperInvariant(c);
@@ -132,7 +132,7 @@ public static class NineMap
         return result;
     }
 
-    private static bool TryGetMask(char original, char normalized, out ushort mask)
+    internal static bool TryGetMask(char original, char normalized, out ushort mask)
     {
         if (NineMasks.TryGetValue(original, out mask))
         {
@@ -161,5 +161,13 @@ public static class NineMap
 
         mask = 0;
         return false;
+    }
+}
+
+public static class NineMapExtensions
+{
+    public static bool[] GetBitsNine(this char c)
+    {
+        return NineMap.GetBitsNine(c);
     }
 }

@@ -55,6 +55,7 @@ Both succeeded with 0 failing tests and 0 build errors.
 - If we continue this effort later, the next likely performance work is to isolate more display logic from the WPF-specific control layer so the reusable display engine can be moved to a cross-platform host without extra UI churn.
 - Correct the 9-segment mapping and preview to the real A..I segment family rather than a generic 16-segment subset.
 - Tighten the 9-segment glyph rules so only explicit template-backed characters are supported; unsupported glyphs stay blank instead of rendering as an all-on generic fallback.
+- Fix the live disabled-character toggle regression by keeping `DisabledCharacters` mutable at runtime so the editor can update the current profile without triggering `FieldAccessException` during reflection-based synchronization.
 
 ## Planned display-family roadmap
 

@@ -4,9 +4,9 @@ namespace SkeuomorphCore;
 
 // A real 14-segment display is a 7-segment core plus the common secondary diagonals/center segments,
 // not a generic 16-segment subset. The canonical subset is A,B,C,D,E,F,G,H,J,K,L,M,N,P.
-public static class FourteenMap
+public abstract class FourteenMap : SegmentMapBase
 {
-    private const int SegmentCount = 14;
+    public const int SegmentCount = 14;
 
     // Canonical 14-segment order for real Lite-On-style hardware:
     // A,B,C,D,E,F,G,H,J,K,L,M,N,P.
@@ -49,15 +49,15 @@ public static class FourteenMap
         [':'] = Mask(SegmentB),
         ['='] = Mask(SegmentD, SegmentG),
         ['_'] = Mask(SegmentD),
-        ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentM, SegmentP),
         ['1'] = Mask(SegmentB, SegmentC),
-        ['2'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG),
-        ['3'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentG),
-        ['4'] = Mask(SegmentB, SegmentC, SegmentF, SegmentG),
-        ['5'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
-        ['6'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['2'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG, SegmentH),
+        ['3'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentG, SegmentH),
+        ['4'] = Mask(SegmentB, SegmentC, SegmentF, SegmentG, SegmentH),
+        ['5'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH),
+        ['6'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH),
         ['7'] = Mask(SegmentA, SegmentB, SegmentC),
-        ['8'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['8'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH),
         ['9'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
         ['A'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG, SegmentH, SegmentK, SegmentL),
         ['B'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentG, SegmentH, SegmentJ, SegmentK, SegmentL),
@@ -134,9 +134,16 @@ public static class FourteenMap
         ['|'] = Mask(SegmentJ, SegmentN),
         ['}'] = Mask(SegmentA, SegmentF, SegmentJ, SegmentL, SegmentN),
         ['~'] = Mask(SegmentK, SegmentL, SegmentP)
+
+
+
+
+
+
+
     };
 
-    public static bool[] GetBitsFourteen(this char c)
+    public static bool[] GetBitsFourteen(char c)
     {
         var original = c;
         var normalized = char.ToUpperInvariant(c);
@@ -154,7 +161,7 @@ public static class FourteenMap
         return result;
     }
 
-    private static bool TryGetMask(char original, char normalized, out ushort mask)
+    internal static bool TryGetMask(char original, char normalized, out ushort mask)
     {
         if (FourteenMasks.TryGetValue(original, out mask))
         {
@@ -180,5 +187,13 @@ public static class FourteenMap
         }
 
         return true;
+    }
+}
+
+public static class FourteenMapExtensions
+{
+    public static bool[] GetBitsFourteen(this char c)
+    {
+        return FourteenMap.GetBitsFourteen(c);
     }
 }

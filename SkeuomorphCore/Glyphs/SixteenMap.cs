@@ -7,9 +7,9 @@ namespace SkeuomorphCore;
 // are aligned to the upstream library's NDP table (A..P, with bit 0 = A, bit 15 = P).
 // See https://github.com/dmadison/led-segment-ascii
 // Licensed under the MIT license (Copyright © 2017 David Madison).
-public static class SixteenMap
+public abstract class SixteenMap : SegmentMapBase
 {
-    private const int SegmentCount = 16;
+    public const int SegmentCount = 16;
 
     // Canonical 16-seg naming used by the upstream dmadison mask table:
     // A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P.
@@ -31,15 +31,7 @@ public static class SixteenMap
     public const ushort SegmentP = 0x8000;
 
     public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
-    public static readonly HashSet<char> DisabledCharacters = ['.', ':'];
-
-
-
-
-
-
-
-
+    public static HashSet<char> DisabledCharacters = ['.', ':'];
 
     private static ushort Mask(params ushort[] segments)
     {
@@ -150,24 +142,9 @@ public static class SixteenMap
         ['|'] = Mask(SegmentG, SegmentH),
         ['}'] = Mask(SegmentA, SegmentF, SegmentJ, SegmentL, SegmentN),
         ['~'] = Mask(SegmentD, SegmentG, SegmentM, SegmentP),
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     };
 
-    public static bool[] GetBitsSixteen(this char c)
+    public static bool[] GetBitsSixteen(char c)
     {
         var key = char.ToUpperInvariant(c);
         if (!DisplayCharacterProfiles.IsSupported("SixteenSegment", key))
@@ -189,7 +166,7 @@ public static class SixteenMap
         return new bool[SegmentCount];
     }
 
-    private static bool TryGetMask(char original, char normalized, out ushort mask)
+    internal static bool TryGetMask(char original, char normalized, out ushort mask)
     {
         if (SixteenMasks.TryGetValue(original, out mask))
         {
@@ -197,5 +174,13 @@ public static class SixteenMap
         }
 
         return SixteenMasks.TryGetValue(normalized, out mask);
+    }
+}
+
+public static class SixteenMapExtensions
+{
+    public static bool[] GetBitsSixteen(this char c)
+    {
+        return SixteenMap.GetBitsSixteen(c);
     }
 }

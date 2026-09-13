@@ -5,9 +5,9 @@ namespace SkeuomorphCore;
 // Canonical 10-segment layout follows the common A..J naming used by alphanumeric LED references:
 // A, B, C, D, E, F, G, H, I, J. J is the additional center segment beyond the standard 9-seg family.
 // Reference: https://7seg.fandom.com/wiki/10-segment_display
-public static class TenMap
+public abstract class TenMap : SegmentMapBase
 {
-    private const int SegmentCount = 10;
+    public const int SegmentCount = 10;
     private static readonly HashSet<char> SevenSegmentCharacters = [.. SevenMap.SupportedCharacters];
 
     public const ushort SegmentA = 0x0001;
@@ -38,13 +38,13 @@ public static class TenMap
     private static readonly Dictionary<char, ushort> TenMasks = new()
     {
         [' '] = 0x000,
-        ['"'] = Mask(SegmentB, SegmentF),
+        ['"'] = Mask(SegmentF, SegmentI),
         ['\''] = Mask(SegmentF),
-        ['-'] = Mask(SegmentG),
-        ['='] = Mask(SegmentD, SegmentG),
+        ['-'] = Mask(SegmentG, SegmentH),
+        ['='] = Mask(SegmentD, SegmentG, SegmentH),
         ['_'] = Mask(SegmentD),
-        ['<'] = Mask(SegmentH, SegmentI),
-        ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['<'] = Mask(SegmentD, SegmentE, SegmentG, SegmentH),
+        ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentI, SegmentJ),
         ['1'] = Mask(SegmentB, SegmentC, SegmentH),
         ['2'] = Mask(SegmentA, SegmentB, SegmentD, SegmentI),
         ['3'] = Mask(SegmentA, SegmentG, SegmentH, SegmentI),
@@ -54,67 +54,125 @@ public static class TenMap
         ['7'] = Mask(SegmentA, SegmentE, SegmentH),
         ['8'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
         ['9'] = Mask(SegmentA, SegmentB, SegmentF, SegmentG, SegmentI),
-        ['$'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
-        ['A'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
-        ['B'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['$'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH, SegmentI, SegmentJ),
+        ['A'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG, SegmentH),
+        ['B'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentH, SegmentI, SegmentJ),
         ['C'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
-        ['D'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['D'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentI, SegmentJ),
         ['E'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF, SegmentG),
         ['F'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG),
-        ['G'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['H'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
-        ['I'] = Mask(SegmentB, SegmentC),
+        ['G'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF, SegmentH),
+        ['H'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG, SegmentH),
+        ['I'] = Mask(SegmentA, SegmentD, SegmentI, SegmentJ),
         ['J'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
-        ['K'] = Mask(SegmentE, SegmentF, SegmentH, SegmentI),
+        ['K'] = Mask(SegmentC, SegmentE, SegmentF, SegmentG, SegmentH, SegmentI),
         ['L'] = Mask(SegmentD, SegmentE, SegmentF),
-        ['M'] = Mask(SegmentA, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
-        ['N'] = Mask(SegmentB, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
+        ['M'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentI, SegmentJ),
+        ['N'] = Mask(SegmentC, SegmentE, SegmentG, SegmentH),
         ['O'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['P'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG, SegmentI),
-        ['Q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
-        ['R'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG, SegmentI),
-        ['S'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
-        ['T'] = Mask(SegmentA, SegmentB),
+        ['P'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG, SegmentH),
+        ['Q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentJ),
+        ['R'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG, SegmentH, SegmentJ),
+        ['S'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH),
+        ['T'] = Mask(SegmentA, SegmentI, SegmentJ),
         ['U'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['V'] = Mask(SegmentB, SegmentE, SegmentF, SegmentI),
-        ['W'] = Mask(SegmentB, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
-        ['X'] = Mask(SegmentB, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
-        ['Y'] = Mask(SegmentB, SegmentC, SegmentF, SegmentH),
-        ['Z'] = Mask(SegmentA, SegmentB, SegmentF, SegmentH),
-        ['a'] = Mask(SegmentC, SegmentD, SegmentG, SegmentI),
-        ['b'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
-        ['c'] = Mask(SegmentD, SegmentE, SegmentG),
-        ['d'] = Mask(SegmentD, SegmentE, SegmentG, SegmentH, SegmentI),
-        ['e'] = Mask(SegmentD, SegmentE, SegmentG, SegmentI),
-        ['f'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG),
-        ['g'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
-        ['h'] = Mask(SegmentC, SegmentE, SegmentF, SegmentG),
-        ['i'] = Mask(SegmentH),
-        ['j'] = Mask(SegmentG, SegmentH),
-        ['k'] = Mask(SegmentE, SegmentF, SegmentH, SegmentI),
+        ['V'] = Mask(SegmentB, SegmentC, SegmentF, SegmentG, SegmentJ),
+        ['W'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentI, SegmentJ),
+        ['X'] = Mask(SegmentB, SegmentE, SegmentG, SegmentH, SegmentI, SegmentJ),
+        ['Y'] = Mask(SegmentB, SegmentF, SegmentG, SegmentH, SegmentJ),
+        ['Z'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG, SegmentH),
+        ['a'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentG, SegmentH),
+        ['b'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH),
+        ['c'] = Mask(SegmentD, SegmentE, SegmentG, SegmentH),
+        ['d'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentG, SegmentH),
+        ['e'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH),
+        ['f'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG, SegmentH),
+        ['g'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH),
+        ['h'] = Mask(SegmentC, SegmentE, SegmentF, SegmentG, SegmentH),
+        ['i'] = Mask(SegmentD, SegmentJ),
+        ['j'] = Mask(SegmentB, SegmentC, SegmentD),
+        ['k'] = Mask(SegmentE, SegmentF, SegmentG, SegmentH, SegmentJ),
         ['l'] = Mask(SegmentD, SegmentE, SegmentF),
-        ['n'] = Mask(SegmentC, SegmentE, SegmentG),
-        ['o'] = Mask(SegmentC, SegmentD, SegmentE, SegmentG),
-        ['r'] = Mask(SegmentE, SegmentG),
-        ['s'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['n'] = Mask(SegmentC, SegmentE, SegmentG, SegmentH),
+        ['o'] = Mask(SegmentC, SegmentD, SegmentE, SegmentG, SegmentH),
+        ['r'] = Mask(SegmentE, SegmentG, SegmentH),
+        ['s'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH),
         ['t'] = Mask(SegmentD, SegmentE, SegmentF, SegmentG),
         ['u'] = Mask(SegmentC, SegmentD, SegmentE),
-        ['v'] = Mask(SegmentE, SegmentI),
-        ['w'] = Mask(SegmentB, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
-        ['x'] = Mask(SegmentB, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
-        ['y'] = Mask(SegmentB, SegmentC, SegmentF, SegmentH),
-        ['z'] = Mask(SegmentD, SegmentG, SegmentI),
-        ['!'] = Mask(SegmentH),
-        ['?'] = Mask(SegmentE, SegmentG, SegmentH),
-        ['@'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['v'] = Mask(SegmentC, SegmentD, SegmentJ),
+        ['w'] = Mask(SegmentC, SegmentD, SegmentE, SegmentJ),
+        ['x'] = Mask(SegmentB, SegmentE, SegmentG, SegmentH, SegmentI, SegmentJ),
+        ['y'] = Mask(SegmentB, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH),
+        ['z'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG, SegmentH),
+        ['!'] = Mask(SegmentI, SegmentJ),
+        ['?'] = Mask(SegmentA, SegmentB, SegmentH, SegmentJ),
+        ['@'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentG, SegmentH),
         ['´'] = Mask(SegmentH),
         ['`'] = Mask(SegmentH),
-        ['|'] = Mask(SegmentH)
+        ['|'] = Mask(SegmentE, SegmentF),
+        ['m'] = Mask(SegmentC, SegmentE, SegmentG, SegmentH, SegmentJ),
+        ['q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG, SegmentH),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     };
 
     public static IReadOnlyCollection<char> SupportedCharacters => TenMasks.Keys;
 
-    public static bool[] GetBitsTen(this char c)
+    public static bool[] GetBitsTen(char c)
     {
         var original = c;
         var normalized = char.ToUpperInvariant(c);
@@ -132,18 +190,8 @@ public static class TenMap
         return result;
     }
 
-    private static bool TryGetMask(char original, char normalized, out ushort mask)
+    internal static bool TryGetMask(char original, char normalized, out ushort mask)
     {
-        if (TenMasks.TryGetValue(original, out mask))
-        {
-            return true;
-        }
-
-        if (TenMasks.TryGetValue(normalized, out mask))
-        {
-            return true;
-        }
-
         if (SevenSegmentCharacters.Contains(original) || SevenSegmentCharacters.Contains(normalized))
         {
             var sevenBits = normalized.GetBitsSeven();
@@ -159,7 +207,25 @@ public static class TenMap
             return true;
         }
 
+        if (TenMasks.TryGetValue(original, out mask))
+        {
+            return true;
+        }
+
+        if (TenMasks.TryGetValue(normalized, out mask))
+        {
+            return true;
+        }
+
         mask = 0;
         return false;
+    }
+}
+
+public static class TenMapExtensions
+{
+    public static bool[] GetBitsTen(this char c)
+    {
+        return TenMap.GetBitsTen(c);
     }
 }
