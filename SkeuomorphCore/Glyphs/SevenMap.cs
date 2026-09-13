@@ -23,6 +23,9 @@ public static class SevenMap
     public const byte SegmentDP = 0x80;
 
     public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "DP"];
+    public static readonly HashSet<char> DisabledCharacters = ['+', '.', '/', ':', 'M', 'W', 'X'];
+
+    public static HashSet<char> DisabledCharacters = ['Q'];
 
     private static byte Mask(params byte[] segments)
     {
@@ -41,8 +44,8 @@ public static class SevenMap
     {
         [' '] = 0x00,
         ['-'] = SegmentG,
-        ['.'] = SegmentB,
-        [':'] = SegmentB,
+        ['.'] = Mask(),
+        [':'] = Mask(),
         ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
         ['1'] = Mask(SegmentB, SegmentC),
         ['2'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG),
@@ -54,37 +57,82 @@ public static class SevenMap
         ['8'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
         ['9'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
         ['='] = Mask(SegmentD, SegmentG),
-        ['+'] = Mask(SegmentD, SegmentG),
-        ['/'] = SegmentB,
+        ['+'] = Mask(),
+        ['/'] = Mask(),
         ['A'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
-        ['B'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['B'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
         ['C'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
-        ['D'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['D'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentG),
         ['E'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF, SegmentG),
         ['F'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG),
         ['G'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF),
         ['H'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
         ['I'] = Mask(SegmentB, SegmentC),
         ['J'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
-        ['K'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
-        ['L'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
-        ['M'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
-        ['N'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['K'] = Mask(SegmentD, SegmentE, SegmentF, SegmentG),
+        ['L'] = Mask(SegmentD, SegmentE, SegmentF),
+        ['M'] = Mask(),
+        ['N'] = Mask(SegmentC, SegmentE, SegmentG),
         ['O'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
         ['P'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
         ['Q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
-        ['R'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['R'] = Mask(SegmentE, SegmentG),
         ['S'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
-        ['T'] = SegmentG,
+        ['T'] = Mask(SegmentA, SegmentB, SegmentC),
         ['U'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
         ['V'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
-        ['W'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['W'] = Mask(SegmentC, SegmentD, SegmentE),
         ['X'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
-        ['Y'] = Mask(SegmentB, SegmentC, SegmentF, SegmentG),
+        ['Y'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentG),
         ['Z'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG),
-        ['_'] = SegmentD,
-        ['r'] = SegmentE,
-        ['o'] = Mask(SegmentC, SegmentD, SegmentE, SegmentG)
+        ['_'] = Mask(SegmentG),
+        ['r'] = Mask(SegmentE, SegmentG),
+        ['o'] = Mask(SegmentC, SegmentD, SegmentE, SegmentG),
+        ['q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG),
+        ['p'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG),
+        ['n'] = Mask(SegmentC, SegmentE, SegmentG),
+        ['m'] = Mask(SegmentC, SegmentE, SegmentG),
+        ['l'] = Mask(SegmentD, SegmentE, SegmentF),
+        ['k'] = Mask(SegmentD, SegmentE, SegmentF, SegmentG),
+        ['h'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['g'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['d'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentG),
+        ['w'] = Mask(),
+        ['x'] = Mask(),
+        ['y'] = Mask(SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     };
 
     public static IReadOnlyCollection<char> SupportedCharacters => SevenMasks.Keys;

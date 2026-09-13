@@ -31,6 +31,7 @@ public static class SixteenMap
     public const ushort SegmentP = 0x8000;
 
     public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
+    public static HashSet<char> DisabledCharacters = [];
 
     private static ushort Mask(params ushort[] segments)
     {

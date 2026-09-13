@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace SkeuomorphCore;
-
 
 public static class DisplayCharacterProfiles
 {
@@ -11,6 +11,7 @@ public static class DisplayCharacterProfiles
     {
         ["SevenSegment"] = new SevenSegmentDisplayProfile(),
         ["NineSegment"] = new NineSegmentDisplayProfile(),
+        ["TenSegment"] = new TenSegmentDisplayProfile(),
         ["FourteenSegment"] = new FourteenSegmentDisplayProfile(),
         ["Rectangle5x7"] = new Rectangle5x7DisplayProfile(),
         ["DotMatrix8x8"] = new DotMatrix8x8DisplayProfile(),
@@ -51,13 +52,99 @@ public static class DisplayCharacterProfiles
         return Profiles.TryGetValue(name ?? string.Empty, out profile!);
     }
 
+    public static bool IsCharacterEnabled(string profileName, char c)
+    {
+        if (!TryGet(profileName, out var profile))
+        {
+            return false;
+        }
+
+        var normalized = NormalizeCharacter(c);
+        return profile.IsSupported(normalized) && !GetDisabledCharacters(profileName).Contains(normalized);
+    }
+
+    public static void SetCharacterEnabled(string profileName, char c, bool enabled)
+    {
+        if (!TryGet(profileName, out _))
+        {
+            throw new KeyNotFoundException($"Display profile '{profileName}' was not found.");
+        }
+
+        var normalized = NormalizeCharacter(c);
+        var disabled = GetDisabledCharacters(profileName);
+        if (enabled)
+        {
+            disabled.Remove(normalized);
+        }
+        else
+        {
+            disabled.Add(normalized);
+        }
+
+        var mapType = GetMapType(profileName);
+        if (mapType is null)
+        {
+            return;
+        }
+
+        var field = mapType.GetField("DisabledCharacters", BindingFlags.Public | BindingFlags.Static);
+        if (field is not null && field.FieldType == typeof(HashSet<char>))
+        {
+            field.SetValue(null, disabled);
+        }
+    }
+
     public static bool IsSupported(string profileName, char c)
     {
-        return TryGet(profileName, out var profile) && profile.IsSupported(c);
+        return TryGet(profileName, out var profile) && IsCharacterEnabled(profileName, c);
     }
 
     public static bool IsSupported(IDisplayProfile profile, char c)
     {
-        return profile is not null && profile.IsSupported(c);
+        return profile is not null && IsCharacterEnabled(profile.Name, c);
+    }
+
+    private static HashSet<char> GetDisabledCharacters(string profileName)
+    {
+        var mapType = GetMapType(profileName);
+        if (mapType is null)
+        {
+            return new HashSet<char>();
+        }
+
+        var field = mapType.GetField("DisabledCharacters", BindingFlags.Public | BindingFlags.Static);
+        if (field is null || field.GetValue(null) is not IEnumerable<char> values)
+        {
+            return new HashSet<char>();
+        }
+
+        return new HashSet<char>(values.Select(NormalizeCharacter));
+    }
+
+    private static Type GetMapType(string profileName)
+    {
+        var typeName = profileName switch
+        {
+            "SevenSegment" => "SevenMap",
+            "NineSegment" => "NineMap",
+            "TenSegment" => "TenMap",
+            "FourteenSegment" => "FourteenMap",
+            "Rectangle5x7" => "Rectangle5x7",
+            "DotMatrix8x8" => "DotMatrix8x8",
+            "SixteenSegment" => "SixteenMap",
+            _ => null
+        };
+
+        if (typeName is null)
+        {
+            return null;
+        }
+
+        return typeof(DisplayCharacterProfiles).Assembly.GetType($"SkeuomorphCore.{typeName}");
+    }
+
+    private static char NormalizeCharacter(char c)
+    {
+        return char.ToUpperInvariant(c);
     }
 }

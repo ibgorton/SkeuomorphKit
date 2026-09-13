@@ -2,13 +2,12 @@ using System.Collections.Generic;
 
 namespace SkeuomorphCore;
 
-// Canonical 9-segment layout follows the common A..I naming used by real alphanumeric LED parts:
-// A, B, C, D, E, F, G, H, I. H and I are the two extra segments beyond the seven-segment core.
-// Reference: https://7seg.fandom.com/wiki/7-segment_display and the canonical 9-seg template naming used by the SVG reference.
-// This is not a 16-segment subset; it is a distinct display family with its own bit ordering.
-public static class NineMap
+// Canonical 10-segment layout follows the common A..J naming used by alphanumeric LED references:
+// A, B, C, D, E, F, G, H, I, J. J is the additional center segment beyond the standard 9-seg family.
+// Reference: https://7seg.fandom.com/wiki/10-segment_display
+public static class TenMap
 {
-    private const int SegmentCount = 9;
+    private const int SegmentCount = 10;
     private static readonly HashSet<char> SevenSegmentCharacters = [.. SevenMap.SupportedCharacters];
 
     public const ushort SegmentA = 0x0001;
@@ -20,8 +19,9 @@ public static class NineMap
     public const ushort SegmentG = 0x0040;
     public const ushort SegmentH = 0x0080;
     public const ushort SegmentI = 0x0100;
+    public const ushort SegmentJ = 0x0200;
 
-    public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+    public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     public static HashSet<char> DisabledCharacters = [];
 
     private static ushort Mask(params ushort[] segments)
@@ -35,12 +35,10 @@ public static class NineMap
         return result;
     }
 
-    // Canonical bit order matches the A..I naming in the reference layout:
-    // A=bit0, B=bit1, C=bit2, D=bit3, E=bit4, F=bit5, G=bit6, H=bit7, I=bit8.
-    // These masks are taken from the canonical 9-segment template used in the reference SVG.
-    // Any character that a 7-segment display can render should render identically on the 9-segment
-    // family, with the extra H/I segments left blank.
-    private static readonly Dictionary<char, ushort> NineMasks = new()
+    // Canonical bit ordering follows the common A..J layout used by the 10-segment reference.
+    // Any character that a 7-segment display can render should render identically on the 10-segment
+    // family, with the extra H/I/J segments left blank unless a specific glyph needs them.
+    private static readonly Dictionary<char, ushort> TenMasks = new()
     {
         [' '] = 0x000,
         ['"'] = Mask(SegmentB, SegmentF),
@@ -71,6 +69,7 @@ public static class NineMap
         ['J'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
         ['K'] = Mask(SegmentE, SegmentF, SegmentH, SegmentI),
         ['L'] = Mask(SegmentD, SegmentE, SegmentF),
+        ['M'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG, SegmentJ),
         ['N'] = Mask(SegmentB, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
         ['O'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
         ['R'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG, SegmentI),
@@ -113,9 +112,9 @@ public static class NineMap
         ['|'] = Mask(SegmentH)
     };
 
-    public static IReadOnlyCollection<char> SupportedCharacters => NineMasks.Keys;
+    public static IReadOnlyCollection<char> SupportedCharacters => TenMasks.Keys;
 
-    public static bool[] GetBitsNine(this char c)
+    public static bool[] GetBitsTen(this char c)
     {
         var original = c;
         var normalized = char.ToUpperInvariant(c);
@@ -135,12 +134,12 @@ public static class NineMap
 
     private static bool TryGetMask(char original, char normalized, out ushort mask)
     {
-        if (NineMasks.TryGetValue(original, out mask))
+        if (TenMasks.TryGetValue(original, out mask))
         {
             return true;
         }
 
-        if (NineMasks.TryGetValue(normalized, out mask))
+        if (TenMasks.TryGetValue(normalized, out mask))
         {
             return true;
         }
