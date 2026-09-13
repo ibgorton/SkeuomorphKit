@@ -117,26 +117,62 @@ public partial class MainWindow : Window
                 var canvas = new Canvas
                 {
                     Width = 220,
-                    Height = 240,
+                    Height = 260,
                     Background = Brushes.Black,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                var segments = new[]
+                var polygons = new[]
                 {
-                    new SegmentSpec(0, 60, 18, 80, 12, 0),
-                    new SegmentSpec(1, 152, 52, 12, 80, 90),
-                    new SegmentSpec(2, 152, 146, 12, 80, 90),
-                    new SegmentSpec(3, 60, 214, 80, 12, 0),
-                    new SegmentSpec(4, 24, 146, 12, 80, 90),
-                    new SegmentSpec(5, 24, 52, 12, 80, 90),
-                    new SegmentSpec(6, 60, 112, 80, 12, 0)
+                    new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
+                    new[] { new Point(9, 1), new Point(10, 2), new Point(10, 8), new Point(9, 9), new Point(8, 8), new Point(8, 2) },
+                    new[] { new Point(9, 9), new Point(10, 10), new Point(10, 16), new Point(9, 17), new Point(8, 16), new Point(8, 10) },
+                    new[] { new Point(9, 17), new Point(8, 18), new Point(2, 18), new Point(1, 17), new Point(2, 16), new Point(8, 16) },
+                    new[] { new Point(1, 17), new Point(0, 16), new Point(0, 10), new Point(1, 9), new Point(2, 10), new Point(2, 16) },
+                    new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) },
+                    new[] { new Point(1, 9), new Point(2, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(2, 10) }
                 };
 
-                foreach (var segment in segments)
+                for (var index = 0; index < polygons.Length; index++)
                 {
-                    var button = CreateSegmentButton(segment.Index, segment.Width, segment.Height, segment.X, segment.Y, segment.Angle);
+                    var points = polygons[index];
+                    var button = CreatePolygonSegmentButton(index, points, new Point(22, 18), 16.0);
+                    canvas.Children.Add(button);
+                    _segmentButtons.Add(button);
+                }
+
+                SegmentGrid.Children.Add(canvas);
+                return;
+            }
+            case NineSegmentDisplayProfile:
+            {
+                var canvas = new Canvas
+                {
+                    Width = 220,
+                    Height = 260,
+                    Background = Brushes.Black,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                var polygons = new[]
+                {
+                    new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
+                    new[] { new Point(9, 1), new Point(10, 2), new Point(10, 8), new Point(9, 9), new Point(8, 8), new Point(8, 2) },
+                    new[] { new Point(9, 9), new Point(10, 10), new Point(10, 16), new Point(9, 17), new Point(8, 16), new Point(8, 10) },
+                    new[] { new Point(9, 17), new Point(8, 18), new Point(2, 18), new Point(1, 17), new Point(2, 16), new Point(8, 16) },
+                    new[] { new Point(1, 17), new Point(0, 16), new Point(0, 10), new Point(1, 9), new Point(2, 10), new Point(2, 16) },
+                    new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) },
+                    new[] { new Point(1, 9), new Point(2, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(2, 10) },
+                    new[] { new Point(2, 2), new Point(3.4, 2), new Point(8, 6.6), new Point(8, 8), new Point(6.6, 8), new Point(2, 3.4) },
+                    new[] { new Point(8, 16), new Point(8, 14.6), new Point(3.4, 10), new Point(2, 10), new Point(2, 11.4), new Point(6.6, 16) }
+                };
+
+                for (var index = 0; index < polygons.Length; index++)
+                {
+                    var points = polygons[index];
+                    var button = CreatePolygonSegmentButton(index, points, new Point(22, 18), 16.0);
                     canvas.Children.Add(button);
                     _segmentButtons.Add(button);
                 }
@@ -342,6 +378,53 @@ public partial class MainWindow : Window
         return CreateSegmentButton(segment);
     }
 
+    private ToggleButton CreatePolygonSegmentButton(int index, IReadOnlyList<Point> points, Point offset, double scale)
+    {
+        var geometry = CreatePolygonGeometry(points, scale);
+        var bounds = geometry.Bounds;
+        var width = Math.Max(1, bounds.Width + 8);
+        var height = Math.Max(1, bounds.Height + 8);
+
+        var body = new Avalonia.Controls.Shapes.Path
+        {
+            Width = width,
+            Height = height,
+            Fill = new SolidColorBrush(Color.FromRgb(255, 82, 82)),
+            Stroke = Brushes.Transparent,
+            StrokeThickness = 0,
+            Stretch = Stretch.Fill,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            IsHitTestVisible = false,
+            Data = geometry,
+            RenderTransformOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Absolute)
+        };
+
+        var button = new ToggleButton
+        {
+            Width = width,
+            Height = height,
+            Background = Brushes.Transparent,
+            BorderThickness = new Thickness(0),
+            Padding = new Thickness(0),
+            Margin = new Thickness(0),
+            Tag = index,
+            Content = body,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
+            IsChecked = false,
+            RenderTransformOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative)
+        };
+
+        button.IsCheckedChanged += (_, _) => UpdateSegmentButtonVisual(button);
+        button.Click += SegmentButton_Click;
+
+        Canvas.SetLeft(button, offset.X + bounds.X - 4);
+        Canvas.SetTop(button, offset.Y + bounds.Y - 4);
+        UpdateSegmentButtonVisual(button);
+        return button;
+    }
+
     private ToggleButton CreateSegmentButton(SegmentSpec segment)
     {
         var geometry = CreateSegmentGeometry(segment);
@@ -386,6 +469,26 @@ public partial class MainWindow : Window
         Canvas.SetTop(button, segment.Y);
         UpdateSegmentButtonVisual(button);
         return button;
+    }
+
+    private static Geometry CreatePolygonGeometry(IReadOnlyList<Point> points, double scale)
+    {
+        var geometry = new PathGeometry();
+        var figure = new PathFigure { IsClosed = true, IsFilled = true };
+
+        var first = points[0];
+        figure.StartPoint = new Point(first.X * scale, first.Y * scale);
+        for (var i = 1; i < points.Count; i++)
+        {
+            var point = points[i];
+            figure.Segments!.Add(new LineSegment
+            {
+                Point = new Point(point.X * scale, point.Y * scale)
+            });
+        }
+
+        geometry.Figures!.Add(figure);
+        return geometry;
     }
 
     private static Geometry CreateSegmentGeometry(SegmentSpec segment)

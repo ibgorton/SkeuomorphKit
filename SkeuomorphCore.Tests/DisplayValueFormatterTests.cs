@@ -18,7 +18,7 @@ public class DisplayValueFormatterTests
             SegmentCount = segmentCount;
             Width = width;
             Height = height;
-            SupportedCharacters = new HashSet<char>(supportedCharacters);
+            SupportedCharacters = [.. supportedCharacters];
         }
 
         public string Name { get; }
@@ -168,6 +168,7 @@ public class DisplayValueFormatterTests
     public void DisplayCharacterProfiles_Registry_ProvidesBuiltInLayouts()
     {
         var seven = DisplayCharacterProfiles.Get("SevenSegment");
+        var nine = DisplayCharacterProfiles.Get("NineSegment");
         var fourteen = DisplayCharacterProfiles.Get("FourteenSegment");
         var rectangle = DisplayCharacterProfiles.Get("Rectangle5x7");
         var dotMatrix = DisplayCharacterProfiles.Get("DotMatrix8x8");
@@ -176,6 +177,11 @@ public class DisplayValueFormatterTests
         Assert.True(seven.IsSupported('A'));
         Assert.True(seven.IsSupported('3'));
         Assert.False(seven.IsSupported('@'));
+
+        Assert.True(nine.IsSupported('A'));
+        Assert.True(nine.IsSupported('a'));
+        Assert.True(nine.IsSupported('3'));
+        Assert.True(nine.IsSupported('$'));
 
         Assert.True(fourteen.IsSupported('A'));
         Assert.True(fourteen.IsSupported('a'));
@@ -194,6 +200,52 @@ public class DisplayValueFormatterTests
         Assert.True(sixteen.IsSupported('@'));
         Assert.True(sixteen.IsSupported('z'));
         Assert.True(sixteen.IsSupported('~'));
+    }
+
+    [Fact]
+    public void NineMap_GetBitsNine_UsesCanonicalNineSegmentOrder()
+    {
+        var bits = 'A'.GetBitsNine();
+
+        Assert.Equal(9, bits.Length);
+        Assert.Equal(new[]
+        {
+            true, true, true, false,
+            true, true, true,
+            false, false
+        }, bits);
+    }
+
+    [Fact]
+    public void NineMap_UsesSevenSegmentGlyphsForSharedCharacters()
+    {
+        var sevenBits = 'I'.GetBitsSeven();
+        var nineBits = 'I'.GetBitsNine();
+
+        Assert.Equal(9, nineBits.Length);
+        Assert.Equal(sevenBits[0], nineBits[0]);
+        Assert.Equal(sevenBits[1], nineBits[1]);
+        Assert.Equal(sevenBits[2], nineBits[2]);
+        Assert.Equal(sevenBits[3], nineBits[3]);
+        Assert.Equal(sevenBits[4], nineBits[4]);
+        Assert.Equal(sevenBits[5], nineBits[5]);
+        Assert.Equal(sevenBits[6], nineBits[6]);
+        Assert.False(nineBits[7]);
+        Assert.False(nineBits[8]);
+    }
+
+    [Fact]
+    public void NineMap_UnsupportedCharacters_AreBlank()
+    {
+        var bits = ';'.GetBitsNine();
+
+        Assert.Equal(9, bits.Length);
+        Assert.Equal(new[]
+        {
+            false, false, false, false,
+            false, false, false,
+            false, false
+        }, bits);
     }
 
     [Fact]
