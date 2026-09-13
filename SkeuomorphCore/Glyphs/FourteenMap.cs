@@ -7,6 +7,26 @@ public static class FourteenMap
 {
     private const int SegmentCount = 14;
 
+    // Canonical 14-segment order for real Lite-On-style hardware:
+    // A,B,C,D,E,F,G,H,J,K,L,M,N,P.
+    // I and O are omitted because they do not exist on the common 14-seg subset.
+    public const ushort SegmentA = 0x0001;
+    public const ushort SegmentB = 0x0002;
+    public const ushort SegmentC = 0x0004;
+    public const ushort SegmentD = 0x0008;
+    public const ushort SegmentE = 0x0010;
+    public const ushort SegmentF = 0x0020;
+    public const ushort SegmentG = 0x0040;
+    public const ushort SegmentH = 0x0080;
+    public const ushort SegmentJ = 0x0100;
+    public const ushort SegmentK = 0x0200;
+    public const ushort SegmentL = 0x0400;
+    public const ushort SegmentM = 0x0800;
+    public const ushort SegmentN = 0x1000;
+    public const ushort SegmentP = 0x2000;
+
+    public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "P"];
+
     public static bool[] GetBitsFourteen(this char c)
     {
         var supported = DisplayCharacterProfiles.IsSupported("FourteenSegment", c);

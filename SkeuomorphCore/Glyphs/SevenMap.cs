@@ -5,11 +5,24 @@ namespace SkeuomorphCore;
 
 // Canonical bit ordering follows the dmadison/led-segment-ascii reference set:
 // 7-segment: DP-G-F-E-D-C-B-A
-// See https://github.com/dmadison/led-segment-ascii
+// See https://github.com/dmadison/led-segment-ascii and https://7seg.fandom.com/wiki/7-segment_display
 // Licensed under the MIT license (Copyright © 2017 David Madison).
 public static class SevenMap
 {
     private const int SegmentCount = 7;
+
+    // The canonical bit ordering follows the common LED naming used by the 7-segment reference docs:
+    // A, B, C, D, E, F, G, DP. The value is stored in the same order as the hardware bitmask.
+    public const byte SegmentA = 0x01;
+    public const byte SegmentB = 0x02;
+    public const byte SegmentC = 0x04;
+    public const byte SegmentD = 0x08;
+    public const byte SegmentE = 0x10;
+    public const byte SegmentF = 0x20;
+    public const byte SegmentG = 0x40;
+    public const byte SegmentDP = 0x80;
+
+    public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "DP"];
 
     // Compact byte-based masks keep the same host-order semantics while eliminating the giant bool[][] tables.
     private static readonly Dictionary<char, byte> SevenMasks = new()
@@ -61,6 +74,8 @@ public static class SevenMap
         ['r'] = 0x50,
         ['o'] = 0x5C
     };
+
+    public static IReadOnlyCollection<char> SupportedCharacters => SevenMasks.Keys;
 
     public static bool[] GetBitsSeven(this char c)
     {

@@ -11,6 +11,27 @@ public static class SixteenMap
 {
     private const int SegmentCount = 16;
 
+    // Canonical 16-seg naming used by the upstream dmadison mask table:
+    // A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P.
+    public const ushort SegmentA = 0x0001;
+    public const ushort SegmentB = 0x0002;
+    public const ushort SegmentC = 0x0004;
+    public const ushort SegmentD = 0x0008;
+    public const ushort SegmentE = 0x0010;
+    public const ushort SegmentF = 0x0020;
+    public const ushort SegmentG = 0x0040;
+    public const ushort SegmentH = 0x0080;
+    public const ushort SegmentI = 0x0100;
+    public const ushort SegmentJ = 0x0200;
+    public const ushort SegmentK = 0x0400;
+    public const ushort SegmentL = 0x0800;
+    public const ushort SegmentM = 0x1000;
+    public const ushort SegmentN = 0x2000;
+    public const ushort SegmentO = 0x4000;
+    public const ushort SegmentP = 0x8000;
+
+    public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
+
     // Canonical NDP mask table from dmadison/led-segment-ascii.
     private static readonly Dictionary<char, ushort> SixteenMasks = new()
     {
