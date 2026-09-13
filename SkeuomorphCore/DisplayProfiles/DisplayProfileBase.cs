@@ -28,7 +28,7 @@ public abstract class DisplayProfileBase : IDisplayProfile
         SegmentCount = segmentCount;
         Width = width;
         Height = height;
-        _supportedCharacters = new HashSet<char>(supportedCharacters);
+        _supportedCharacters = [.. supportedCharacters];
     }
 
     /// <summary>

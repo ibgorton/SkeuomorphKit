@@ -5,67 +5,138 @@ namespace SkeuomorphCore;
 
 // Canonical bit ordering follows the dmadison/led-segment-ascii reference set:
 // 7-segment: DP-G-F-E-D-C-B-A
-// See https://github.com/dmadison/led-segment-ascii
+// See https://github.com/dmadison/led-segment-ascii and https://7seg.fandom.com/wiki/7-segment_display
 // Licensed under the MIT license (Copyright © 2017 David Madison).
-public static class SevenMap
+public abstract class SevenMap : SegmentMapBase
 {
-    private const int SegmentCount = 7;
+    public const int SegmentCount = 7;
 
-    // Compact byte-based masks keep the same host-order semantics while eliminating the giant bool[][] tables.
+    // The canonical bit ordering follows the common LED naming used by the 7-segment reference docs:
+    // A, B, C, D, E, F, G, DP. The value is stored in the same order as the hardware bitmask.
+    public const byte SegmentA = 0x01;
+    public const byte SegmentB = 0x02;
+    public const byte SegmentC = 0x04;
+    public const byte SegmentD = 0x08;
+    public const byte SegmentE = 0x10;
+    public const byte SegmentF = 0x20;
+    public const byte SegmentG = 0x40;
+    public const byte SegmentDP = 0x80;
+
+    public static readonly string[] SegmentLetters = ["A", "B", "C", "D", "E", "F", "G", "DP"];
+    public static HashSet<char> DisabledCharacters = ['#', '$', '%', '&', '*', '+', '.', '/', ':', 'K', 'M', 'T', 'V', 'W', 'X', '\\', '{', '}'];
+
+
+    private static byte Mask(params byte[] segments)
+    {
+        byte result = 0;
+        foreach (var segment in segments)
+        {
+            result |= segment;
+        }
+
+        return result;
+    }
+
     private static readonly Dictionary<char, byte> SevenMasks = new()
     {
         [' '] = 0x00,
-        ['-'] = 0x40,
-        ['.'] = 0x02,
-        [':'] = 0x02,
-        ['0'] = 0x3F,
-        ['1'] = 0x06,
-        ['2'] = 0x5B,
-        ['3'] = 0x4F,
-        ['4'] = 0x66,
-        ['5'] = 0x6D,
-        ['6'] = 0x7D,
-        ['7'] = 0x07,
-        ['8'] = 0x7F,
-        ['9'] = 0x6F,
-        ['='] = 0x48,
-        ['+'] = 0x48,
-        ['/'] = 0x02,
-        ['A'] = 0x77,
-        ['B'] = 0x7C,
-        ['C'] = 0x39,
-        ['D'] = 0x5E,
-        ['E'] = 0x79,
-        ['F'] = 0x71,
-        ['G'] = 0x3D,
-        ['H'] = 0x76,
-        ['I'] = 0x06,
-        ['J'] = 0x1E,
-        ['K'] = 0x76,
-        ['L'] = 0x39,
-        ['M'] = 0x76,
-        ['N'] = 0x76,
-        ['O'] = 0x3F,
-        ['P'] = 0x77,
-        ['Q'] = 0x7E,
-        ['R'] = 0x77,
-        ['S'] = 0x6D,
-        ['T'] = 0x40,
-        ['U'] = 0x3E,
-        ['V'] = 0x3E,
-        ['W'] = 0x76,
-        ['X'] = 0x76,
-        ['Y'] = 0x66,
-        ['Z'] = 0x5B,
-        ['_'] = 0x08,
-        ['r'] = 0x50,
-        ['o'] = 0x5C
+        ['-'] = SegmentG,
+        ['.'] = Mask(),
+        [':'] = Mask(),
+        ['='] = Mask(SegmentD, SegmentG),
+        ['_'] = Mask(SegmentD),
+        ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['1'] = Mask(SegmentB, SegmentC),
+        ['2'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG),
+        ['3'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentG),
+        ['4'] = Mask(SegmentB, SegmentC, SegmentF, SegmentG),
+        ['5'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['6'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['7'] = Mask(SegmentA, SegmentB, SegmentC),
+        ['8'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['9'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['A'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['B'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['C'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
+        ['D'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentG),
+        ['E'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['F'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG),
+        ['G'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['H'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['I'] = Mask(SegmentB, SegmentC),
+        ['J'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
+        ['K'] = Mask(SegmentD, SegmentE, SegmentF, SegmentG),
+        ['L'] = Mask(SegmentD, SegmentE, SegmentF),
+        ['M'] = Mask(SegmentA, SegmentC, SegmentE, SegmentG),
+        ['N'] = Mask(SegmentC, SegmentE, SegmentG),
+        ['O'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['P'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['Q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG),
+        ['R'] = Mask(SegmentE, SegmentG),
+        ['S'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['T'] = Mask(SegmentA, SegmentB, SegmentC),
+        ['U'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['V'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['W'] = Mask(SegmentC, SegmentD, SegmentE),
+        ['X'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['Y'] = Mask(SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['Z'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG),
+        ['a'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['b'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['c'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
+        ['d'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentG),
+        ['e'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['f'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG),
+        ['g'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['h'] = Mask(SegmentC, SegmentE, SegmentF, SegmentG),
+        ['i'] = Mask(SegmentC),
+        ['j'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE),
+        ['k'] = Mask(SegmentD, SegmentE, SegmentF, SegmentG),
+        ['l'] = Mask(SegmentD, SegmentE, SegmentF),
+        ['m'] = Mask(SegmentA, SegmentC, SegmentE, SegmentG),
+        ['n'] = Mask(SegmentC, SegmentE, SegmentG),
+        ['o'] = Mask(SegmentC, SegmentD, SegmentE, SegmentG),
+        ['p'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG),
+        ['q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG),
+        ['r'] = Mask(SegmentE, SegmentG),
+        ['s'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['t'] = Mask(SegmentA, SegmentB, SegmentC),
+        ['u'] = Mask(SegmentC, SegmentD, SegmentE),
+        ['v'] = Mask(SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
+        ['w'] = Mask(SegmentC, SegmentD, SegmentE),
+        ['x'] = Mask(SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['y'] = Mask(SegmentB, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['z'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG),
+        ['!'] = Mask(SegmentB, SegmentC),
+        ['"'] = Mask(SegmentB, SegmentF),
+        ['#'] = Mask(SegmentA, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['$'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['%'] = Mask(SegmentA, SegmentB, SegmentD, SegmentF, SegmentG),
+        ['&'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
+        ['\''] = Mask(SegmentF),
+        ['('] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
+        [')'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD),
+        ['*'] = Mask(SegmentA, SegmentC, SegmentE, SegmentF, SegmentG),
+        ['+'] = Mask(SegmentD, SegmentG),
+        [','] = Mask(),
+        ['/'] = Mask(SegmentB, SegmentF),
+        ['?'] = Mask(SegmentA, SegmentB, SegmentE, SegmentG),
+        ['['] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
+        ['\\'] = Mask(SegmentB, SegmentF),
+        [']'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD),
+        ['^'] = Mask(SegmentA, SegmentB, SegmentF),
+        ['{'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
+        ['|'] = Mask(SegmentE, SegmentF),
+        ['}'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
+        ['~'] = Mask(SegmentG)
     };
 
-    public static bool[] GetBitsSeven(this char c)
+    public static IReadOnlyCollection<char> SupportedCharacters => SevenMasks.Keys;
+
+    public static bool[] GetBitsSeven(char c)
     {
         var result = new bool[SegmentCount];
-        GetBitsSeven(c, result);
+        GetBitsSeven(c, result.AsSpan());
         return result;
     }
 
@@ -77,12 +148,6 @@ public static class SevenMap
         }
 
         var normalized = char.ToUpperInvariant(c);
-        if (!DisplayCharacterProfiles.IsSupported("SevenSegment", normalized))
-        {
-            destination.Clear();
-            return false;
-        }
-
         if (!TryGetMask(c, normalized, out var mask))
         {
             destination.Clear();
@@ -97,7 +162,7 @@ public static class SevenMap
         return true;
     }
 
-    private static bool TryGetMask(char original, char normalized, out byte mask)
+    internal static bool TryGetMask(char original, char normalized, out byte mask)
     {
         if (SevenMasks.TryGetValue(original, out mask))
         {
@@ -106,12 +171,27 @@ public static class SevenMap
 
         return SevenMasks.TryGetValue(normalized, out mask);
     }
+}
+
+public static class SevenMapExtensions
+{
+    public static bool[] GetBitsSeven(this char c)
+    {
+        return SevenMap.GetBitsSeven(c);
+    }
+
+    public static bool GetBitsSeven(char c, Span<bool> destination)
+    {
+        return SevenMap.GetBitsSeven(c, destination);
+    }
 
     public static void GetBitSeven(this bool[] t, char c)
     {
         if (t is null)
+        {
             throw new ArgumentNullException(nameof(t));
+        }
 
-        GetBitsSeven(c, t.AsSpan());
+        SevenMap.GetBitsSeven(c, t.AsSpan());
     }
 }

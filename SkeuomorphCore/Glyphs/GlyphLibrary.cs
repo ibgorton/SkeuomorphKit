@@ -29,9 +29,9 @@ public static class GlyphLibrary
     {
         [' '] = 0x00000000000UL,
         ['!'] = 0x00100421084UL,
-        ['"'] = 0x000000000C6UL,
-        ['#'] = 0x00000AFABEAUL,
-        ['%'] = 0x000019D1173UL,
+        ['"'] = 0x294AUL,
+        ['#'] = 0x15F57D40UL,
+        ['%'] = 0x632222263UL,
         ['&'] = 0x0059312AA2EUL,
         ['\''] = 0x00000000084UL,
         ['('] = 0x00208210888UL,
@@ -40,14 +40,14 @@ public static class GlyphLibrary
         [','] = 0x00088400000UL,
         ['-'] = 0x000000F8000UL,
         ['.'] = 0x00018C00000UL,
-        ['/'] = 0x00000111110UL,
+        ['/'] = 0x2222200UL,
         [':'] = 0x00018C03180UL,
         [';'] = 0x00088403180UL,
-        ['='] = 0x000000F83E0UL,
+        ['='] = 0x1F07C00UL,
         ['?'] = 0x0010044422EUL,
-        ['['] = 0x0038421084EUL,
-        ['\\'] = 0x00001041041UL,
-        [']'] = 0x0039084210EUL,
+        ['['] = 0x184210846UL,
+        ['\\'] = 0x20820820UL,
+        [']'] = 0x31084210CUL,
         ['_'] = 0x007C0000000UL,
         ['`'] = 0x00000000044UL,
         ['0'] = 0x003A33AE62EUL,
@@ -68,12 +68,12 @@ public static class GlyphLibrary
         ['F'] = 0x0004217843FUL,
         ['G'] = 0x003A31E862EUL,
         ['H'] = 0x004631FC631UL,
-        ['I'] = 0x0038842108EUL,
+        ['I'] = 0x7C842109FUL,
         ['J'] = 0x0019294211CUL,
         ['K'] = 0x00452519531UL,
         ['L'] = 0x007C2108421UL,
         ['M'] = 0x0046318D771UL,
-        ['N'] = 0x004631CD671UL,
+        ['N'] = 0x4639ACE31UL,
         ['O'] = 0x003A318C62EUL,
         ['P'] = 0x0004217C62FUL,
         ['Q'] = 0x0059358C62EUL,
@@ -86,14 +86,14 @@ public static class GlyphLibrary
         ['X'] = 0x00462A22A31UL,
         ['Y'] = 0x00108422A31UL,
         ['Z'] = 0x007C222221FUL,
-        ['a'] = 0x007A3E83800UL,
-        ['b'] = 0x0036719B421UL,
+        ['a'] = 0x7A3E83800UL,
+        ['b'] = 0x36719B421UL,
         ['c'] = 0x003A218B800UL,
-        ['d'] = 0x007A318FA10UL,
+        ['d'] = 0x7A31F4210UL,
         ['e'] = 0x00383F8B800UL,
         ['f'] = 0x00084278A4CUL,
         ['g'] = 0x003A1E8C7C0UL,
-        ['h'] = 0x0046319B421UL,
+        ['h'] = 0x463368421UL,
         ['i'] = 0x00388421804UL,
         ['j'] = 0x00192843008UL,
         ['k'] = 0x0024A32A421UL,
@@ -102,7 +102,7 @@ public static class GlyphLibrary
         ['n'] = 0x0046319B400UL,
         ['o'] = 0x003A318B800UL,
         ['p'] = 0x00042F9B400UL,
-        ['q'] = 0x00421E8F800UL,
+        ['q'] = 0x421E8C5C0UL,
         ['r'] = 0x0004219B400UL,
         ['s'] = 0x003E0E0F800UL,
         ['t'] = 0x00608423C84UL,
@@ -112,6 +112,23 @@ public static class GlyphLibrary
         ['x'] = 0x00454454400UL,
         ['y'] = 0x003A1E8C400UL,
         ['z'] = 0x007C4447C00UL,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     };
 
     public static IReadOnlyCollection<char> PatternKeys => Patterns.Keys;

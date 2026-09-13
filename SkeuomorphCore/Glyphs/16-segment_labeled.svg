@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" width="192px" height="320px" viewBox="-1 -1 12 20">
+<g id="segs" style="fill-rule:evenodd; stroke:#FFFFFF; stroke-width:0.25; stroke-opacity:1; stroke-linecap:butt; stroke-linejoin:miter;">
+  <polygon id="a1" points=" 1, 1  2, 0  4, 0  5, 1  4, 2  2, 2" fill="#DDD"/>
+  <polygon id="a2" points=" 5, 1  6, 0  8, 0  9, 1  8, 2  6, 2" fill="#DDD"/>
+  <polygon id="b" points=" 9, 1 10, 2 10, 8  9, 9  8, 8  8, 2" fill="#DDD"/>
+  <polygon id="c" points=" 9, 9 10,10 10,16  9,17  8,16  8,10" fill="#DDD"/>
+  <polygon id="d1" points=" 9,17  8,18  6,18  5,17  6,16  8,16" fill="#DDD"/>
+  <polygon id="d2" points=" 5,17  4,18  2,18  1,17  2,16  4,16" fill="#DDD"/>
+  <polygon id="e" points=" 1,17  0,16  0,10  1, 9  2,10  2,16" fill="#DDD"/>
+  <polygon id="f" points=" 1, 9  0, 8  0, 2  1, 1  2, 2  2, 8" fill="#DDD"/>
+  <polygon id="g1" points=" 1, 9  2, 8  4, 8  5, 9  4,10  2,10" fill="#DDD"/>
+  <polygon id="g2" points=" 5, 9  6, 8  8, 8  9, 9  8,10  6,10" fill="#DDD"/>
+  <polygon id="h" points=" 5, 1  6, 2  6, 8  5, 9  4, 8  4, 2" fill="#DDD"/>
+  <polygon id="i" points=" 5, 9  6,10  6,16  5,17  4,16  4,10" fill="#DDD"/>
+  <polygon id="j" points=" 2, 2  3, 2  4, 7  4, 8  3, 8  2, 3" fill="#DDD"/>
+  <polygon id="k" points=" 8, 2  8, 3  7, 8  6, 8  6, 7  7, 2" fill="#DDD"/>
+  <polygon id="m" points=" 6,10  7,10  8,15  8,16  7,16  6,11" fill="#DDD"/>
+  <polygon id="l" points=" 4,10  4,11  3,16  2,16  2,15  3,10" fill="#DDD"/>
+</g> 
+<g  style="fill-rule:evenodd; stroke:none;font-weight:bold;font-size:2px;font-family:sans-serif;text-anchor:middle;">
+  <text x="3" y="1.6">a₁</text>
+  <text x="7" y="1.6">a₂</text>
+  <text x="9" y="5.6">b</text>
+  <text x="9" y="13.6">c</text>
+  <text x="3" y="17.7">d₁</text>
+  <text x="7" y="17.7">d₂</text>
+  <text x="1" y="13.6">e</text>
+  <text x="1" y="5.6">f</text>
+  <text x="3" y="9.4">g₁</text>
+  <text x="7" y="9.4">g₂</text>
+  <text x="5" y="5.6">h</text>
+  <text x="5" y="13.6">i</text>
+  <text x="3" y="5.6">j</text>
+  <text x="7" y="5.6">k</text>
+  <text x="3" y="13.6">m</text>
+  <text x="7" y="13.6">l</text>
+</g>  
+</svg>

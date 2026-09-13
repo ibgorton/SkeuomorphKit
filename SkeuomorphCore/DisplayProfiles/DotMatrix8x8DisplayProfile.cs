@@ -17,6 +17,6 @@ public sealed class DotMatrix8x8DisplayProfile : DisplayProfileBase
 
     private static HashSet<char> BuildDotMatrixSet()
     {
-        return new HashSet<char>(GlyphLibrary.PatternKeys);
+        return [.. GlyphLibrary.PatternKeys];
     }
 }

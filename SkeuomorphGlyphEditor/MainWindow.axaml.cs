@@ -1,7 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -17,6 +20,7 @@ public partial class MainWindow : Window
 {
     private readonly List<ToggleButton> _segmentButtons = new();
     private int _segmentCount;
+    private bool _isDirty;
 
     public MainWindow()
     {
@@ -25,14 +29,101 @@ public partial class MainWindow : Window
         LayoutPicker.ItemsSource = DisplayCharacterProfiles.AllNames;
         LayoutPicker.SelectedIndex = 1;
         CharacterInput.Text = "A";
+        CharacterInput.TextChanged += CharacterInput_TextChanged;
+        CharacterEnabledToggle!.IsCheckedChanged += CharacterEnabledToggle_IsCheckedChanged;
         LayoutPicker.SelectionChanged += (_, _) => RefreshLayout();
 
         Loaded += (_, _) => RefreshLayout();
+        UpdateDirtyIndicator();
+    }
+
+    private void MarkDirty()
+    {
+        if (_isDirty)
+        {
+            return;
+        }
+
+        _isDirty = true;
+        UpdateDirtyIndicator();
+    }
+
+    private void ClearDirty()
+    {
+        if (!_isDirty)
+        {
+            return;
+        }
+
+        _isDirty = false;
+        UpdateDirtyIndicator();
+    }
+
+    private void UpdateDirtyIndicator()
+    {
+        if (DirtyStateText is null || DirtyStateBorder is null)
+        {
+            return;
+        }
+
+        if (_isDirty)
+        {
+            DirtyStateText.Text = "Unsaved";
+            DirtyStateText.Foreground = new SolidColorBrush(Color.FromRgb(255, 170, 170));
+            DirtyStateBorder.Background = new SolidColorBrush(Color.FromRgb(54, 24, 24));
+            DirtyStateBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(180, 76, 76));
+            return;
+        }
+
+        DirtyStateText.Text = "Saved";
+        DirtyStateText.Foreground = new SolidColorBrush(Color.FromRgb(157, 231, 180));
+        DirtyStateBorder.Background = new SolidColorBrush(Color.FromRgb(18, 52, 32));
+        DirtyStateBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(43, 107, 61));
+    }
+
+    private void CharacterInput_TextChanged(object? sender, EventArgs e)
+    {
+        UpdateCharacterEnabledToggle();
+    }
+
+    private void UpdateCharacterEnabledToggle()
+    {
+        var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
+        var inputText = CharacterInput.Text ?? string.Empty;
+        var character = inputText.Length > 0 ? inputText[0] : 'A';
+        CharacterEnabledToggle!.IsChecked = DisplayCharacterProfiles.IsCharacterEnabled(selected, character);
     }
 
     private void LoadButton_Click(object? sender, RoutedEventArgs e)
     {
+        var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
+        var inputText = CharacterInput.Text ?? string.Empty;
+        var character = inputText.Length > 0 ? inputText[0] : 'A';
+        var enabled = CharacterEnabledToggle!.IsChecked == true;
+        DisplayCharacterProfiles.SetCharacterEnabled(selected, character, enabled);
+        PersistCharacterAvailability(selected, character, enabled);
         RefreshLayout();
+    }
+
+    private void CharacterEnabledToggle_IsCheckedChanged(object? sender, RoutedEventArgs e)
+    {
+        var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
+        var inputText = CharacterInput.Text ?? string.Empty;
+        var character = inputText.Length > 0 ? inputText[0] : 'A';
+        var enabled = CharacterEnabledToggle!.IsChecked == true;
+        DisplayCharacterProfiles.SetCharacterEnabled(selected, character, enabled);
+        PersistCharacterAvailability(selected, character, enabled);
+        RefreshLayout();
+    }
+
+    private void PreviousCharacterButton_Click(object? sender, RoutedEventArgs e)
+    {
+        NavigateCharacter(-1);
+    }
+
+    private void NextCharacterButton_Click(object? sender, RoutedEventArgs e)
+    {
+        NavigateCharacter(1);
     }
 
     private void SaveButton_Click(object? sender, RoutedEventArgs e)
@@ -40,18 +131,46 @@ public partial class MainWindow : Window
         SaveCurrentCharacter();
     }
 
+    private void NavigateCharacter(int delta)
+    {
+        var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
+        var characters = GetCharactersForLayout(selected).ToList();
+        if (characters.Count == 0)
+        {
+            return;
+        }
+
+        var currentText = CharacterInput.Text ?? string.Empty;
+        var current = currentText.Length > 0 ? currentText[0] : 'A';
+        var currentIndex = characters.IndexOf(current);
+        if (currentIndex < 0)
+        {
+            currentIndex = 0;
+        }
+
+        var nextIndex = (currentIndex + delta + characters.Count) % characters.Count;
+        var nextCharacter = characters[nextIndex];
+        CharacterInput.Text = nextCharacter == ' ' ? " " : nextCharacter.ToString();
+        UpdateCharacterEnabledToggle();
+        LoadCharacterIntoGrid(selected, nextCharacter.ToString());
+        UpdateMaskText();
+    }
+
     private void RefreshLayout()
     {
         var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
         var profile = DisplayCharacterProfiles.Get(selected);
+        var inputText = CharacterInput.Text ?? string.Empty;
+        var character = inputText.Length > 0 ? inputText[0] : 'A';
         _segmentCount = profile.SegmentCount;
 
         BuildSegmentGrid(profile);
         BuildCharacterMap(profile.Name);
-        var inputText = CharacterInput.Text ?? string.Empty;
-        LoadCharacterIntoGrid(profile.Name, inputText.Length > 0 ? inputText[0].ToString() : "A");
+        UpdateCharacterEnabledToggle();
+        LoadCharacterIntoGrid(profile.Name, character.ToString());
         UpdateMaskText();
         UpdateSegmentLegend();
+        ClearDirty();
     }
 
     private void BuildCharacterMap(string layout)
@@ -61,27 +180,55 @@ public partial class MainWindow : Window
 
         foreach (var character in characters)
         {
+            var isDisabled = !DisplayCharacterProfiles.IsCharacterEnabled(layout, character);
             var button = new Button
             {
-                Content = character == ' ' ? "space" : character.ToString(),
-                Width = 56,
-                Height = 34,
+                Content = CreateCharacterMapContent(character, isDisabled),
+                Width = 52,
+                Height = 36,
                 Margin = new Thickness(2),
                 Tag = character,
-                Background = Brushes.Transparent,
-                BorderBrush = Brushes.Gray,
-                BorderThickness = new Thickness(1)
+                Background = isDisabled ? new SolidColorBrush(Color.FromRgb(44, 20, 20)) : new SolidColorBrush(Color.FromRgb(30, 30, 30)),
+                BorderBrush = isDisabled ? new SolidColorBrush(Color.FromRgb(200, 78, 78)) : new SolidColorBrush(Color.FromRgb(90, 90, 90)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(4),
+                FontWeight = isDisabled ? FontWeight.SemiBold : FontWeight.Normal,
+                Foreground = isDisabled ? new SolidColorBrush(Color.FromRgb(255, 190, 190)) : new SolidColorBrush(Color.FromRgb(240, 240, 240)),
+                Opacity = isDisabled ? 0.8 : 1.0
             };
 
             button.Click += (_, _) =>
             {
                 CharacterInput.Text = character == ' ' ? " " : character.ToString();
+                UpdateCharacterEnabledToggle();
                 LoadCharacterIntoGrid(layout, character.ToString());
                 UpdateMaskText();
             };
 
             CharacterMapPanel.Children.Add(button);
         }
+    }
+
+    private static object CreateCharacterMapContent(char character, bool isDisabled)
+    {
+        var label = character == ' ' ? "space" : character.ToString();
+        if (!isDisabled)
+        {
+            return label;
+        }
+
+        return new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Spacing = 0,
+            Children =
+            {
+                new TextBlock { Text = label, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center },
+                new TextBlock { Text = "OFF", FontSize = 8, Foreground = new SolidColorBrush(Color.FromRgb(255, 128, 128)), FontWeight = FontWeight.Bold, HorizontalAlignment = HorizontalAlignment.Center }
+            }
+        };
     }
 
     private static IReadOnlyList<char> GetCharactersForLayout(string layout)
@@ -91,7 +238,7 @@ public partial class MainWindow : Window
 
         foreach (var character in candidates)
         {
-            var supported = DisplayCharacterProfiles.IsSupported(layout, character);
+            var supported = DisplayCharacterProfiles.Get(layout).IsSupported(character);
 
             if (supported && !characters.Contains(character))
             {
@@ -117,26 +264,100 @@ public partial class MainWindow : Window
                 var canvas = new Canvas
                 {
                     Width = 220,
-                    Height = 240,
+                    Height = 260,
                     Background = Brushes.Black,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                var segments = new[]
+                var polygons = new[]
                 {
-                    new SegmentSpec(0, 60, 18, 80, 12, 0),
-                    new SegmentSpec(1, 152, 52, 12, 80, 90),
-                    new SegmentSpec(2, 152, 146, 12, 80, 90),
-                    new SegmentSpec(3, 60, 214, 80, 12, 0),
-                    new SegmentSpec(4, 24, 146, 12, 80, 90),
-                    new SegmentSpec(5, 24, 52, 12, 80, 90),
-                    new SegmentSpec(6, 60, 112, 80, 12, 0)
+                    new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
+                    new[] { new Point(9, 1), new Point(10, 2), new Point(10, 8), new Point(9, 9), new Point(8, 8), new Point(8, 2) },
+                    new[] { new Point(9, 9), new Point(10, 10), new Point(10, 16), new Point(9, 17), new Point(8, 16), new Point(8, 10) },
+                    new[] { new Point(9, 17), new Point(8, 18), new Point(2, 18), new Point(1, 17), new Point(2, 16), new Point(8, 16) },
+                    new[] { new Point(1, 17), new Point(0, 16), new Point(0, 10), new Point(1, 9), new Point(2, 10), new Point(2, 16) },
+                    new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) },
+                    new[] { new Point(1, 9), new Point(2, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(2, 10) }
                 };
 
-                foreach (var segment in segments)
+                for (var index = 0; index < polygons.Length; index++)
                 {
-                    var button = CreateSegmentButton(segment.Index, segment.Width, segment.Height, segment.X, segment.Y, segment.Angle);
+                    var points = polygons[index];
+                    var button = CreatePolygonSegmentButton(index, points, new Point(22, 18), 16.0);
+                    canvas.Children.Add(button);
+                    _segmentButtons.Add(button);
+                }
+
+                SegmentGrid.Children.Add(canvas);
+                return;
+            }
+            case NineSegmentDisplayProfile:
+            {
+                var canvas = new Canvas
+                {
+                    Width = 220,
+                    Height = 260,
+                    Background = Brushes.Black,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                var polygons = new[]
+                {
+                    new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
+                    new[] { new Point(9, 1), new Point(10, 2), new Point(10, 8), new Point(9, 9), new Point(8, 8), new Point(8, 2) },
+                    new[] { new Point(9, 9), new Point(10, 10), new Point(10, 16), new Point(9, 17), new Point(8, 16), new Point(8, 10) },
+                    new[] { new Point(9, 17), new Point(8, 18), new Point(2, 18), new Point(1, 17), new Point(2, 16), new Point(8, 16) },
+                    new[] { new Point(1, 17), new Point(0, 16), new Point(0, 10), new Point(1, 9), new Point(2, 10), new Point(2, 16) },
+                    new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) },
+                    new[] { new Point(1, 9), new Point(2, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(2, 10) },
+                    new[] { new Point(2, 2), new Point(3.4, 2), new Point(8, 6.6), new Point(8, 8), new Point(6.6, 8), new Point(2, 3.4) },
+                    new[] { new Point(8, 16), new Point(8, 14.6), new Point(3.4, 10), new Point(2, 10), new Point(2, 11.4), new Point(6.6, 16) }
+                };
+
+                for (var index = 0; index < polygons.Length; index++)
+                {
+                    var points = polygons[index];
+                    var button = CreatePolygonSegmentButton(index, points, new Point(22, 18), 16.0);
+                    canvas.Children.Add(button);
+                    _segmentButtons.Add(button);
+                }
+
+                SegmentGrid.Children.Add(canvas);
+                return;
+            }
+            case TenSegmentDisplayProfile:
+            {
+                var canvas = new Canvas
+                {
+                    Width = 220,
+                    Height = 260,
+                    Background = Brushes.Black,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                // Match the canonical geometry in SkeuomorphCore/Glyphs/10-segment_labeled.svg.
+                // The 10-seg reference is a 7-segment core plus the common center/diagonal additions H and I.
+                var polygons = new[]
+                {
+                    new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
+                    new[] { new Point(9, 1), new Point(10, 2), new Point(10, 8), new Point(9, 9), new Point(8, 8), new Point(8, 2) },
+                    new[] { new Point(9, 9), new Point(10, 10), new Point(10, 16), new Point(9, 17), new Point(8, 16), new Point(8, 10) },
+                    new[] { new Point(9, 17), new Point(8, 18), new Point(2, 18), new Point(1, 17), new Point(2, 16), new Point(8, 16) },
+                    new[] { new Point(1, 17), new Point(0, 16), new Point(0, 10), new Point(1, 9), new Point(2, 10), new Point(2, 16) },
+                    new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) },
+                    new[] { new Point(1, 9), new Point(2, 8), new Point(4, 8), new Point(5, 9), new Point(4, 10), new Point(2, 10) },
+                    new[] { new Point(5, 9), new Point(6, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(6, 10) },
+                    new[] { new Point(6, 2), new Point(6, 8), new Point(5, 9), new Point(4, 8), new Point(4, 2) },
+                    new[] { new Point(5, 9), new Point(6, 10), new Point(6, 16), new Point(4, 16), new Point(4, 10) }
+                };
+
+                for (var index = 0; index < polygons.Length; index++)
+                {
+                    var points = polygons[index];
+                    var button = CreatePolygonSegmentButton(index, points, new Point(22, 18), 16.0);
                     canvas.Children.Add(button);
                     _segmentButtons.Add(button);
                 }
@@ -148,46 +369,37 @@ public partial class MainWindow : Window
             {
                 var canvas = new Canvas
                 {
-                    Width = 260,
+                    Width = 220,
                     Height = 260,
                     Background = Brushes.Black,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                var anchor = new[]
+                // Match the canonical 14-segment geometry in SkeuomorphCore/Glyphs/14-segment_labeled_clockwise.svg.
+                // This layout is a 7-segment core plus the common diagonal/center segments used by real LCD/LED parts.
+                var polygons = new[]
                 {
-                    new Point(70, 35), new Point(130, 35), new Point(190, 35),
-                    new Point(70, 130), new Point(130, 130), new Point(190, 130),
-                    new Point(70, 225), new Point(130, 225), new Point(190, 225)
+                    new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
+                    new[] { new Point(9, 1), new Point(10, 2), new Point(10, 8), new Point(9, 9), new Point(8, 8), new Point(8, 2) },
+                    new[] { new Point(9, 9), new Point(10, 10), new Point(10, 16), new Point(9, 17), new Point(8, 16), new Point(8, 10) },
+                    new[] { new Point(9, 17), new Point(8, 18), new Point(2, 18), new Point(1, 17), new Point(2, 16), new Point(8, 16) },
+                    new[] { new Point(1, 17), new Point(0, 16), new Point(0, 10), new Point(1, 9), new Point(2, 10), new Point(2, 16) },
+                    new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) },
+                    new[] { new Point(1, 9), new Point(2, 8), new Point(4, 8), new Point(5, 9), new Point(4, 10), new Point(2, 10) },
+                    new[] { new Point(5, 9), new Point(6, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(6, 10) },
+                    new[] { new Point(6, 2), new Point(6, 8), new Point(5, 9), new Point(4, 8), new Point(4, 2) },
+                    new[] { new Point(5, 9), new Point(6, 10), new Point(6, 16), new Point(4, 16), new Point(4, 10) },
+                    new[] { new Point(2, 2), new Point(3, 2), new Point(4, 7), new Point(4, 8), new Point(3, 8), new Point(2, 3) },
+                    new[] { new Point(8, 2), new Point(8, 3), new Point(7, 8), new Point(6, 8), new Point(6, 7), new Point(7, 2) },
+                    new[] { new Point(6, 10), new Point(7, 10), new Point(8, 15), new Point(8, 16), new Point(7, 16), new Point(6, 11) },
+                    new[] { new Point(4, 10), new Point(4, 11), new Point(3, 16), new Point(2, 16), new Point(2, 15), new Point(3, 10) }
                 };
 
-                // Real 14-seg parts omit the I and O center segments, leaving the standard
-                // A/B/C/D/E/F/G/H/J/K/L/M/N/P set used by the Lite-On datasheet.
-                var segments = new[]
+                for (var index = 0; index < polygons.Length; index++)
                 {
-                    new SegmentSpec(0, anchor[0], anchor[1], 12),
-                    new SegmentSpec(1, anchor[1], anchor[2], 12),
-                    new SegmentSpec(2, anchor[2], anchor[5], 12),
-                    new SegmentSpec(3, anchor[5], anchor[8], 12),
-                    new SegmentSpec(4, anchor[7], anchor[8], 12),
-                    new SegmentSpec(5, anchor[6], anchor[7], 12),
-                    new SegmentSpec(6, anchor[3], anchor[6], 12),
-                    new SegmentSpec(7, anchor[0], anchor[3], 12),
-                    new SegmentSpec(8, anchor[0], anchor[4], 12),
-                    new SegmentSpec(9, anchor[1], anchor[4], 12),
-                    new SegmentSpec(10, anchor[4], anchor[2], 12),
-                    new SegmentSpec(11, anchor[4], anchor[5], 12),
-                    new SegmentSpec(12, anchor[4], anchor[8], 12),
-                    new SegmentSpec(13, anchor[7], anchor[4], 12),
-                    new SegmentSpec(14, anchor[6], anchor[4], 12),
-                    new SegmentSpec(15, anchor[3], anchor[4], 12)
-                };
-
-                var mapping = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 15 };
-                foreach (var sourceIndex in mapping)
-                {
-                    var button = CreateSegmentButton(segments[sourceIndex]);
+                    var points = polygons[index];
+                    var button = CreatePolygonSegmentButton(index, points, new Point(22, 18), 16.0);
                     canvas.Children.Add(button);
                     _segmentButtons.Add(button);
                 }
@@ -248,39 +460,31 @@ public partial class MainWindow : Window
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                // 3x3 anchor lattice: each segment must touch exactly two adjacent reference points.
-                var anchor = new[]
+                // Physical center order as described by the hardware layout:
+                // a1, a2, b, c, d1, d2, e, f, j, h, k, g2, l, i, m, g1.
+                var legacyClockwiseSegmentDefinitions = new[]
                 {
-                    new Point(70, 35), new Point(130, 35), new Point(190, 35),
-                    new Point(70, 130), new Point(130, 130), new Point(190, 130),
-                    new Point(70, 225), new Point(130, 225), new Point(190, 225)
+                    (Index: 0, Name: "a1", Points: new[] { new Point(1, 1), new Point(2, 0), new Point(4, 0), new Point(5, 1), new Point(4, 2), new Point(2, 2) }),
+                    (Index: 1, Name: "a2", Points: new[] { new Point(5, 1), new Point(6, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(6, 2) }),
+                    (Index: 2, Name: "b", Points: new[] { new Point(9, 1), new Point(10, 2), new Point(10, 8), new Point(9, 9), new Point(8, 8), new Point(8, 2) }),
+                    (Index: 3, Name: "c", Points: new[] { new Point(9, 9), new Point(10, 10), new Point(10, 16), new Point(9, 17), new Point(8, 16), new Point(8, 10) }),
+                    (Index: 4, Name: "d1", Points: new[] { new Point(9, 17), new Point(8, 18), new Point(6, 18), new Point(5, 17), new Point(6, 16), new Point(8, 16) }),
+                    (Index: 5, Name: "d2", Points: new[] { new Point(5, 17), new Point(4, 18), new Point(2, 18), new Point(1, 17), new Point(2, 16), new Point(4, 16) }),
+                    (Index: 6, Name: "e", Points: new[] { new Point(1, 17), new Point(0, 16), new Point(0, 10), new Point(1, 9), new Point(2, 10), new Point(2, 16) }),
+                    (Index: 7, Name: "f", Points: new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) }),
+                    (Index: 8, Name: "j", Points: new[] { new Point(2, 2), new Point(3, 2), new Point(4, 7), new Point(4, 8), new Point(3, 8), new Point(2, 3) }),
+                    (Index: 9, Name: "h", Points: new[] { new Point(5, 1), new Point(6, 2), new Point(6, 8), new Point(5, 9), new Point(4, 8), new Point(4, 2) }),
+                    (Index: 10, Name: "k", Points: new[] { new Point(8, 2), new Point(8, 3), new Point(7, 8), new Point(6, 8), new Point(6, 7), new Point(7, 2) }),
+                    (Index: 11, Name: "g2", Points: new[] { new Point(5, 9), new Point(6, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(6, 10) }),
+                    (Index: 12, Name: "l", Points: new[] { new Point(6, 10), new Point(7, 10), new Point(8, 15), new Point(8, 16), new Point(7, 16), new Point(6, 11) }),
+                    (Index: 13, Name: "i", Points: new[] { new Point(5, 9), new Point(6, 10), new Point(6, 16), new Point(5, 17), new Point(4, 16), new Point(4, 10) }),
+                    (Index: 14, Name: "m", Points: new[] { new Point(4, 10), new Point(4, 11), new Point(3, 16), new Point(2, 16), new Point(2, 15), new Point(3, 10) }),
+                    (Index: 15, Name: "g1", Points: new[] { new Point(1, 9), new Point(2, 8), new Point(4, 8), new Point(5, 9), new Point(4, 10), new Point(2, 10) })
                 };
 
-                // Keep the segment numbering aligned to the actual 16-seg lattice:
-                // 0..7 are the outer perimeter; 8..15 are the center-to-corner and center-cross segments.
-                var segments = new[]
+                foreach (var segment in legacyClockwiseSegmentDefinitions)
                 {
-                    new SegmentSpec(0, anchor[0], anchor[1], 12),
-                    new SegmentSpec(1, anchor[1], anchor[2], 12),
-                    new SegmentSpec(2, anchor[2], anchor[5], 12),
-                    new SegmentSpec(3, anchor[5], anchor[8], 12),
-                    new SegmentSpec(4, anchor[7], anchor[8], 12),
-                    new SegmentSpec(5, anchor[6], anchor[7], 12),
-                    new SegmentSpec(6, anchor[3], anchor[6], 12),
-                    new SegmentSpec(7, anchor[0], anchor[3], 12),
-                    new SegmentSpec(8, anchor[0], anchor[4], 12),
-                    new SegmentSpec(9, anchor[1], anchor[4], 12),
-                    new SegmentSpec(10, anchor[4], anchor[2], 12),
-                    new SegmentSpec(11, anchor[4], anchor[5], 12),
-                    new SegmentSpec(12, anchor[4], anchor[8], 12),
-                    new SegmentSpec(13, anchor[7], anchor[4], 12),
-                    new SegmentSpec(14, anchor[6], anchor[4], 12),
-                    new SegmentSpec(15, anchor[3], anchor[4], 12)
-                };
-
-                foreach (var segment in segments)
-                {
-                    var button = CreateSegmentButton(segment);
+                    var button = CreatePolygonSegmentButton(segment.Index, segment.Points, new Point(18, 14), 18.0);
                     canvas.Children.Add(button);
                     _segmentButtons.Add(button);
                 }
@@ -333,6 +537,7 @@ public partial class MainWindow : Window
 
     private void SegmentButton_Click(object? sender, RoutedEventArgs e)
     {
+        MarkDirty();
         UpdateMaskText();
     }
 
@@ -340,6 +545,53 @@ public partial class MainWindow : Window
     {
         var segment = new SegmentSpec(index, x, y, width, height, angle);
         return CreateSegmentButton(segment);
+    }
+
+    private ToggleButton CreatePolygonSegmentButton(int index, IReadOnlyList<Point> points, Point offset, double scale)
+    {
+        var geometry = CreatePolygonGeometry(points, scale);
+        var bounds = geometry.Bounds;
+        var width = Math.Max(1, bounds.Width + 8);
+        var height = Math.Max(1, bounds.Height + 8);
+
+        var body = new Avalonia.Controls.Shapes.Path
+        {
+            Width = width,
+            Height = height,
+            Fill = new SolidColorBrush(Color.FromRgb(255, 82, 82)),
+            Stroke = Brushes.Transparent,
+            StrokeThickness = 0,
+            Stretch = Stretch.Fill,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            IsHitTestVisible = false,
+            Data = geometry,
+            RenderTransformOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Absolute)
+        };
+
+        var button = new ToggleButton
+        {
+            Width = width,
+            Height = height,
+            Background = Brushes.Transparent,
+            BorderThickness = new Thickness(0),
+            Padding = new Thickness(0),
+            Margin = new Thickness(0),
+            Tag = index,
+            Content = body,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
+            IsChecked = false,
+            RenderTransformOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative)
+        };
+
+        button.IsCheckedChanged += (_, _) => UpdateSegmentButtonVisual(button);
+        button.Click += SegmentButton_Click;
+
+        Canvas.SetLeft(button, offset.X + bounds.X - 4);
+        Canvas.SetTop(button, offset.Y + bounds.Y - 4);
+        UpdateSegmentButtonVisual(button);
+        return button;
     }
 
     private ToggleButton CreateSegmentButton(SegmentSpec segment)
@@ -386,6 +638,26 @@ public partial class MainWindow : Window
         Canvas.SetTop(button, segment.Y);
         UpdateSegmentButtonVisual(button);
         return button;
+    }
+
+    private static Geometry CreatePolygonGeometry(IReadOnlyList<Point> points, double scale)
+    {
+        var geometry = new PathGeometry();
+        var figure = new PathFigure { IsClosed = true, IsFilled = true };
+
+        var first = points[0];
+        figure.StartPoint = new Point(first.X * scale, first.Y * scale);
+        for (var i = 1; i < points.Count; i++)
+        {
+            var point = points[i];
+            figure.Segments!.Add(new LineSegment
+            {
+                Point = new Point(point.X * scale, point.Y * scale)
+            });
+        }
+
+        geometry.Figures!.Add(figure);
+        return geometry;
     }
 
     private static Geometry CreateSegmentGeometry(SegmentSpec segment)
@@ -436,10 +708,29 @@ public partial class MainWindow : Window
             return;
         }
 
-        path.Fill = button.IsChecked == true
-            ? new SolidColorBrush(Color.FromRgb(255, 82, 82))
-            : new SolidColorBrush(Color.FromRgb(120, 76, 76));
-        path.Opacity = button.IsChecked == true ? 1.0 : 0.35;
+        var lit = button.IsChecked == true;
+        var glow = lit ? Color.FromRgb(255, 98, 98) : Color.FromRgb(88, 54, 54);
+        var shadow = lit ? Color.FromRgb(255, 148, 148) : Color.FromRgb(64, 40, 40);
+
+        path.Fill = new SolidColorBrush(glow);
+        path.Stroke = lit ? new SolidColorBrush(Color.FromRgb(255, 180, 180)) : new SolidColorBrush(Color.FromRgb(70, 44, 44));
+        path.StrokeThickness = lit ? 0.7 : 0.3;
+        path.Opacity = lit ? 1.0 : 0.4;
+        path.Effect = lit
+            ? new DropShadowEffect
+            {
+                BlurRadius = 10,
+                Color = new Color(255, 255, 90, 90),
+                OffsetX = 0,
+                OffsetY = 0
+            }
+            : null;
+
+        button.Background = lit
+            ? new SolidColorBrush(Color.FromArgb(40, 255, 100, 100))
+            : new SolidColorBrush(Color.FromArgb(10, 255, 255, 255));
+        button.BorderBrush = lit ? new SolidColorBrush(Color.FromArgb(120, 255, 120, 120)) : new SolidColorBrush(Color.FromArgb(80, 120, 120, 120));
+        button.BorderThickness = new Thickness(lit ? 1 : 0.5);
     }
 
     private readonly record struct SegmentSpec
@@ -519,9 +810,10 @@ public partial class MainWindow : Window
         var width = profile.Width;
         var height = profile.Height;
         var bits = string.Join(", ", GetCurrentBits().Select(v => v ? "true" : "false"));
+        var maskExpression = BuildMaskExpression(selected, mask);
 
         MaskValueText.Text = $"{text} :: mask = {mask} (0x{mask:X})";
-        CodePreview.Text = $"namespace SkeuomorphCore;\n\npublic static class GeneratedGlyphMaps\n{{\n    public static readonly CharacterMap {selected}Map = new({width}, {height});\n\n    static GeneratedGlyphMaps()\n    {{\n        {selected}Map.Set('{text}', {mask}UL);\n    }}\n}}\n\n// bits: [{bits}]";
+        CodePreview.Text = $"namespace SkeuomorphCore;\n\npublic static class GeneratedGlyphMaps\n{{\n    public static readonly CharacterMap {selected}Map = new({width}, {height});\n\n    static GeneratedGlyphMaps()\n    {{\n        {selected}Map.Set('{text}', {maskExpression});\n    }}\n}}\n\n// bits: [{bits}]";
         UpdateSegmentLegend();
     }
 
@@ -578,60 +870,392 @@ public partial class MainWindow : Window
         return output;
     }
 
-    private void SaveCurrentCharacter()
-    {
-        var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
-        var profile = DisplayCharacterProfiles.Get(selected);
-        var characterText = CharacterInput.Text ?? string.Empty;
-        if (string.IsNullOrEmpty(characterText))
-        {
-            return;
-        }
+   private void SaveCurrentCharacter()
+   {
+       var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
+       var profile = DisplayCharacterProfiles.Get(selected);
+       var characterText = CharacterInput.Text ?? string.Empty;
+       if (string.IsNullOrEmpty(characterText))
+       {
+           return;
+       }
 
-        var character = characterText[0].ToString();
-        var mapName = profile.Name + "Map";
-        var width = profile.Width;
-        var height = profile.Height;
+       var character = characterText[0];
+       var mask = 0UL;
+       for (var index = 0; index < _segmentButtons.Count; index++)
+       {
+           if (_segmentButtons[index].IsChecked == true)
+           {
+               mask |= 1UL << index;
+           }
+       }
 
-        var mask = 0UL;
-        for (var index = 0; index < _segmentButtons.Count; index++)
-        {
-            if (_segmentButtons[index].IsChecked == true)
-            {
-                mask |= 1UL << index;
-            }
-        }
-
-       var repoRoot = ResolveRepositoryRoot();
-       var coreDirectory = System.IO.Path.Combine(repoRoot, "SkeuomorphCore");
-       Directory.CreateDirectory(coreDirectory);
-
-       var filePath = System.IO.Path.Combine(coreDirectory, "GeneratedGlyphMaps.cs");
-
-       var classBody = $@"namespace SkeuomorphCore;
- 
-public static class GeneratedGlyphMaps
-{{
-    public static readonly CharacterMap {mapName} = new({width}, {height});
- 
-    static GeneratedGlyphMaps()
-    {{
-        {mapName}.Set('{character[0]}', {mask}UL);
-    }}
-}}
-";
+       var filePath = ResolveMapFileForLayout(selected);
+       if (filePath is null)
+       {
+           CodePreview.Text = $"No map file is defined for {selected}. Save is only supported for the segment-based glyph maps.";
+           MaskValueText.Text = "Save skipped";
+           return;
+       }
 
        try
        {
-           File.WriteAllText(filePath, classBody);
-           CodePreview.Text = classBody;
-           MaskValueText.Text = $"Saved {character[0]} :: mask = {mask} (0x{mask:X})";
+           var source = File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
+           var updated = UpdateMapFileCharacterEntry(source, character, mask, selected);
+           File.WriteAllText(filePath, updated);
+           ApplyRuntimeMapUpdate(selected, character, mask);
+           RefreshLayout();
+           ClearDirty();
+           CodePreview.Text = updated;
+           MaskValueText.Text = $"Saved {character} :: mask = {mask} (0x{mask:X}) to {System.IO.Path.GetFileName(filePath)}";
        }
        catch (Exception ex)
        {
            CodePreview.Text = ex.Message;
            MaskValueText.Text = $"Save failed: {ex.Message}";
        }
+   }
+
+   private static void ApplyRuntimeMapUpdate(string layout, char character, ulong mask)
+   {
+       var mapTypeName = layout switch
+       {
+           "SevenSegment" => "SevenMap",
+           "NineSegment" => "NineMap",
+           "TenSegment" => "TenMap",
+           "FourteenSegment" => "FourteenMap",
+           "Rectangle5x7" => "GlyphLibrary",
+           "SixteenSegment" => "SixteenMap",
+           _ => null
+       };
+
+       if (mapTypeName is null)
+       {
+           return;
+       }
+
+       var mapType = typeof(DisplayCharacterProfiles).Assembly.GetType($"SkeuomorphCore.{mapTypeName}");
+       if (mapType is null)
+       {
+           return;
+       }
+
+       var fieldName = mapTypeName switch
+       {
+           "SevenMap" => "SevenMasks",
+           "NineMap" => "NineMasks",
+           "TenMap" => "TenMasks",
+           "FourteenMap" => "FourteenMasks",
+           "GlyphLibrary" => "Patterns",
+           "SixteenMap" => "SixteenMasks",
+           _ => null
+       };
+
+       if (fieldName is null)
+       {
+           return;
+       }
+
+       var field = mapType.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static);
+       if (field is null)
+       {
+           return;
+       }
+
+       var dictionary = field.GetValue(null) as IDictionary;
+       if (dictionary is null)
+       {
+           return;
+       }
+
+       var value = Convert.ChangeType(mask, field.FieldType.GetGenericArguments()[1]);
+       dictionary[character] = value;
+   }
+
+   private static void PersistCharacterAvailability(string layout, char character, bool enabled)
+   {
+       if (layout == "Rectangle5x7")
+       {
+           return;
+       }
+
+       var filePath = ResolveMapFileForLayout(layout);
+       if (filePath is null)
+       {
+           return;
+       }
+
+       var source = File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
+       var updated = UpdateMapDisabledCharacters(source, layout, character, enabled);
+       File.WriteAllText(filePath, updated);
+   }
+
+   private static string? ResolveMapFileForLayout(string layout)
+   {
+       var repoRoot = ResolveRepositoryRoot();
+       var coreDirectory = System.IO.Path.Combine(repoRoot, "SkeuomorphCore", "Glyphs");
+       var fileName = layout switch
+       {
+           "SevenSegment" => "SevenMap.cs",
+           "NineSegment" => "NineMap.cs",
+           "TenSegment" => "TenMap.cs",
+           "FourteenSegment" => "FourteenMap.cs",
+           "Rectangle5x7" => "GlyphLibrary.cs",
+           "SixteenSegment" => "SixteenMap.cs",
+           _ => null
+       };
+
+       return fileName is null ? null : System.IO.Path.Combine(coreDirectory, fileName);
+   }
+
+   private static string BuildMaskExpression(string layout, ulong mask)
+   {
+       var segments = layout switch
+       {
+           "SevenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentDP" },
+           "NineSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentI" },
+           "TenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentI", "SegmentJ" },
+           "FourteenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentJ", "SegmentK", "SegmentL", "SegmentM", "SegmentN", "SegmentP" },
+           "Rectangle5x7" => null,
+           "SixteenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentI", "SegmentJ", "SegmentK", "SegmentL", "SegmentM", "SegmentN", "SegmentO", "SegmentP" },
+           _ => null
+       };
+
+       if (segments is null)
+       {
+           return layout == "Rectangle5x7" ? $"0x{mask:X}UL" : mask.ToString();
+       }
+
+       var active = new List<string>();
+       for (var index = 0; index < segments.Length; index++)
+       {
+           if ((mask & (1UL << index)) != 0)
+           {
+               active.Add(segments[index]);
+           }
+       }
+
+       return active.Count == 0 ? "Mask()" : $"Mask({string.Join(", ", active)})";
+   }
+
+   private static string UpdateMapDisabledCharacters(string source, string layout, char character, bool enabled)
+   {
+       if (layout == "Rectangle5x7")
+       {
+           return source;
+       }
+
+       var mapName = layout switch
+       {
+           "SevenSegment" => "SevenMap",
+           "NineSegment" => "NineMap",
+           "TenSegment" => "TenMap",
+           "FourteenSegment" => "FourteenMap",
+           "SixteenSegment" => "SixteenMap",
+           _ => throw new InvalidOperationException($"Unsupported layout: {layout}")
+       };
+
+       var fieldPattern = @"(?ms)^\s*public\s+static\s+(?:readonly\s+)?HashSet<char>\s+DisabledCharacters\s*=\s*(?<value>\[[^\]]*\]|new\s*\(\)|new\s*HashSet<char>\s*\{[^}]*\})\s*;";
+       var matches = Regex.Matches(source, fieldPattern);
+
+       var currentValue = matches.Count > 0 ? matches[0].Groups["value"].Value : "[]";
+       var chars = ParseHashSetCharacters(currentValue);
+       var normalized = NormalizeCharacterLiteral(character);
+       if (enabled)
+       {
+           chars.Remove(normalized);
+       }
+       else
+       {
+           chars.Add(normalized);
+       }
+
+       var newline = DetectNewline(source);
+       var cleanedSource = Regex.Replace(source, fieldPattern, string.Empty);
+       var insertionIndex = cleanedSource.IndexOf("public static readonly string[] SegmentLetters", StringComparison.Ordinal);
+       if (insertionIndex < 0)
+       {
+           throw new InvalidOperationException($"Could not locate the segment letters in {mapName}.");
+       }
+
+       var segmentIndex = cleanedSource.IndexOf(";", insertionIndex);
+       if (segmentIndex < 0)
+       {
+           throw new InvalidOperationException($"Could not insert disabled-character tracking into {mapName}.");
+       }
+
+       var before = cleanedSource.Substring(0, segmentIndex + 1);
+       var after = cleanedSource.Substring(segmentIndex + 1);
+       var serialized = chars.Count == 0 ? "[]" : $"[{string.Join(", ", chars.OrderBy(c => c).Select(c => $"'{EscapeCharacterLiteral(c)}'"))}]";
+       return before + newline + "    public static readonly HashSet<char> DisabledCharacters = " + serialized + ";" + newline + after;
+   }
+
+   private static HashSet<char> ParseHashSetCharacters(string literal)
+   {
+       var result = new HashSet<char>();
+       if (string.IsNullOrWhiteSpace(literal) || literal == "[]" || literal == "new()" || literal == "new HashSet<char>()")
+       {
+           return result;
+       }
+
+       var match = Regex.Match(literal, @"\[(?<items>.*)\]|new\s*HashSet<char>\s*\{(?<items>.*)\}", RegexOptions.Singleline);
+       if (!match.Success)
+       {
+           return result;
+       }
+
+       var body = match.Groups["items"].Value;
+       var entries = body.Split(',');
+       foreach (var entry in entries)
+       {
+           var text = entry.Trim();
+           if (text.Length == 0)
+           {
+               continue;
+           }
+
+           var literalMatch = Regex.Match(text, @"^'(?<value>(?:\\'|\\\\|\\n|\\r|\\t|[^'])*)'$", RegexOptions.Singleline);
+           if (!literalMatch.Success)
+           {
+               continue;
+           }
+
+           result.Add(ParseCharacterLiteral(literalMatch.Groups["value"].Value));
+       }
+
+       return result;
+   }
+
+   private static char NormalizeCharacterLiteral(char character)
+   {
+       return char.ToUpperInvariant(character);
+   }
+
+   private static string UpdateMapFileCharacterEntry(string source, char character, ulong mask, string layout)
+   {
+       var mapName = layout switch
+       {
+           "SevenSegment" => "SevenMap",
+           "NineSegment" => "NineMap",
+           "TenSegment" => "TenMap",
+           "FourteenSegment" => "FourteenMap",
+           "Rectangle5x7" => "GlyphLibrary",
+           "SixteenSegment" => "SixteenMap",
+           _ => throw new InvalidOperationException($"Unsupported layout: {layout}")
+       };
+
+       var dictionaryPattern = @"(?<prefix>private\s+static\s+readonly\s+Dictionary<char,\s*[^>]+>\s*\w+\s*=\s*new\(\)\s*\{\s*)" +
+                               @"(?<body>.*?)" +
+                               @"(?<suffix>\s*\};)";
+
+       var match = Regex.Match(source, dictionaryPattern, RegexOptions.Singleline);
+       if (!match.Success)
+       {
+           throw new InvalidOperationException($"Could not locate the {mapName} dictionary in the map file.");
+       }
+
+       var body = match.Groups["body"].Value;
+       var lines = body.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).ToList();
+       var updatedLines = new List<string>();
+       var replaced = false;
+       var maskExpression = BuildMaskExpression(layout, mask);
+       var newline = DetectNewline(source);
+
+       foreach (var line in lines)
+       {
+           var trimmed = line.Trim();
+           if (trimmed.Length == 0)
+           {
+               updatedLines.Add(line);
+               continue;
+           }
+
+           var entryMatch = Regex.Match(trimmed, @"^\[\s*'(?<literal>(?:\\'|[^'])*)'\s*\]\s*=\s*(?<value>.+?)\s*,?\s*$");
+           if (!entryMatch.Success)
+           {
+               updatedLines.Add(line);
+               continue;
+           }
+
+           var key = ParseCharacterLiteral(entryMatch.Groups["literal"].Value);
+           if (key == character)
+           {
+               updatedLines.Add($"        ['{EscapeCharacterLiteral(character)}'] = {maskExpression},");
+               replaced = true;
+               continue;
+           }
+
+           updatedLines.Add(line);
+       }
+
+       if (!replaced)
+       {
+           updatedLines.Insert(updatedLines.Count, $"        ['{EscapeCharacterLiteral(character)}'] = {maskExpression},");
+       }
+
+       var prefix = match.Groups["prefix"].Value;
+       var suffix = match.Groups["suffix"].Value;
+       return source.Substring(0, match.Index) + prefix + string.Join(newline, updatedLines) + newline + suffix + source.Substring(match.Index + match.Length);
+   }
+
+   private static char ParseCharacterLiteral(string literal)
+   {
+       if (string.IsNullOrEmpty(literal))
+       {
+           return ' ';
+       }
+
+       var result = new List<char>();
+       for (var index = 0; index < literal.Length; index++)
+       {
+           var ch = literal[index];
+           if (ch != '\\' || index + 1 >= literal.Length)
+           {
+               result.Add(ch);
+               continue;
+           }
+
+           var next = literal[++index];
+           result.Add(next switch
+           {
+               '\'' => '\'',
+               '\\' => '\\',
+               'n' => '\n',
+               'r' => '\r',
+               't' => '\t',
+               _ => next
+           });
+       }
+
+       return result.Count > 0 ? result[0] : ' ';
+   }
+
+   private static string EscapeCharacterLiteral(char character)
+   {
+       return character switch
+       {
+           '\\' => "\\\\",
+           '\'' => "\\'",
+           '\n' => "\\n",
+           '\r' => "\\r",
+           '\t' => "\\t",
+           _ => character.ToString()
+       };
+   }
+
+   private static string DetectNewline(string source)
+   {
+       if (source.Contains("\r\n", StringComparison.Ordinal))
+       {
+           return "\r\n";
+       }
+
+       if (source.Contains('\n'))
+       {
+           return "\n";
+       }
+
+       return Environment.NewLine;
    }
 
    private static string ResolveRepositoryRoot()
