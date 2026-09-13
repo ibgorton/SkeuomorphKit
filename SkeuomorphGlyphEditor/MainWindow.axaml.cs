@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -311,6 +310,33 @@ public partial class MainWindow : Window
 
         _segmentButtons.Clear();
 
+        var layoutDefinition = GetLayoutDefinition(profile.Name);
+        if (layoutDefinition is not null)
+        {
+            var canvas = new Canvas
+            {
+                Width = layoutDefinition.CanvasWidth,
+                Height = layoutDefinition.CanvasHeight,
+                Background = Brushes.Black,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            for (var index = 0; index < layoutDefinition.Segments.Count; index++)
+            {
+                var points = layoutDefinition.Segments[index]
+                    .Select(point => new Point(point[0], point[1]))
+                    .ToArray();
+
+                var button = CreatePolygonSegmentButton(index, points, new Point(layoutDefinition.OffsetX, layoutDefinition.OffsetY), layoutDefinition.Scale);
+                canvas.Children.Add(button);
+                _segmentButtons.Add(button);
+            }
+
+            SegmentGrid.Children.Add(canvas);
+            return;
+        }
+
         switch (profile)
         {
             case SevenSegmentDisplayProfile:
@@ -346,7 +372,10 @@ public partial class MainWindow : Window
                 SegmentGrid.Children.Add(canvas);
                 return;
             }
-            case NineSegmentDisplayProfile:
+            case NineSegmentDisplayProfile when profile.Name is "NineSegment" or "NineSegmentSlash":
+            case NineSegmentDisplayProfile when profile.Name is "NineSegmentSlashAlt":
+            case NineSegmentDisplayProfile when profile.Name is "NineSegmentBackslash":
+            case NineSegmentDisplayProfile when profile.Name is "NineSegmentBackslashAlt":
             {
                 var canvas = new Canvas
                 {
@@ -357,17 +386,32 @@ public partial class MainWindow : Window
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                var polygons = new[]
+                var polygons = profile.Name switch
                 {
-                    new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
-                    new[] { new Point(9, 1), new Point(10, 2), new Point(10, 8), new Point(9, 9), new Point(8, 8), new Point(8, 2) },
-                    new[] { new Point(9, 9), new Point(10, 10), new Point(10, 16), new Point(9, 17), new Point(8, 16), new Point(8, 10) },
-                    new[] { new Point(9, 17), new Point(8, 18), new Point(2, 18), new Point(1, 17), new Point(2, 16), new Point(8, 16) },
-                    new[] { new Point(1, 17), new Point(0, 16), new Point(0, 10), new Point(1, 9), new Point(2, 10), new Point(2, 16) },
-                    new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) },
-                    new[] { new Point(1, 9), new Point(2, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(2, 10) },
-                    new[] { new Point(2, 2), new Point(3.4, 2), new Point(8, 6.6), new Point(8, 8), new Point(6.6, 8), new Point(2, 3.4) },
-                    new[] { new Point(8, 16), new Point(8, 14.6), new Point(3.4, 10), new Point(2, 10), new Point(2, 11.4), new Point(6.6, 16) }
+                    "NineSegmentBackslash" or "NineSegmentBackslashAlt" => new[]
+                    {
+                        new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
+                        new[] { new Point(9, 1), new Point(10, 2), new Point(10, 8), new Point(9, 9), new Point(8, 8), new Point(8, 2) },
+                        new[] { new Point(9, 9), new Point(10, 10), new Point(10, 16), new Point(9, 17), new Point(8, 16), new Point(8, 10) },
+                        new[] { new Point(9, 17), new Point(8, 18), new Point(2, 18), new Point(1, 17), new Point(2, 16), new Point(8, 16) },
+                        new[] { new Point(1, 17), new Point(0, 16), new Point(0, 10), new Point(1, 9), new Point(2, 10), new Point(2, 16) },
+                        new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) },
+                        new[] { new Point(1, 9), new Point(2, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(2, 10) },
+                        new[] { new Point(8, 2), new Point(8, 3.4), new Point(3.4, 8), new Point(2, 8), new Point(2, 6.6), new Point(6.6, 2) },
+                        new[] { new Point(8, 10), new Point(8, 11.4), new Point(3.4, 16), new Point(2, 16), new Point(2, 14.6), new Point(6.6, 10) }
+                    },
+                    _ => new[]
+                    {
+                        new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
+                        new[] { new Point(9, 1), new Point(10, 2), new Point(10, 8), new Point(9, 9), new Point(8, 8), new Point(8, 2) },
+                        new[] { new Point(9, 9), new Point(10, 10), new Point(10, 16), new Point(9, 17), new Point(8, 16), new Point(8, 10) },
+                        new[] { new Point(9, 17), new Point(8, 18), new Point(2, 18), new Point(1, 17), new Point(2, 16), new Point(8, 16) },
+                        new[] { new Point(1, 17), new Point(0, 16), new Point(0, 10), new Point(1, 9), new Point(2, 10), new Point(2, 16) },
+                        new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) },
+                        new[] { new Point(1, 9), new Point(2, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(2, 10) },
+                        new[] { new Point(2, 2), new Point(3.4, 2), new Point(8, 6.6), new Point(8, 8), new Point(6.6, 8), new Point(2, 3.4) },
+                        new[] { new Point(8, 16), new Point(8, 14.6), new Point(3.4, 10), new Point(2, 10), new Point(2, 11.4), new Point(6.6, 16) }
+                    }
                 };
 
                 for (var index = 0; index < polygons.Length; index++)
@@ -392,8 +436,6 @@ public partial class MainWindow : Window
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                // Match the canonical geometry in SkeuomorphCore/Glyphs/10-segment_labeled.svg.
-                // The 10-seg reference is a 7-segment core plus the common center/diagonal additions H and I.
                 var polygons = new[]
                 {
                     new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
@@ -430,8 +472,6 @@ public partial class MainWindow : Window
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                // Match the canonical 14-segment geometry in SkeuomorphCore/Glyphs/14-segment_labeled_clockwise.svg.
-                // This layout is a 7-segment core plus the common diagonal/center segments used by real LCD/LED parts.
                 var polygons = new[]
                 {
                     new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
@@ -519,8 +559,6 @@ public partial class MainWindow : Window
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                // Physical center order as described by the hardware layout:
-                // a1, a2, b, c, d1, d2, e, f, j, h, k, g2, l, i, m, g1.
                 var legacyClockwiseSegmentDefinitions = new[]
                 {
                     (Index: 0, Name: "a1", Points: new[] { new Point(1, 1), new Point(2, 0), new Point(4, 0), new Point(5, 1), new Point(4, 2), new Point(2, 2) }),
@@ -597,6 +635,37 @@ public partial class MainWindow : Window
             SegmentGrid.Children.Add(button);
             _segmentButtons.Add(button);
         }
+    }
+
+    private static GlyphMapLayoutDefinition? GetLayoutDefinition(string layoutName)
+    {
+        if (GlyphMapCatalog.BuiltInJson.TryGetValue(layoutName, out var json))
+        {
+            return GlyphMapDefinition.FromJson(json, layoutName).Layout;
+        }
+
+        var canonicalName = layoutName switch
+        {
+            "SevenMap" => "SevenSegment",
+            "NineMap" => "NineSegment",
+            "NineSegmentSlash" => "NineSegment",
+            "NineSegmentBackslash" => "NineSegment",
+            "NineSegmentSlashAlt" => "NineSegment",
+            "NineSegmentBackslashAlt" => "NineSegment",
+            "TenMap" => "TenSegment",
+            "FourteenMap" => "FourteenSegment",
+            "RectangleMap" => "Rectangle5x7",
+            "DotMatrix8x8Map" => "DotMatrix8x8",
+            "SixteenMap" => "SixteenSegment",
+            _ => layoutName
+        };
+
+        if (canonicalName != layoutName && GlyphMapCatalog.BuiltInJson.TryGetValue(canonicalName, out var canonicalJson))
+        {
+            return GlyphMapDefinition.FromJson(canonicalJson, canonicalName).Layout;
+        }
+
+        return null;
     }
 
     private void SegmentButton_Click(object? sender, RoutedEventArgs e)
@@ -873,6 +942,12 @@ public partial class MainWindow : Window
         UpdateMaskText();
     }
 
+    private static string BuildMaskExpression(string layout, ulong mask)
+    {
+        _ = layout;
+        return $"0x{mask:X}";
+    }
+
     private void UpdateMaskText()
     {
         var selected = LayoutPicker.SelectedItem as string ?? "Rectangle5x7";
@@ -901,31 +976,38 @@ public partial class MainWindow : Window
 
     private void UpdateSegmentLegend()
     {
-        if (LayoutPicker.SelectedItem as string != "SixteenSegment")
+        var selected = LayoutPicker.SelectedItem as string;
+        var names = selected switch
+        {
+            "NineSegment" => new[] { "a", "b", "c", "d", "e", "f", "g", "h", "i" },
+            "TenSegment" => new[] { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j" },
+            "SixteenSegment" => new[]
+            {
+                "top-left",
+                "top-right",
+                "upper-right",
+                "lower-right",
+                "bottom-right",
+                "bottom-left",
+                "left-bottom",
+                "left-top",
+                "left-upper-diagonal",
+                "middle-top-vertical",
+                "right-upper-diagonal",
+                "middle-horizontal-right",
+                "right-lower-diagonal",
+                "middle-bottom-vertical",
+                "left-lower-diagonal",
+                "middle-horizontal-left"
+            },
+            _ => null
+        };
+
+        if (names is null)
         {
             SegmentLegendText.Text = string.Empty;
             return;
         }
-
-        var names = new[]
-        {
-            "top-left",
-            "top-right",
-            "upper-right",
-            "lower-right",
-            "bottom-right",
-            "bottom-left",
-            "left-bottom",
-            "left-top",
-            "left-upper-diagonal",
-            "middle-top-vertical",
-            "right-upper-diagonal",
-            "middle-horizontal-right",
-            "right-lower-diagonal",
-            "middle-bottom-vertical",
-            "left-lower-diagonal",
-            "middle-horizontal-left"
-        };
 
         var lit = new List<string>();
         for (var i = 0; i < _segmentButtons.Count; i++)
@@ -981,20 +1063,18 @@ public partial class MainWindow : Window
        var filePath = ResolveMapFileForLayout(selected);
        if (filePath is null)
        {
-           CodePreview.Text = $"No map file is defined for {selected}. Save is only supported for the segment-based glyph maps.";
+           CodePreview.Text = $"No map file is defined for {selected}. Save is only supported for the glyph maps that are registered in the library.";
            MaskValueText.Text = "Save skipped";
            return;
        }
 
        try
        {
-           var source = File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
-           var updated = UpdateMapFileCharacterEntry(source, character, mask, selected);
-           File.WriteAllText(filePath, updated);
            ApplyRuntimeMapUpdate(selected, character, mask);
+           PersistRuntimeMap(selected);
            RefreshLayout();
            ClearDirty();
-           CodePreview.Text = updated;
+           CodePreview.Text = File.ReadAllText(filePath);
            var maskText = mask.HasValue ? $"{mask.Value} (0x{mask.Value:X})" : "null";
            MaskValueText.Text = $"Saved {character} :: mask = {maskText} to {System.IO.Path.GetFileName(filePath)}";
        }
@@ -1007,47 +1087,80 @@ public partial class MainWindow : Window
 
    private static void ApplyRuntimeMapUpdate(string layout, char character, ulong? mask)
    {
-       var mapTypeName = layout switch
-       {
-           "SevenSegment" => "SevenMap",
-           "NineSegment" => "NineMap",
-           "TenSegment" => "TenMap",
-           "FourteenSegment" => "FourteenMap",
-           "Rectangle5x7" => "RectangleMap",
-           "SixteenSegment" => "SixteenMap",
-           _ => null
-       };
-
-       if (mapTypeName is null)
+       var map = GetRuntimeMap(layout);
+       if (map is null)
        {
            return;
        }
 
-       var mapType = typeof(DisplayCharacterProfiles).Assembly.GetType($"SkeuomorphCore.{mapTypeName}");
-       if (mapType is null || mapType.IsAbstract || !typeof(SegmentMapBase).IsAssignableFrom(mapType))
+       if (map is ISegmentedGlyphMap segmented)
        {
+           if (mask.HasValue)
+           {
+               segmented.SetCharacterEnabled(character, true);
+               if (segmented.Masks is IDictionary<char, ulong?> dictionary && dictionary.ContainsKey(character))
+               {
+                   dictionary[character] = mask.Value;
+               }
+
+               return;
+           }
+
+           segmented.SetCharacterEnabled(character, false);
            return;
        }
 
-       var mapInstance = Activator.CreateInstance(mapType);
-       var masksProperty = mapType.GetProperty("Masks", BindingFlags.Public | BindingFlags.Instance);
-       if (masksProperty is null || masksProperty.GetValue(mapInstance) is not IDictionary dictionary)
+       if (map is IBitmapGlyphMap bitmap)
        {
-           return;
-       }
+           if (mask.HasValue)
+           {
+               bitmap.SetCharacterEnabled(character, true);
+               return;
+           }
 
-       if (mask.HasValue)
-       {
-           dictionary[character] = mask.Value;
-           return;
+           bitmap.SetCharacterEnabled(character, false);
        }
-
-       dictionary[character] = null;
    }
 
    private static void PersistCharacterAvailability(string layout, char character, bool enabled)
    {
-       if (layout == "Rectangle5x7")
+       var map = GetRuntimeMap(layout);
+       if (map is null)
+       {
+           return;
+       }
+
+       map.SetCharacterEnabled(character, enabled);
+       PersistRuntimeMap(layout);
+   }
+
+   private static IGlyphMap? GetRuntimeMap(string layout)
+   {
+       var mapName = NormalizeMapName(layout);
+       if (string.IsNullOrWhiteSpace(mapName))
+       {
+           return null;
+       }
+
+       var mapsField = typeof(DisplayCharacterProfiles).GetField("Maps", BindingFlags.NonPublic | BindingFlags.Static);
+       if (mapsField is null || mapsField.GetValue(null) is not IDictionary runtimeMaps)
+       {
+           return null;
+       }
+
+       var canonicalName = GetMapNameForLayout(mapName);
+       if (string.IsNullOrWhiteSpace(canonicalName))
+       {
+           return null;
+       }
+
+       return runtimeMaps[canonicalName] as IGlyphMap;
+   }
+
+   private static void PersistRuntimeMap(string layout)
+   {
+       var map = GetRuntimeMap(layout);
+       if (map is null)
        {
            return;
        }
@@ -1058,42 +1171,44 @@ public partial class MainWindow : Window
            return;
        }
 
-       var source = File.Exists(filePath) ? File.ReadAllText(filePath) : string.Empty;
-       ulong? mask = null;
-       if (enabled)
+       var definition = GlyphMapDefinition.FromMap(GetMapNameForLayout(layout), map);
+       File.WriteAllText(filePath, definition.ToJson());
+   }
+
+   private static string NormalizeMapName(string? layout)
+   {
+       if (string.IsNullOrWhiteSpace(layout))
        {
-           var mapTypeName = layout switch
-           {
-               "SevenSegment" => "SevenMap",
-               "NineSegment" => "NineMap",
-               "TenSegment" => "TenMap",
-               "FourteenSegment" => "FourteenMap",
-               "SixteenSegment" => "SixteenMap",
-               _ => null
-           };
-
-           if (mapTypeName is not null)
-           {
-               var mapType = typeof(DisplayCharacterProfiles).Assembly.GetType($"SkeuomorphCore.{mapTypeName}");
-               var defaultMasksField = mapType?.GetField("DefaultMasks", BindingFlags.NonPublic | BindingFlags.Static);
-               if (defaultMasksField is not null && defaultMasksField.GetValue(null) is System.Collections.IDictionary defaults && defaults.Contains(character))
-               {
-                   var defaultValue = defaults[character];
-                   if (defaultValue is ulong ulongValue)
-                   {
-                       mask = ulongValue;
-                       var persisted = UpdateMapFileCharacterEntry(source, character, mask, layout);
-                       File.WriteAllText(filePath, persisted);
-                       return;
-                   }
-               }
-           }
-
-           mask = 0UL;
+           return string.Empty;
        }
 
-       var updatedFileText = UpdateMapFileCharacterEntry(source, character, mask, layout);
-       File.WriteAllText(filePath, updatedFileText);
+       return layout switch
+       {
+           "SevenMap" => "SevenSegment",
+           "NineMap" => "NineSegment",
+           "TenMap" => "TenSegment",
+           "FourteenMap" => "FourteenSegment",
+           "RectangleMap" => "Rectangle5x7",
+           "DotMatrix8x8Map" => "DotMatrix8x8",
+           "SixteenMap" => "SixteenSegment",
+           _ => layout
+       };
+   }
+
+   private static string GetMapNameForLayout(string layout)
+   {
+       var normalized = NormalizeMapName(layout);
+       return normalized switch
+       {
+           "SevenSegment" => "SevenSegment",
+           "NineSegment" => "NineSegment",
+           "TenSegment" => "TenSegment",
+           "FourteenSegment" => "FourteenSegment",
+           "Rectangle5x7" => "Rectangle5x7",
+           "DotMatrix8x8" => "DotMatrix8x8",
+           "SixteenSegment" => "SixteenSegment",
+           _ => string.Empty
+       };
    }
 
    private static string? ResolveMapFileForLayout(string layout)
@@ -1102,17 +1217,20 @@ public partial class MainWindow : Window
        var candidateDirectories = new[]
        {
            System.IO.Path.Combine(repoRoot, "SkeuomorphCore", "Glyphs", "Maps"),
+           System.IO.Path.Combine(repoRoot, "SkeuomorphCore", "Glyphs", "BitmapSources"),
            System.IO.Path.Combine(repoRoot, "SkeuomorphCore", "Glyphs")
        };
 
-       var fileName = layout switch
+       var normalized = NormalizeMapName(layout);
+       var fileName = normalized switch
        {
-           "SevenSegment" => "SevenMap.cs",
-           "NineSegment" => "NineMap.cs",
-           "TenSegment" => "TenMap.cs",
-           "FourteenSegment" => "FourteenMap.cs",
-           "Rectangle5x7" => "RectangleMap.cs",
-           "SixteenSegment" => "SixteenMap.cs",
+           "SevenSegment" => "SevenSegment.json",
+           "NineSegment" => "NineSegment.json",
+           "TenSegment" => "TenSegment.json",
+           "FourteenSegment" => "FourteenSegment.json",
+           "Rectangle5x7" => "Rectangle5x7.json",
+           "DotMatrix8x8" => "DotMatrix8x8.json",
+           "SixteenSegment" => "SixteenSegment.json",
            _ => null
        };
 
@@ -1130,209 +1248,16 @@ public partial class MainWindow : Window
            }
        }
 
+       foreach (var directory in candidateDirectories)
+       {
+           var jsonCandidate = System.IO.Path.Combine(directory, fileName);
+           if (File.Exists(jsonCandidate))
+           {
+               return jsonCandidate;
+           }
+       }
+
        return System.IO.Path.Combine(candidateDirectories[0], fileName);
-   }
-
-   private static string BuildMaskExpression(string layout, ulong? mask)
-   {
-       if (!mask.HasValue)
-       {
-           return "null";
-       }
-
-       var value = mask.Value;
-       var segments = layout switch
-       {
-           "SevenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentDP" },
-           "NineSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentI" },
-           "TenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentI", "SegmentJ" },
-           "FourteenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentJ", "SegmentK", "SegmentL", "SegmentM", "SegmentN", "SegmentP" },
-           "Rectangle5x7" => null,
-           "SixteenSegment" => new[] { "SegmentA", "SegmentB", "SegmentC", "SegmentD", "SegmentE", "SegmentF", "SegmentG", "SegmentH", "SegmentI", "SegmentJ", "SegmentK", "SegmentL", "SegmentM", "SegmentN", "SegmentO", "SegmentP" },
-           _ => null
-       };
-
-       if (segments is null)
-       {
-           return layout == "Rectangle5x7" ? $"0x{value:X}UL" : value.ToString();
-       }
-
-       var active = new List<string>();
-       for (var index = 0; index < segments.Length; index++)
-       {
-           if ((value & (1UL << index)) != 0)
-           {
-               active.Add(segments[index]);
-           }
-       }
-
-       return active.Count == 0 ? "Mask()" : $"Mask({string.Join(", ", active)})";
-   }
-
-   private static string UpdateMapFileCharacterEntry(string source, char character, ulong? mask, string layout)
-   {
-       var mapName = layout switch
-       {
-           "SevenSegment" => "SevenMap",
-           "NineSegment" => "NineMap",
-           "TenSegment" => "TenMap",
-           "FourteenSegment" => "FourteenMap",
-           "Rectangle5x7" => "GlyphLibrary",
-           "SixteenSegment" => "SixteenMap",
-           _ => throw new InvalidOperationException($"Unsupported layout: {layout}")
-       };
-
-       const string defaultMaskMarker = "DefaultMasks";
-       var markerIndex = source.IndexOf(defaultMaskMarker, StringComparison.Ordinal);
-       if (markerIndex < 0)
-       {
-           throw new InvalidOperationException($"Could not locate the {mapName} dictionary in the map file.");
-       }
-
-       var initializerIndex = source.IndexOf('{', markerIndex);
-       if (initializerIndex < 0)
-       {
-           throw new InvalidOperationException($"Could not locate the {mapName} dictionary in the map file.");
-       }
-
-       var depth = 0;
-       var bodyEnd = -1;
-       for (var index = initializerIndex; index < source.Length; index++)
-       {
-           var current = source[index];
-           if (current == '{')
-           {
-               depth++;
-           }
-           else if (current == '}')
-           {
-               depth--;
-               if (depth == 0)
-               {
-                   bodyEnd = index;
-                   break;
-               }
-           }
-       }
-
-       if (bodyEnd < 0)
-       {
-           throw new InvalidOperationException($"Could not locate the {mapName} dictionary in the map file.");
-       }
-
-       var prefix = source.Substring(0, initializerIndex + 1);
-       var suffix = source.Substring(bodyEnd);
-       var body = source.Substring(initializerIndex + 1, bodyEnd - initializerIndex - 1);
-       var lines = body.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None).ToList();
-       var updatedLines = new List<string>();
-       var replaced = false;
-       var maskExpression = BuildMaskExpression(layout, mask);
-       var newline = DetectNewline(source);
-
-       foreach (var line in lines)
-       {
-           var trimmed = line.Trim();
-           if (trimmed.Length == 0)
-           {
-               updatedLines.Add(line);
-               continue;
-           }
-
-           var entryMatch = Regex.Match(trimmed, @"^\[\s*'(?<literal>(?:\\'|[^'])*)'\s*\]\s*=\s*(?<value>.+?)\s*,?\s*$");
-           if (!entryMatch.Success)
-           {
-               updatedLines.Add(line);
-               continue;
-           }
-
-           var key = ParseCharacterLiteral(entryMatch.Groups["literal"].Value);
-           if (key == character)
-           {
-               updatedLines.Add($"        ['{EscapeCharacterLiteral(character)}'] = {maskExpression},");
-               replaced = true;
-               continue;
-           }
-
-           updatedLines.Add(line);
-       }
-
-       if (!replaced)
-       {
-           updatedLines.Add($"        ['{EscapeCharacterLiteral(character)}'] = {maskExpression},");
-       }
-
-       updatedLines = updatedLines
-           .Where(static line => !string.IsNullOrWhiteSpace(line.Trim()))
-           .OrderBy(static line =>
-           {
-               var match = Regex.Match(line.Trim(), @"^\[\s*'(?<literal>(?:\\'|[^'])*)'\s*\]=", RegexOptions.Singleline);
-               return match.Success ? ParseCharacterLiteral(match.Groups["literal"].Value) : char.MaxValue;
-           })
-           .ToList();
-
-       var bodyText = string.Join(newline, updatedLines);
-       var serializedBody = string.IsNullOrEmpty(bodyText) ? string.Empty : bodyText + newline;
-       return prefix + serializedBody + suffix;
-   }
-
-   private static char ParseCharacterLiteral(string literal)
-   {
-       if (string.IsNullOrEmpty(literal))
-       {
-           return ' ';
-       }
-
-       var result = new List<char>();
-       for (var index = 0; index < literal.Length; index++)
-       {
-           var ch = literal[index];
-           if (ch != '\\' || index + 1 >= literal.Length)
-           {
-               result.Add(ch);
-               continue;
-           }
-
-           var next = literal[++index];
-           result.Add(next switch
-           {
-               '\'' => '\'',
-               '\\' => '\\',
-               'n' => '\n',
-               'r' => '\r',
-               't' => '\t',
-               _ => next
-           });
-       }
-
-       return result.Count > 0 ? result[0] : ' ';
-   }
-
-   private static string EscapeCharacterLiteral(char character)
-   {
-       return character switch
-       {
-           '\\' => "\\\\",
-           '\'' => "\\'",
-           '\n' => "\\n",
-           '\r' => "\\r",
-           '\t' => "\\t",
-           _ => character.ToString()
-       };
-   }
-
-   private static string DetectNewline(string source)
-   {
-       if (source.Contains("\r\n", StringComparison.Ordinal))
-       {
-           return "\r\n";
-       }
-
-       if (source.Contains('\n'))
-       {
-           return "\n";
-       }
-
-       return Environment.NewLine;
    }
 
    private static string ResolveRepositoryRoot()

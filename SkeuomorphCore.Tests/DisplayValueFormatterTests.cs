@@ -212,6 +212,39 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
+    public void DisplayCharacterProfiles_LegacyMapNames_AreNormalizedToCanonicalProfiles()
+    {
+        var profile = DisplayCharacterProfiles.Get("NineMap");
+        var map = DisplayCharacterProfiles.GetMap("NineMap");
+
+        Assert.Equal("NineSegment", profile.Name);
+        Assert.Equal("NineSegment", map.Name);
+        Assert.True(DisplayCharacterProfiles.IsSupported("NineMap", 'A'));
+    }
+
+    [Fact]
+    public void GlyphMapCatalog_DefaultDefinitions_AreJsonSerializables()
+    {
+        var json = GlyphMapCatalog.BuiltInJson["SevenSegment"];
+        var definition = GlyphMapDefinition.FromJson(json, "SevenSegment");
+
+        Assert.Equal("SevenSegment", definition.Name);
+        Assert.True(definition.Characters.ContainsKey("A"));
+        Assert.True(definition.ToMasks().ContainsKey('A'));
+    }
+
+    [Fact]
+    public void DisplayCharacterProfiles_RegisterMapJson_AllowsRuntimeConfiguration()
+    {
+        var json = "{\n  \"Name\": \"CustomSeven\",\n  \"SegmentCount\": 7,\n  \"Characters\": {\n    \"A\": \"0x7E\",\n    \"B\": \"null\"\n  }\n}";
+
+        DisplayCharacterProfiles.RegisterMapJson("CustomSeven", json);
+
+        Assert.True(DisplayCharacterProfiles.IsSupported("CustomSeven", 'A'));
+        Assert.False(DisplayCharacterProfiles.IsSupported("CustomSeven", 'B'));
+    }
+
+    [Fact]
     public void DisplayCharacterProfiles_SetCharacterEnabled_ExcludesCharacterFromUseWithoutRemovingMapDefinition()
     {
         Assert.True(DisplayCharacterProfiles.IsSupported("SevenSegment", 'A'));
@@ -241,6 +274,16 @@ public class DisplayValueFormatterTests
         Assert.False(DisplayCharacterProfiles.IsSupported("TenSegment", 'A'));
         DisplayCharacterProfiles.SetCharacterEnabled("TenSegment", 'A', true);
         Assert.True(DisplayCharacterProfiles.IsSupported("TenSegment", 'A'));
+    }
+
+    [Fact]
+    public void DisplayCharacterProfiles_SpaceCharacter_IsEnabledAndEditable()
+    {
+        Assert.True(DisplayCharacterProfiles.IsSupported("SevenSegment", ' '));
+        DisplayCharacterProfiles.SetCharacterEnabled("SevenSegment", ' ', false);
+        Assert.False(DisplayCharacterProfiles.IsSupported("SevenSegment", ' '));
+        DisplayCharacterProfiles.SetCharacterEnabled("SevenSegment", ' ', true);
+        Assert.True(DisplayCharacterProfiles.IsSupported("SevenSegment", ' '));
     }
 
     [Fact]
@@ -390,6 +433,22 @@ public class DisplayValueFormatterTests
             true, true, true,
             false, false
         }, bits);
+    }
+
+    [Fact]
+    public void NineMap_UsesCanonicalMasksForExtendedSegments()
+    {
+        Assert.True(DisplayCharacterProfiles.TryGetMap("NineSegment", out var map));
+        var segmented = map as ISegmentedGlyphMap;
+        Assert.NotNull(segmented);
+
+        Assert.True(segmented!.TryGetMask('V', out var vMask));
+        Assert.True(segmented.TryGetMask('T', out var tMask));
+        Assert.True(segmented.TryGetMask('K', out var kMask));
+
+        Assert.Equal(0x132UL, vMask);
+        Assert.Equal(0x101UL, tMask);
+        Assert.Equal(0x1B0UL, kMask);
     }
 
     [Fact]
