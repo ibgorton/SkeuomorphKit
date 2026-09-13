@@ -372,8 +372,7 @@ public partial class MainWindow : Window
                 SegmentGrid.Children.Add(canvas);
                 return;
             }
-            case NineSegmentDisplayProfile when profile.Name is "NineSegment" or "NineSegmentSlash":
-            case NineSegmentDisplayProfile when profile.Name is "NineSegmentSlashAlt":
+            case NineSegmentDisplayProfile when profile.Name is "NineSegmentSlash" or "NineSegmentSlashAlt":
             case NineSegmentDisplayProfile when profile.Name is "NineSegmentBackslash":
             case NineSegmentDisplayProfile when profile.Name is "NineSegmentBackslashAlt":
             {
@@ -642,27 +641,6 @@ public partial class MainWindow : Window
         if (GlyphMapCatalog.BuiltInJson.TryGetValue(layoutName, out var json))
         {
             return GlyphMapDefinition.FromJson(json, layoutName).Layout;
-        }
-
-        var canonicalName = layoutName switch
-        {
-            "SevenMap" => "SevenSegment",
-            "NineMap" => "NineSegment",
-            "NineSegmentSlash" => "NineSegment",
-            "NineSegmentBackslash" => "NineSegment",
-            "NineSegmentSlashAlt" => "NineSegment",
-            "NineSegmentBackslashAlt" => "NineSegment",
-            "TenMap" => "TenSegment",
-            "FourteenMap" => "FourteenSegment",
-            "RectangleMap" => "Rectangle5x7",
-            "DotMatrix8x8Map" => "DotMatrix8x8",
-            "SixteenMap" => "SixteenSegment",
-            _ => layoutName
-        };
-
-        if (canonicalName != layoutName && GlyphMapCatalog.BuiltInJson.TryGetValue(canonicalName, out var canonicalJson))
-        {
-            return GlyphMapDefinition.FromJson(canonicalJson, canonicalName).Layout;
         }
 
         return null;
@@ -979,7 +957,7 @@ public partial class MainWindow : Window
         var selected = LayoutPicker.SelectedItem as string;
         var names = selected switch
         {
-            "NineSegment" => new[] { "a", "b", "c", "d", "e", "f", "g", "h", "i" },
+            "NineSegmentSlash" or "NineSegmentSlashAlt" or "NineSegmentBackslash" or "NineSegmentBackslashAlt" => new[] { "a", "b", "c", "d", "e", "f", "g", "h", "i" },
             "TenSegment" => new[] { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j" },
             "SixteenSegment" => new[]
             {
@@ -1177,22 +1155,7 @@ public partial class MainWindow : Window
 
    private static string NormalizeMapName(string? layout)
    {
-       if (string.IsNullOrWhiteSpace(layout))
-       {
-           return string.Empty;
-       }
-
-       return layout switch
-       {
-           "SevenMap" => "SevenSegment",
-           "NineMap" => "NineSegment",
-           "TenMap" => "TenSegment",
-           "FourteenMap" => "FourteenSegment",
-           "RectangleMap" => "Rectangle5x7",
-           "DotMatrix8x8Map" => "DotMatrix8x8",
-           "SixteenMap" => "SixteenSegment",
-           _ => layout
-       };
+       return string.IsNullOrWhiteSpace(layout) ? string.Empty : layout.Trim();
    }
 
    private static string GetMapNameForLayout(string layout)
@@ -1201,7 +1164,10 @@ public partial class MainWindow : Window
        return normalized switch
        {
            "SevenSegment" => "SevenSegment",
-           "NineSegment" => "NineSegment",
+           "NineSegmentSlash" => "NineSegmentSlash",
+           "NineSegmentBackslash" => "NineSegmentBackslash",
+           "NineSegmentSlashAlt" => "NineSegmentSlashAlt",
+           "NineSegmentBackslashAlt" => "NineSegmentBackslashAlt",
            "TenSegment" => "TenSegment",
            "FourteenSegment" => "FourteenSegment",
            "Rectangle5x7" => "Rectangle5x7",
@@ -1225,7 +1191,10 @@ public partial class MainWindow : Window
        var fileName = normalized switch
        {
            "SevenSegment" => "SevenSegment.json",
-           "NineSegment" => "NineSegment.json",
+           "NineSegmentSlash" => "NineSegmentSlash.json",
+           "NineSegmentBackslash" => "NineSegmentBackslash.json",
+           "NineSegmentSlashAlt" => "NineSegmentSlashAlt.json",
+           "NineSegmentBackslashAlt" => "NineSegmentBackslashAlt.json",
            "TenSegment" => "TenSegment.json",
            "FourteenSegment" => "FourteenSegment.json",
            "Rectangle5x7" => "Rectangle5x7.json",

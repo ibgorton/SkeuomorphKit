@@ -283,6 +283,8 @@ public sealed class DotMatrix8x8Map : SegmentMapBase
     private static readonly Dictionary<string, IBitmapGlyphSource> Sources = CreateSources();
     private static readonly Dictionary<char, ulong?> DefaultMasks = BuildRuntimeMasks();
     private static readonly Dictionary<char, ulong?> RuntimeMasks = new(DefaultMasks);
+    private static readonly Dictionary<char, BitmapGlyph?> DefaultGlyphs = BuildDefaultGlyphs();
+    private static readonly Dictionary<char, BitmapGlyph?> RuntimeGlyphs = new(DefaultGlyphs);
 
     public override string MapName => nameof(DotMatrix8x8Map);
     public override int MapSegmentCount => SegmentCount;
@@ -296,6 +298,8 @@ public sealed class DotMatrix8x8Map : SegmentMapBase
 
     public static IReadOnlyCollection<string> SupportedStyles => Sources.Keys;
     public static IReadOnlyCollection<char> SupportedCharacters => new DotMatrix8x8Map().GetSupportedCharacters();
+    public static IReadOnlyDictionary<char, BitmapGlyph?> DefaultGlyphsMap => DefaultGlyphs;
+    public static IReadOnlyDictionary<char, BitmapGlyph?> RuntimeGlyphsMap => RuntimeGlyphs;
 
     protected override IReadOnlyCollection<char> GetSupportedCharacters()
     {
@@ -381,6 +385,23 @@ public sealed class DotMatrix8x8Map : SegmentMapBase
         return masks;
     }
 
+    private static Dictionary<char, BitmapGlyph?> BuildDefaultGlyphs()
+    {
+        var glyphs = new Dictionary<char, BitmapGlyph?>();
+        foreach (var character in BuildExtendedAsciiCharacterSet())
+        {
+            if (TryGetMask(character, DotMatrix8x8GlyphStyles.Default, out var mask))
+            {
+                glyphs[character] = BitmapGlyphFromMask(mask, Width, Height);
+                continue;
+            }
+
+            glyphs[character] = null;
+        }
+
+        return glyphs;
+    }
+
     private static HashSet<char> BuildExtendedAsciiCharacterSet()
     {
         var set = new HashSet<char>(PrintableAscii.Characters);
@@ -460,4 +481,17 @@ public sealed class DotMatrix8x8Map : SegmentMapBase
 
         return rows;
     }
+}
+
+public sealed class DotMatrix8x8BitmapGlyphMap : BitmapGlyphMapBase
+{
+    public override string MapName => nameof(DotMatrix8x8Map);
+
+    public override int Width => DotMatrix8x8Map.Width;
+
+    public override int Height => DotMatrix8x8Map.Height;
+
+    public override IReadOnlyDictionary<char, BitmapGlyph?> RuntimeGlyphs => DotMatrix8x8Map.RuntimeGlyphsMap;
+
+    public override IReadOnlyDictionary<char, BitmapGlyph?> DefaultGlyphs => DotMatrix8x8Map.DefaultGlyphsMap;
 }

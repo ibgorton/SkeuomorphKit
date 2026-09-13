@@ -7,21 +7,34 @@ namespace SkeuomorphCore;
 public interface IGlyphMap
 {
     string Name { get; }
-    int MapSegmentCount { get; }
+    IReadOnlyCollection<char> SupportedCharacters { get; }
     bool IsSupported(char c);
-    bool TryGetMask(char c, out ulong mask);
-    bool[] GetBits(char c);
-    IReadOnlyDictionary<char, ulong?> Masks { get; }
     bool SetCharacterEnabled(char c, bool enabled);
 }
 
-public abstract class SegmentMapBase : IGlyphMap
+public interface ISegmentedGlyphMap : IGlyphMap
+{
+    int MapSegmentCount { get; }
+    bool TryGetMask(char c, out ulong mask);
+    bool[] GetBits(char c);
+    IReadOnlyDictionary<char, ulong?> Masks { get; }
+}
+
+public interface IBitmapGlyphMap : IGlyphMap
+{
+    int Width { get; }
+    int Height { get; }
+    bool TryGetGlyph(char c, out BitmapGlyph glyph);
+}
+
+public abstract class SegmentMapBase : ISegmentedGlyphMap
 {
     public static IReadOnlySet<char> PrintableAsciiSet => PrintableAscii.Characters;
 
     public abstract string MapName { get; }
     public abstract int MapSegmentCount { get; }
     public virtual IReadOnlyCollection<char> MapSupportedCharacters => GetSupportedCharacters();
+    public virtual IReadOnlyCollection<char> SupportedCharacters => MapSupportedCharacters;
     public virtual IReadOnlySet<char> MapDisabledCharacters => Masks
         .Where(static pair => !pair.Value.HasValue)
         .Select(static pair => pair.Key)

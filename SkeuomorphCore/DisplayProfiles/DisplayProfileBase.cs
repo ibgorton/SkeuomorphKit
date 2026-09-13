@@ -13,6 +13,7 @@ namespace SkeuomorphCore;
 public abstract class DisplayProfileBase : IDisplayProfile
 {
     private readonly HashSet<char> _supportedCharacters;
+    private readonly IGlyphMap? _glyphMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DisplayProfileBase"/> class.
@@ -22,13 +23,15 @@ public abstract class DisplayProfileBase : IDisplayProfile
     /// <param name="width">The display width in logical columns.</param>
     /// <param name="height">The display height in logical rows.</param>
     /// <param name="supportedCharacters">The set of characters supported by the display type.</param>
-    protected DisplayProfileBase(string name, int segmentCount, int width, int height, IEnumerable<char> supportedCharacters)
+    /// <param name="glyphMap">The current glyph map backing this profile, if one exists.</param>
+    protected DisplayProfileBase(string name, int segmentCount, int width, int height, IEnumerable<char> supportedCharacters, IGlyphMap? glyphMap = null)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         SegmentCount = segmentCount;
         Width = width;
         Height = height;
         _supportedCharacters = [.. supportedCharacters];
+        _glyphMap = glyphMap;
     }
 
     /// <summary>
@@ -58,7 +61,12 @@ public abstract class DisplayProfileBase : IDisplayProfile
     /// <returns><c>true</c> if the character is supported; otherwise, <c>false</c>.</returns>
     public virtual bool IsSupported(char c)
     {
-        return _supportedCharacters.Contains(c);
+        if (!_supportedCharacters.Contains(c))
+        {
+            return false;
+        }
+
+        return _glyphMap is null || _glyphMap.IsSupported(c);
     }
 
     /// <summary>

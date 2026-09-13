@@ -4,8 +4,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
-using static SkeuomorphCore.SevenMap;
-
 namespace SkeuomorphDisplay.Wpf.SevenSegment;
 
 /*     SEGMENT NUMBERING
