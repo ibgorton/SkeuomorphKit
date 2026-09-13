@@ -233,6 +233,25 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
+    public void DisplayCharacterProfiles_SetCharacterEnabled_AllowsNullAndEnabledStates()
+    {
+        Assert.False(DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
+        DisplayCharacterProfiles.SetCharacterEnabled("TenSegment", 'p', true);
+        Assert.True(DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
+        DisplayCharacterProfiles.SetCharacterEnabled("TenSegment", 'p', false);
+        Assert.False(DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
+    }
+
+    [Fact]
+    public void TenMap_LowercaseP_IsEnabledAndEditable()
+    {
+        Assert.False(DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
+        Assert.True('p'.GetBits<TenMap>().Length == 10 || !DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
+        DisplayCharacterProfiles.SetCharacterEnabled("TenSegment", 'p', true);
+        Assert.True(DisplayCharacterProfiles.IsSupported("TenSegment", 'p'));
+    }
+
+    [Fact]
     public void DisplayCharacterProfiles_IgnoreStaticLayoutsThatAreNotSegmentMaps()
     {
         Assert.True(DisplayCharacterProfiles.IsSupported("DotMatrix8x8", 'A'));

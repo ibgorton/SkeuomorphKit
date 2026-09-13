@@ -27,12 +27,11 @@ public sealed class NineMap : SegmentMapBase
     private static readonly Dictionary<char, ulong?> DefaultMasks = new()
     {
         [' '] = 0x000,
+        ['!'] = Mask(SegmentH),
         ['"'] = Mask(SegmentB, SegmentF),
+        ['$'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
         ['\''] = Mask(SegmentF),
         ['-'] = Mask(SegmentG),
-        ['='] = Mask(SegmentD, SegmentG),
-        ['_'] = Mask(SegmentD),
-        ['<'] = Mask(SegmentH, SegmentI),
         ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF),
         ['1'] = Mask(SegmentB, SegmentC),
         ['2'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG),
@@ -43,7 +42,10 @@ public sealed class NineMap : SegmentMapBase
         ['7'] = Mask(SegmentA, SegmentE, SegmentH),
         ['8'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
         ['9'] = Mask(SegmentA, SegmentB, SegmentF, SegmentG, SegmentI),
-        ['$'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG),
+        ['<'] = Mask(SegmentH, SegmentI),
+        ['='] = Mask(SegmentD, SegmentG),
+        ['?'] = Mask(SegmentE, SegmentG, SegmentH),
+        ['@'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
         ['A'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG),
         ['B'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
         ['C'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
@@ -70,6 +72,7 @@ public sealed class NineMap : SegmentMapBase
         ['X'] = Mask(SegmentB, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
         ['Y'] = Mask(SegmentB, SegmentC, SegmentF, SegmentH),
         ['Z'] = Mask(SegmentA, SegmentB, SegmentF, SegmentH),
+        ['_'] = Mask(SegmentD),
         ['a'] = Mask(SegmentC, SegmentD, SegmentG, SegmentI),
         ['b'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
         ['c'] = Mask(SegmentD, SegmentE, SegmentG),
@@ -93,10 +96,10 @@ public sealed class NineMap : SegmentMapBase
         ['x'] = Mask(SegmentB, SegmentC, SegmentE, SegmentG, SegmentH, SegmentI),
         ['y'] = Mask(SegmentB, SegmentC, SegmentF, SegmentH),
         ['z'] = Mask(SegmentD, SegmentG, SegmentI),
-        ['!'] = Mask(SegmentH),
-        ['?'] = Mask(SegmentE, SegmentG, SegmentH),
-        ['@'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
         ['|'] = Mask(SegmentH),
+
+
+
     };
 
     private static readonly Dictionary<char, ulong?> RuntimeMasks = new(DefaultMasks);
@@ -115,22 +118,5 @@ public sealed class NineMap : SegmentMapBase
     public override IReadOnlyDictionary<char, ulong?> Masks => RuntimeMasks;
 
     public static IReadOnlyCollection<char> SupportedCharacters => new NineMap().GetSupportedCharacters();
-
-    public override bool[] GetBits(char c)
-    {
-        if (new SevenMap().Masks.ContainsKey(c))
-        {
-            var sevenBits = new SevenMap().GetBits(c);
-            var result = new bool[SegmentCount];
-            for (var i = 0; i < sevenBits.Length; i++)
-            {
-                result[i] = sevenBits[i];
-            }
-
-            return result;
-        }
-
-        return base.GetBits(c);
-    }
 }
 

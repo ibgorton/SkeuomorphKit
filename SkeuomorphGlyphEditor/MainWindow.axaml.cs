@@ -987,13 +987,18 @@ public partial class MainWindow : Window
                    if (defaultValue is ulong ulongValue)
                    {
                        mask = ulongValue;
+                       var persisted = UpdateMapFileCharacterEntry(source, character, mask, layout);
+                       File.WriteAllText(filePath, persisted);
+                       return;
                    }
                }
            }
+
+           mask = 0UL;
        }
 
-       var updated = UpdateMapFileCharacterEntry(source, character, mask, layout);
-       File.WriteAllText(filePath, updated);
+       var updatedFileText = UpdateMapFileCharacterEntry(source, character, mask, layout);
+       File.WriteAllText(filePath, updatedFileText);
    }
 
    private static string? ResolveMapFileForLayout(string layout)
@@ -1109,8 +1114,17 @@ public partial class MainWindow : Window
 
        if (!replaced)
        {
-           updatedLines.Insert(updatedLines.Count, $"        ['{EscapeCharacterLiteral(character)}'] = {maskExpression},");
+           updatedLines.Add($"        ['{EscapeCharacterLiteral(character)}'] = {maskExpression},");
        }
+
+       updatedLines = updatedLines
+           .Where(static line => !string.IsNullOrWhiteSpace(line.Trim()))
+           .OrderBy(static line =>
+           {
+               var match = Regex.Match(line.Trim(), @"^\[\s*'(?<literal>(?:\\'|[^'])*)'\s*\]\s*=", RegexOptions.Singleline);
+               return match.Success ? ParseCharacterLiteral(match.Groups["literal"].Value) : char.MaxValue;
+           })
+           .ToList();
 
        var prefix = match.Groups["prefix"].Value;
        var suffix = match.Groups["suffix"].Value;

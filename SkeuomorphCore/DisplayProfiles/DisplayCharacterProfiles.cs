@@ -106,13 +106,15 @@ public static class DisplayCharacterProfiles
         {
             if (defaultMasksField is not null && defaultMasksField.GetValue(null) is System.Collections.IDictionary defaults && defaults.Contains(c))
             {
-                dictionary[c] = defaults[c];
-            }
-            else
-            {
-                dictionary.Remove(c);
+                var defaultValue = defaults[c];
+                if (defaultValue is ulong ulongValue)
+                {
+                    dictionary[c] = ulongValue;
+                    return;
+                }
             }
 
+            dictionary[c] = 0UL;
             return;
         }
 

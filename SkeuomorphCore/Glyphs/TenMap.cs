@@ -28,23 +28,25 @@ public sealed class TenMap : SegmentMapBase
     private static readonly Dictionary<char, ulong?> DefaultMasks = new()
     {
         [' '] = 0x000,
+        ['!'] = Mask(SegmentI, SegmentJ),
         ['"'] = Mask(SegmentF, SegmentI),
+        ['$'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH, SegmentI, SegmentJ),
         ['\''] = Mask(SegmentF),
         ['-'] = Mask(SegmentG, SegmentH),
-        ['='] = Mask(SegmentD, SegmentG, SegmentH),
-        ['_'] = Mask(SegmentD),
-        ['<'] = Mask(SegmentD, SegmentE, SegmentG, SegmentH),
         ['0'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentI, SegmentJ),
-        ['1'] = Mask(SegmentB, SegmentC, SegmentH),
-        ['2'] = Mask(SegmentA, SegmentB, SegmentD, SegmentI),
-        ['3'] = Mask(SegmentA, SegmentG, SegmentH, SegmentI),
-        ['4'] = Mask(SegmentB, SegmentC, SegmentG, SegmentH),
-        ['5'] = Mask(SegmentA, SegmentF, SegmentG, SegmentI),
-        ['6'] = Mask(SegmentC, SegmentD, SegmentE, SegmentG, SegmentH),
-        ['7'] = Mask(SegmentA, SegmentE, SegmentH),
-        ['8'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG),
-        ['9'] = Mask(SegmentA, SegmentB, SegmentF, SegmentG, SegmentI),
-        ['$'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH, SegmentI, SegmentJ),
+        ['1'] = Mask(SegmentB, SegmentC),
+        ['2'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG, SegmentH),
+        ['3'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentG, SegmentH),
+        ['4'] = Mask(SegmentB, SegmentC, SegmentF, SegmentG, SegmentH),
+        ['5'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH),
+        ['6'] = Mask(SegmentA, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH),
+        ['7'] = Mask(SegmentA, SegmentB, SegmentC),
+        ['8'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH),
+        ['9'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH),
+        ['<'] = Mask(SegmentD, SegmentE, SegmentG, SegmentH),
+        ['='] = Mask(SegmentD, SegmentG, SegmentH),
+        ['?'] = Mask(SegmentA, SegmentB, SegmentH, SegmentJ),
+        ['@'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentG, SegmentH),
         ['A'] = Mask(SegmentA, SegmentB, SegmentC, SegmentE, SegmentF, SegmentG, SegmentH),
         ['B'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentH, SegmentI, SegmentJ),
         ['C'] = Mask(SegmentA, SegmentD, SegmentE, SegmentF),
@@ -71,6 +73,7 @@ public sealed class TenMap : SegmentMapBase
         ['X'] = Mask(SegmentB, SegmentE, SegmentG, SegmentH, SegmentI, SegmentJ),
         ['Y'] = Mask(SegmentB, SegmentF, SegmentG, SegmentH, SegmentJ),
         ['Z'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG, SegmentH),
+        ['_'] = Mask(SegmentD),
         ['a'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentG, SegmentH),
         ['b'] = Mask(SegmentC, SegmentD, SegmentE, SegmentF, SegmentG, SegmentH),
         ['c'] = Mask(SegmentD, SegmentE, SegmentG, SegmentH),
@@ -79,12 +82,15 @@ public sealed class TenMap : SegmentMapBase
         ['f'] = Mask(SegmentA, SegmentE, SegmentF, SegmentG, SegmentH),
         ['g'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH),
         ['h'] = Mask(SegmentC, SegmentE, SegmentF, SegmentG, SegmentH),
-        ['i'] = Mask(SegmentD, SegmentJ),
+        ['i'] = Mask(SegmentJ),
         ['j'] = Mask(SegmentB, SegmentC, SegmentD),
         ['k'] = Mask(SegmentE, SegmentF, SegmentG, SegmentH, SegmentJ),
         ['l'] = Mask(SegmentD, SegmentE, SegmentF),
+        ['m'] = Mask(SegmentC, SegmentE, SegmentG, SegmentH, SegmentJ),
         ['n'] = Mask(SegmentC, SegmentE, SegmentG, SegmentH),
         ['o'] = Mask(SegmentC, SegmentD, SegmentE, SegmentG, SegmentH),
+        ['p'] = Mask(SegmentA, SegmentB, SegmentE, SegmentF, SegmentG, SegmentH),
+        ['q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG, SegmentH),
         ['r'] = Mask(SegmentE, SegmentG, SegmentH),
         ['s'] = Mask(SegmentA, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH),
         ['t'] = Mask(SegmentD, SegmentE, SegmentF, SegmentG),
@@ -94,12 +100,13 @@ public sealed class TenMap : SegmentMapBase
         ['x'] = Mask(SegmentB, SegmentE, SegmentG, SegmentH, SegmentI, SegmentJ),
         ['y'] = Mask(SegmentB, SegmentC, SegmentD, SegmentF, SegmentG, SegmentH),
         ['z'] = Mask(SegmentA, SegmentB, SegmentD, SegmentE, SegmentG, SegmentH),
-        ['!'] = Mask(SegmentI, SegmentJ),
-        ['?'] = Mask(SegmentA, SegmentB, SegmentH, SegmentJ),
-        ['@'] = Mask(SegmentA, SegmentB, SegmentC, SegmentD, SegmentE, SegmentG, SegmentH),
         ['|'] = Mask(SegmentE, SegmentF),
-        ['m'] = Mask(SegmentC, SegmentE, SegmentG, SegmentH, SegmentJ),
-        ['q'] = Mask(SegmentA, SegmentB, SegmentC, SegmentF, SegmentG, SegmentH),
+
+
+
+
+
+
     };
 
     private static readonly Dictionary<char, ulong?> RuntimeMasks = new(DefaultMasks);
@@ -118,22 +125,5 @@ public sealed class TenMap : SegmentMapBase
     public override IReadOnlyDictionary<char, ulong?> Masks => RuntimeMasks;
 
     public static IReadOnlyCollection<char> SupportedCharacters => new TenMap().GetSupportedCharacters();
-
-    public override bool[] GetBits(char c)
-    {
-        if (new SevenMap().Masks.ContainsKey(c))
-        {
-            var sevenBits = new SevenMap().GetBits(c);
-            var result = new bool[SegmentCount];
-            for (var i = 0; i < sevenBits.Length; i++)
-            {
-                result[i] = sevenBits[i];
-            }
-
-            return result;
-        }
-
-        return base.GetBits(c);
-    }
 }
 
