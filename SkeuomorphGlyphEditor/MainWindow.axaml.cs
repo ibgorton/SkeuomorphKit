@@ -183,6 +183,30 @@ public partial class MainWindow : Window
         SaveCurrentCharacter();
     }
 
+    private void AllOnButton_Click(object? sender, RoutedEventArgs e)
+    {
+        ApplyAllSegments(true);
+    }
+
+    private void AllOffButton_Click(object? sender, RoutedEventArgs e)
+    {
+        ApplyAllSegments(false);
+    }
+
+    private void ApplyAllSegments(bool lit)
+    {
+        foreach (var button in _segmentButtons)
+        {
+            if (button.IsChecked != lit)
+            {
+                button.IsChecked = lit;
+            }
+        }
+
+        MarkDirty();
+        UpdateMaskText();
+    }
+
     private void CreateCustomMapButton_Click(object? sender, RoutedEventArgs e)
     {
         try
@@ -1152,11 +1176,7 @@ public partial class MainWindow : Window
    {
        var sourceName = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
        var sourceDefinition = GetMapDefinitionForLayout(sourceName);
-       var desiredName = (CustomMapNameText.Text ?? string.Empty).Trim();
-       if (string.IsNullOrWhiteSpace(desiredName))
-       {
-           throw new InvalidOperationException("A custom map name is required.");
-       }
+       var desiredName = ValidateCustomMapName((CustomMapNameText.Text ?? string.Empty).Trim(), sourceName, allowOverwrite: false);
 
        var baseBitOrder = ParseBitOrderText(BitOrderText.Text, sourceDefinition.SegmentCount, sourceName, allowEmpty: true);
        var kind = SchemaKindPicker.SelectedItem is GlyphMapKind selectedKind ? selectedKind : sourceDefinition.Kind;
@@ -1179,6 +1199,7 @@ public partial class MainWindow : Window
        DisplayCharacterProfiles.RegisterMapJson(desiredName, serialized);
        SaveMapJsonToDisk(desiredName, serialized);
 
+       CustomMapNameText.Text = desiredName;
        LayoutPicker.ItemsSource = DisplayCharacterProfiles.AllNames;
        LayoutPicker.SelectedItem = desiredName;
        RefreshLayout();
@@ -1195,6 +1216,12 @@ public partial class MainWindow : Window
            targetName = sourceName + "Remapped";
        }
 
+       if (string.Equals(targetName, sourceName, StringComparison.Ordinal))
+       {
+           throw new InvalidOperationException("Use a different name for the remapped map or leave the name blank to auto-generate one.");
+       }
+
+       targetName = ValidateCustomMapName(targetName, sourceName, allowOverwrite: false);
        var bitOrder = ParseBitOrderText(BitOrderText.Text, sourceDefinition.SegmentCount, sourceName, allowEmpty: false);
        var remapped = sourceDefinition.RemapBitOrder(bitOrder);
        remapped.Name = targetName;
@@ -1204,6 +1231,7 @@ public partial class MainWindow : Window
        DisplayCharacterProfiles.RegisterMapJson(targetName, serialized);
        SaveMapJsonToDisk(targetName, serialized);
 
+       CustomMapNameText.Text = targetName;
        LayoutPicker.ItemsSource = DisplayCharacterProfiles.AllNames;
        LayoutPicker.SelectedItem = targetName;
        RefreshLayout();
@@ -1224,9 +1252,9 @@ public partial class MainWindow : Window
            throw new InvalidOperationException("A layout name is required.");
        }
 
-       if (GlyphMapCatalog.BuiltInJson.TryGetValue(normalized, out var builtInJson))
+       if (GlyphMapCatalog.TryGetJson(normalized, out var json))
        {
-           return GlyphMapDefinition.FromJson(builtInJson, normalized);
+           return GlyphMapDefinition.FromJson(json, normalized);
        }
 
        if (DisplayCharacterProfiles.TryGet(normalized, out var profile))
@@ -1236,6 +1264,54 @@ public partial class MainWindow : Window
        }
 
        throw new KeyNotFoundException($"Layout '{normalized}' does not have a backing glyph map definition.");
+   }
+
+   private static string ValidateCustomMapName(string name, string sourceName, bool allowOverwrite)
+   {
+       var trimmed = (name ?? string.Empty).Trim();
+       if (string.IsNullOrWhiteSpace(trimmed))
+       {
+           throw new InvalidOperationException("A custom map name is required.");
+       }
+
+       if (trimmed.Length < 2)
+       {
+           throw new InvalidOperationException("Custom map names must be at least 2 characters long.");
+       }
+
+       if (!char.IsLetter(trimmed[0]) && trimmed[0] != '_')
+       {
+           throw new InvalidOperationException("Custom map names must start with a letter or underscore.");
+       }
+
+       if (trimmed.Any(static character => !char.IsLetterOrDigit(character) && character != '_' && character != '-'))
+       {
+           throw new InvalidOperationException("Custom map names may only contain letters, digits, underscores, and dashes.");
+       }
+
+       var existingNames = DisplayCharacterProfiles.AllNames
+           .Select(static entry => NormalizeMapName(entry))
+           .Where(static entry => !string.IsNullOrWhiteSpace(entry))
+           .ToHashSet(StringComparer.Ordinal);
+
+       if (!allowOverwrite && existingNames.Contains(trimmed) && !string.Equals(trimmed, sourceName, StringComparison.Ordinal))
+       {
+           throw new InvalidOperationException($"A glyph map named '{trimmed}' already exists. Use a different name or leave the field blank to auto-generate one.");
+       }
+
+       if (GlyphMapCatalog.BuiltInJson.ContainsKey(trimmed))
+       {
+           throw new InvalidOperationException($"'{trimmed}' is already reserved as a built-in glyph map name.");
+       }
+
+       var repoPath = ResolveRepositoryRoot();
+       var customMapPath = System.IO.Path.Combine(repoPath, "SkeuomorphCore", "Glyphs", "Maps", $"{trimmed}.json");
+       if (File.Exists(customMapPath) && !allowOverwrite)
+       {
+           throw new InvalidOperationException($"A custom map file for '{trimmed}' already exists on disk.");
+       }
+
+       return trimmed;
    }
 
    private static GlyphMapLayoutDefinition? CloneLayoutDefinition(GlyphMapLayoutDefinition? source)

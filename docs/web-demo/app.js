@@ -47,18 +47,55 @@ function chooseCharacter(map, preferred) {
   return names[0];
 }
 
-function renderBitmap(map, character) {
-  const bitmapText = map.Characters[character] || '0';
-  const rows = String(bitmapText).split('|').filter(Boolean);
-  const width = rows[0]?.length || 0;
-  const gridStyle = `grid-template-columns: repeat(${width}, 18px);`;
+function normalizeDisplayText(map, value) {
+  const text = String(value || '').trim() || 'A';
+  if (!map || !map.Characters) {
+    return text;
+  }
 
-  const cells = rows.flatMap((row, rowIndex) =>
-    Array.from(row, (cell, colIndex) => {
-      const active = cell === '1';
-      return `<span class="bitmap-cell ${active ? 'on' : ''}" title="${rowIndex},${colIndex}"></span>`;
-    })
-  ).join('');
+  return [...text].map((character) => {
+    if (character in map.Characters) {
+      return character;
+    }
+
+    if (character === '−' || character === '–' || character === '—') {
+      return '-';
+    }
+
+    if (character === '·' || character === '•') {
+      return '.';
+    }
+
+    if (character === '：') {
+      return ':';
+    }
+
+    const token = character === '.' || character === ':' || character === '-' ? character : null;
+    return token && token in map.Characters ? token : character;
+  }).join('');
+}
+
+function renderBitmap(map, text) {
+  const glyphs = [...String(text || 'A')].map((character) => {
+    const normalized = normalizeDisplayText(map, character);
+    const bitmapText = map.Characters[normalized] || map.Characters['A'] || '0';
+    const rows = String(bitmapText).split('|').filter(Boolean);
+    const width = rows[0]?.length || 0;
+    return { normalized, rows, width };
+  });
+
+  const totalWidth = glyphs.reduce((sum, glyph) => sum + glyph.width, 0) + Math.max(0, glyphs.length - 1) * 8;
+  const gridStyle = `grid-template-columns: repeat(${Math.max(...glyphs.map((glyph) => glyph.width), 1)}, 18px);`;
+
+  const cells = glyphs.flatMap((glyph, glyphIndex) => {
+    const offset = glyphIndex === 0 ? 0 : glyphs.slice(0, glyphIndex).reduce((sum, item) => sum + item.width, 0) + glyphIndex * 8;
+    return glyph.rows.flatMap((row, rowIndex) =>
+      Array.from(row, (cell, colIndex) => {
+        const active = cell === '1';
+        return `<span class="bitmap-cell ${active ? 'on' : ''}" title="${glyph.normalized} @ ${rowIndex},${colIndex} + ${offset}"></span>`;
+      })
+    );
+  }).join('');
 
   return `
     <div class="meta">
@@ -74,18 +111,23 @@ function renderBitmap(map, character) {
   `;
 }
 
-function renderSegmentDisplay(map, character) {
+function renderSegmentDisplay(map, text) {
   const layout = map.Layout || { CanvasWidth: 220, CanvasHeight: 260, Segments: [] };
-  const width = layout.CanvasWidth || 220;
+  const baseWidth = layout.CanvasWidth || 220;
   const height = layout.CanvasHeight || 260;
   const points = layout.Segments || [];
-  const maskValue = parseHexMask(map.Characters[character]);
-
-  const segments = points.map((segmentPoints, index) => {
-    const isActive = (maskValue & (1n << BigInt(index))) !== 0n;
-    const pointsText = segmentPoints.map(([x, y]) => `${x},${y}`).join(' ');
-    return `<polygon class="segment ${isActive ? 'on' : 'off'}" points="${pointsText}"></polygon>`;
+  const glyphs = [...String(text || 'A')].map((character, index) => {
+    const normalized = normalizeDisplayText(map, character);
+    const maskValue = parseHexMask(map.Characters[normalized] ?? map.Characters['A'] ?? '0x0');
+    const segments = points.map((segmentPoints, segmentIndex) => {
+      const isActive = (maskValue & (1n << BigInt(segmentIndex))) !== 0n;
+      const pointsText = segmentPoints.map(([x, y]) => `${x},${y}`).join(' ');
+      return `<polygon class="segment ${isActive ? 'on' : 'off'}" points="${pointsText}" transform="translate(${index * (baseWidth + 12)}, 0)"></polygon>`;
+    }).join('');
+    return segments;
   }).join('');
+
+  const totalWidth = Math.max(1, (glyphs.length ? String(text || 'A').length : 1) * (baseWidth + 12));
 
   return `
     <div class="meta">
@@ -93,8 +135,8 @@ function renderSegmentDisplay(map, character) {
       <span class="badge">Segmented</span>
     </div>
     <div class="display-wrap">
-      <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${character} glyph for ${map.Name}">
-        ${segments}
+      <svg viewBox="0 0 ${totalWidth} ${height}" role="img" aria-label="${text} glyph for ${map.Name}">
+        ${glyphs}
       </svg>
     </div>
     <div class="glyph-list">
@@ -110,12 +152,12 @@ function renderSelectedPanel() {
     return;
   }
 
-  const char = chooseCharacter(map, state.currentChar);
-  state.currentChar = char;
-  charInput.value = char;
+  const text = normalizeDisplayText(map, state.currentChar || 'A');
+  state.currentChar = text;
+  charInput.value = text;
 
   const isBitmap = Number(map.Kind) === 1;
-  panel.innerHTML = isBitmap ? renderBitmap(map, char) : renderSegmentDisplay(map, char);
+  panel.innerHTML = isBitmap ? renderBitmap(map, text) : renderSegmentDisplay(map, text);
 }
 
 async function loadMaps() {
@@ -144,7 +186,8 @@ async function loadMaps() {
 select.addEventListener('change', (event) => {
   state.selectedName = normalizeMapName(event.target.value);
   const map = state.maps.find(([name]) => name === state.selectedName)?.[1];
-  state.currentChar = map ? chooseCharacter(map, state.currentChar) : 'A';
+  const fallback = map ? chooseCharacter(map, String(state.currentChar || 'A')) : 'A';
+  state.currentChar = fallback;
   renderSelectedPanel();
 });
 
@@ -155,8 +198,7 @@ charInput.addEventListener('input', (event) => {
     return;
   }
 
-  const next = value.length ? value[0] : 'A';
-  state.currentChar = next;
+  state.currentChar = value;
   renderSelectedPanel();
 });
 

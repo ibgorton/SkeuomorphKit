@@ -2,9 +2,9 @@ using SkeuomorphCore;
 
 namespace SkeuomorphDisplay
 {
-    public abstract class SixteenSegmentDisplayBase : SegmentDisplayState
+    public abstract class SixteenSegmentDisplayBase : ProfileSegmentDisplayState
     {
-        protected SixteenSegmentDisplayBase() : base(16)
+        protected SixteenSegmentDisplayBase() : base("SixteenSegment")
         {
         }
 
@@ -15,19 +15,14 @@ namespace SkeuomorphDisplay
     {
         public override void SetChar(char character)
         {
-            if (!TrySetCurrentCharacter(character))
-            {
-                return;
-            }
-
             ShowDecimalPoint = character == '.';
             if (character == '.')
             {
-                ApplyBitPattern(new bool[16]);
+                ApplyBitPattern(new bool[SegmentCount]);
                 return;
             }
 
-            ApplyBitPattern(character.GetBits("SixteenSegment"));
+            ApplyProfileCharacter(character);
         }
     }
 }

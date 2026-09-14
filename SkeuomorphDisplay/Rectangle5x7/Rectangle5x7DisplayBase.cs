@@ -2,9 +2,9 @@ using SkeuomorphCore;
 
 namespace SkeuomorphDisplay
 {
-    public abstract class Rectangle5x7DisplayBase : SegmentDisplayState
+    public abstract class Rectangle5x7DisplayBase : ProfileSegmentDisplayState
     {
-        protected Rectangle5x7DisplayBase() : base(35)
+        protected Rectangle5x7DisplayBase() : base("Rectangle5x7")
         {
         }
     }
@@ -13,12 +13,7 @@ namespace SkeuomorphDisplay
     {
         public override void SetChar(char character)
         {
-            if (!TrySetCurrentCharacter(character))
-            {
-                return;
-            }
-
-            ApplyBitPattern(character.GetBits("Rectangle5x7"));
+            ApplyProfileCharacter(character);
         }
     }
 }

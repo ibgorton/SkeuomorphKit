@@ -102,5 +102,27 @@ namespace SkeuomorphDisplay
 
         public static SegmentDisplayConnection<TDisplay> Create<TDisplay>() where TDisplay : SegmentDisplayState, new()
             => new(new TDisplay());
+
+        public static SegmentDisplayConnection<ProfileSegmentDisplayState> CreateProfile(string profileName)
+        {
+            if (string.IsNullOrWhiteSpace(profileName))
+            {
+                throw new ArgumentException("A display profile name is required.", nameof(profileName));
+            }
+
+            return new SegmentDisplayConnection<ProfileSegmentDisplayState>(new ProfileDisplayAdapter(profileName));
+        }
+
+        private sealed class ProfileDisplayAdapter : ProfileSegmentDisplayState
+        {
+            public ProfileDisplayAdapter(string profileName) : base(profileName)
+            {
+            }
+
+            public override void SetChar(char character)
+            {
+                ApplyProfileCharacter(character);
+            }
+        }
     }
 }

@@ -4,9 +4,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SkeuomorphCore;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum GlyphMapKind
 {
     Segmented,
@@ -38,7 +40,8 @@ public sealed class GlyphMapDefinition
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
-        WriteIndented = true
+        WriteIndented = true,
+        Converters = { new JsonStringEnumConverter() }
     };
 
     public int Version { get; set; } = CurrentVersion;
@@ -67,6 +70,11 @@ public sealed class GlyphMapDefinition
             throw new InvalidOperationException("A glyph map name is required.");
         }
 
+        if (!Enum.IsDefined(typeof(GlyphMapKind), Kind))
+        {
+            throw new InvalidOperationException($"The glyph map '{Name}' has an unsupported Kind value '{Kind}'.");
+        }
+
         if (SegmentCount <= 0)
         {
             throw new InvalidOperationException($"The glyph map '{Name}' must define a positive SegmentCount.");
@@ -84,6 +92,11 @@ public sealed class GlyphMapDefinition
         if (Layout is not null)
         {
             ValidateLayout(Layout, SegmentCount, Name);
+        }
+
+        if (Characters.Count == 0)
+        {
+            throw new InvalidOperationException($"The glyph map '{Name}' must define at least one character entry.");
         }
 
         foreach (var pair in Characters)
@@ -441,10 +454,81 @@ public static class GlyphMapCatalog
 {
     private static readonly Lazy<IReadOnlyDictionary<string, string>> LazyBuiltInJson = new(LoadBuiltInJson);
     private static readonly Lazy<IReadOnlyDictionary<string, GlyphMapDefinition>> LazyBuiltInDefinitions = new(LoadBuiltInDefinitions);
+    private static readonly Dictionary<string, string> RuntimeJson = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, GlyphMapDefinition> RuntimeDefinitions = new(StringComparer.OrdinalIgnoreCase);
 
-    public static IReadOnlyDictionary<string, string> BuiltInJson => LazyBuiltInJson.Value;
+    public static IReadOnlyDictionary<string, string> BuiltInJson
+    {
+        get
+        {
+            var result = new Dictionary<string, string>(LazyBuiltInJson.Value, StringComparer.OrdinalIgnoreCase);
+            foreach (var pair in RuntimeJson)
+            {
+                result[pair.Key] = pair.Value;
+            }
 
-    public static IReadOnlyDictionary<string, GlyphMapDefinition> BuiltInDefinitions => LazyBuiltInDefinitions.Value;
+            return result;
+        }
+    }
+
+    public static IReadOnlyDictionary<string, GlyphMapDefinition> BuiltInDefinitions
+    {
+        get
+        {
+            var result = new Dictionary<string, GlyphMapDefinition>(LazyBuiltInDefinitions.Value, StringComparer.OrdinalIgnoreCase);
+            foreach (var pair in RuntimeDefinitions)
+            {
+                result[pair.Key] = pair.Value;
+            }
+
+            return result;
+        }
+    }
+
+    public static bool TryGetJson(string name, out string json)
+    {
+        var normalized = name ?? string.Empty;
+        if (RuntimeJson.TryGetValue(normalized, out json!))
+        {
+            return true;
+        }
+
+        return BuiltInJson.TryGetValue(normalized, out json!);
+    }
+
+    public static bool TryGetDefinition(string name, out GlyphMapDefinition definition)
+    {
+        var normalized = name ?? string.Empty;
+        if (RuntimeDefinitions.TryGetValue(normalized, out definition!))
+        {
+            return true;
+        }
+
+        if (BuiltInDefinitions.TryGetValue(normalized, out definition!))
+        {
+            return true;
+        }
+
+        definition = null!;
+        return false;
+    }
+
+    public static void RegisterJson(string name, string json)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("A glyph map name is required.", nameof(name));
+        }
+
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            throw new ArgumentException("A glyph map JSON payload is required.", nameof(json));
+        }
+
+        var definition = GlyphMapDefinition.FromJson(json, name);
+        RuntimeJson[definition.Name] = definition.ToJson();
+        RuntimeDefinitions[definition.Name] = definition;
+    }
 
     public static IReadOnlyDictionary<string, GlyphMapDefinition> GetBuiltInDefinitions()
     {
@@ -453,23 +537,52 @@ public static class GlyphMapCatalog
 
     public static string Serialize(string name)
     {
-        return BuiltInJson.TryGetValue(name ?? string.Empty, out var json)
-            ? json
-            : throw new KeyNotFoundException($"Built-in glyph map '{name}' was not found.");
+        if (TryGetJson(name, out var json))
+        {
+            return json;
+        }
+
+        throw new KeyNotFoundException($"Built-in glyph map '{name}' was not found.");
     }
 
     public static GlyphMapDefinition Load(string name)
     {
-        return GlyphMapDefinition.FromJson(Serialize(name), name);
+        if (TryGetDefinition(name, out var definition))
+        {
+            return definition;
+        }
+
+        throw new KeyNotFoundException($"Glyph map '{name}' was not found.");
     }
 
     public static string SerializeForWeb()
     {
-        return JsonSerializer.Serialize(
-            BuiltInDefinitions
-                .OrderBy(static pair => pair.Key, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(static pair => pair.Key, static pair => pair.Value, StringComparer.OrdinalIgnoreCase),
-            new JsonSerializerOptions { WriteIndented = true });
+        var allDefinitions = BuiltInDefinitions
+            .OrderBy(static pair => pair.Key, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(static pair => pair.Key, static pair => pair.Value, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var pair in RuntimeDefinitions)
+        {
+            allDefinitions[pair.Key] = pair.Value;
+        }
+
+        return JsonSerializer.Serialize(allDefinitions, new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    public static void WriteWebCatalog(string outputPath)
+    {
+        if (string.IsNullOrWhiteSpace(outputPath))
+        {
+            throw new ArgumentException("An output path is required.", nameof(outputPath));
+        }
+
+        var directory = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        File.WriteAllText(outputPath, SerializeForWeb());
     }
 
     private static IReadOnlyDictionary<string, string> LoadBuiltInJson()
@@ -491,6 +604,11 @@ public static class GlyphMapCatalog
             }
         }
 
+        foreach (var pair in RuntimeJson)
+        {
+            result[pair.Key] = pair.Value;
+        }
+
         return result;
     }
 
@@ -502,9 +620,14 @@ public static class GlyphMapCatalog
             result[pair.Key] = GlyphMapDefinition.FromJson(pair.Value, pair.Key);
         }
 
+        foreach (var pair in RuntimeDefinitions)
+        {
+            result[pair.Key] = pair.Value;
+        }
+
         return result;
     }
-
+  
     private static IEnumerable<string> GetCandidateJsonDirectories()
     {
         var candidates = new List<string>

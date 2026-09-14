@@ -77,6 +77,41 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
+    public void DisplayFactory_CreateProfile_UsesCanonicalRegistryBits()
+    {
+        var connection = DisplayFactory.CreateProfile("SevenSegment");
+        connection.SetChar('A');
+
+        var expected = DisplayCharacterProfiles.Get("SevenSegment").GetBits('A');
+        Assert.Equal(expected, connection.Display.GetSegments());
+    }
+
+    [Fact]
+    public void GetDisplayChars_ComposesCompositeSymbolsForDisplayProfiles()
+    {
+        var result = DisplayValueFormatter.GetDisplayChars("12:34.5", "SevenSegment");
+
+        Assert.Equal(new[] { '1', '2', ':', '3', '4', '.', '5' }, result);
+        Assert.True(DisplayValueFormatter.CanDisplay("-12.5", "SevenSegment"));
+    }
+
+    [Fact]
+    public void GetDisplayChars_AllowsAdditionalCompositeDisplayTokens()
+    {
+        Assert.Equal(new[] { '1', '2', '/', '3', '1', '/', '2', '4' }, DisplayValueFormatter.GetDisplayChars("12/31/24", "SevenSegment"));
+        Assert.Equal(new[] { '+', '1', '2', '.', '5' }, DisplayValueFormatter.GetDisplayChars("+12.5", "SevenSegment"));
+        Assert.Equal(new[] { '1', '2', ':', '3', '4', ':', '5', '6' }, DisplayValueFormatter.GetDisplayChars("12:34:56", "SevenSegment"));
+    }
+
+    [Fact]
+    public void GetDisplayChars_RejectsUnsupportedCompositeSymbols()
+    {
+        Assert.False(DisplayValueFormatter.CanDisplay("12@34", "SevenSegment"));
+        var ex = Assert.Throws<InvalidOperationException>(() => DisplayValueFormatter.GetDisplayChars("12@34", "SevenSegment"));
+        Assert.Contains("@", ex.Message);
+    }
+
+    [Fact]
     public void DisplayCharacterProfiles_Registry_ProvidesBuiltInLayouts()
     {
         var seven = DisplayCharacterProfiles.Get("SevenSegment");
@@ -201,6 +236,40 @@ public class DisplayValueFormatterTests
     }
 
     [Fact]
+    public void GlyphMapDefinition_FromJson_RejectsUnsupportedKind()
+    {
+        var json = """
+{
+  "Name": "CustomUnknownKind",
+  "Kind": 99,
+  "SegmentCount": 3,
+  "Characters": {
+    "A": "0x7"
+  }
+}
+""";
+
+        var ex = Assert.Throws<InvalidOperationException>(() => GlyphMapDefinition.FromJson(json, "CustomUnknownKind"));
+        Assert.Contains("unsupported Kind", ex.Message);
+    }
+
+    [Fact]
+    public void GlyphMapDefinition_FromJson_RejectsEmptyCharacterSet()
+    {
+        var json = """
+{
+  "Name": "CustomEmptyCharacters",
+  "Kind": 0,
+  "SegmentCount": 3,
+  "Characters": {}
+}
+""";
+
+        var ex = Assert.Throws<InvalidOperationException>(() => GlyphMapDefinition.FromJson(json, "CustomEmptyCharacters"));
+        Assert.Contains("at least one character entry", ex.Message);
+    }
+
+    [Fact]
     public void DisplayCharacterProfiles_RegisterMapJson_AllowsRuntimeConfiguration()
     {
         var json = "{\n  \"Name\": \"CustomSeven\",\n  \"SegmentCount\": 7,\n  \"Characters\": {\n    \"A\": \"0x7E\",\n    \"B\": \"null\"\n  }\n}";
@@ -209,6 +278,75 @@ public class DisplayValueFormatterTests
 
         Assert.True(DisplayCharacterProfiles.IsSupported("CustomSeven", 'A'));
         Assert.False(DisplayCharacterProfiles.IsSupported("CustomSeven", 'B'));
+        Assert.True(GlyphMapCatalog.BuiltInJson.ContainsKey("CustomSeven"));
+    }
+
+    [Fact]
+    public void DisplayCharacterProfiles_RegisterMapJson_PreservesCustomBitOrderAndLayoutMetadata()
+    {
+        var json = """
+        {
+          "Name": "CustomRemappedSeven",
+          "Kind": 0,
+          "SegmentCount": 3,
+          "BitOrder": [2, 0, 1],
+          "Layout": {
+            "Columns": 3,
+            "Rows": 1,
+            "Segments": [
+              [[0, 0], [1, 0]],
+              [[1, 0], [2, 0]],
+              [[2, 0], [3, 0]]
+            ]
+          },
+          "Characters": {
+            "A": "0x7",
+            "B": "null"
+          }
+        }
+        """;
+
+        DisplayCharacterProfiles.RegisterMapJson("CustomRemappedSeven", json);
+
+        var definition = GlyphMapCatalog.Load("CustomRemappedSeven");
+        Assert.Equal(new[] { 2, 0, 1 }, definition.BitOrder);
+        Assert.Equal(3, definition.Layout!.Segments.Count);
+        Assert.Equal(3, definition.Layout.Columns);
+        Assert.Equal(0, definition.Layout.Segments[0][0][0]);
+    }
+
+    [Fact]
+    public void GlyphMapCatalog_WriteWebCatalog_EmitsRuntimeMaps()
+    {
+        var json = """
+        {
+          "Name": "CustomWebCatalog",
+          "Kind": 0,
+          "SegmentCount": 7,
+          "Characters": {
+            "A": "0x7E",
+            ".": "0x40"
+          }
+        }
+        """;
+
+        DisplayCharacterProfiles.RegisterMapJson("CustomWebCatalog", json);
+        var outputPath = Path.Combine(Path.GetTempPath(), $"skeuomorph-web-{Guid.NewGuid():N}.json");
+
+        try
+        {
+            GlyphMapCatalog.WriteWebCatalog(outputPath);
+            var payload = File.ReadAllText(outputPath);
+            Assert.Contains("CustomWebCatalog", payload);
+            Assert.Contains("\"A\": \"0x7E\"", payload);
+        }
+        finally
+        {
+            if (File.Exists(outputPath))
+            {
+                File.Delete(outputPath);
+            }
+        }
     }
 
     [Fact]

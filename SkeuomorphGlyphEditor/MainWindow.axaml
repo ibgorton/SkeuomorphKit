@@ -43,10 +43,14 @@
                         <TextBlock Text="Bit order" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,4" />
                         <TextBox x:Name="BitOrderText" Width="170" PlaceholderText="0,1,2,3" />
                     </StackPanel>
+                </StackPanel>
 
-                    <Button Content="Create custom map" Click="CreateCustomMapButton_Click" Width="150" Height="34" />
-                    <Button Content="Remap current map" Click="RemapCurrentMapButton_Click" Width="150" Height="34" />
-                    <Button Content="Save to map" Click="SaveButton_Click" Width="140" Height="34" />
+                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Button Content="All ON" Click="AllOnButton_Click" Width="96" Height="32" />
+                    <Button Content="All OFF" Click="AllOffButton_Click" Width="96" Height="32" />
+                    <Button Content="Create custom map" Click="CreateCustomMapButton_Click" Width="150" Height="32" />
+                    <Button Content="Remap current map" Click="RemapCurrentMapButton_Click" Width="150" Height="32" />
+                    <Button Content="Save to map" Click="SaveButton_Click" Width="120" Height="32" />
                 </StackPanel>
 
                 <StackPanel Spacing="4">

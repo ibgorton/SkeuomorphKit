@@ -216,6 +216,8 @@ public static class DisplayCharacterProfiles
         }
 
         var definition = GlyphMapDefinition.FromJson(json, name);
+        GlyphMapCatalog.RegisterJson(definition.Name, definition.ToJson());
+
         IGlyphMap map = definition.Kind switch
         {
             GlyphMapKind.Bitmap => new JsonBitmapGlyphMap(definition.Name, definition.ToBitmaps(), definition.SegmentCount),

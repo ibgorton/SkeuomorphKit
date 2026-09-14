@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
@@ -68,5 +69,81 @@ public static class DisplayValueFormatter
         }
 
         return (integerText.ToCharArray(), fractionText.ToCharArray(), negative);
+    }
+
+    /// <summary>
+    /// Produces a single display glyph sequence for a composed string such as a time, date, or decimal value.
+    /// Each character is normalized to the active profile's canonical glyph set before being emitted.
+    /// </summary>
+    public static char[] GetDisplayChars(string value, string profileName)
+    {
+        if (value is null)
+        {
+            throw new ArgumentNullException(nameof(value));
+        }
+
+        if (string.IsNullOrWhiteSpace(profileName))
+        {
+            throw new ArgumentException("A display profile name is required.", nameof(profileName));
+        }
+
+        var output = new List<char>();
+        foreach (var character in value)
+        {
+            var normalized = NormalizeDisplayCharacter(character);
+            if (IsCompositeDisplayToken(normalized))
+            {
+                output.Add(normalized);
+                continue;
+            }
+
+            if (!DisplayCharacterProfiles.IsCharacterEnabled(profileName, normalized))
+            {
+                throw new InvalidOperationException($"Character '{character}' is not supported by profile '{profileName}'.");
+            }
+
+            output.Add(normalized);
+        }
+
+        return output.ToArray();
+    }
+
+    public static bool CanDisplay(string value, string profileName)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return true;
+        }
+
+        try
+        {
+            _ = GetDisplayChars(value, profileName);
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+    }
+
+    private static char NormalizeDisplayCharacter(char character)
+    {
+        return character switch
+        {
+            '−' or '–' or '—' or '‒' or '―' => '-',
+            '·' or '•' or '∙' or '⋅' => '.',
+            '：' or '∶' => ':',
+            '＋' => '+',
+            '／' => '/',
+            '＼' => '\\',
+            '％' => '%',
+            '°' => '°',
+            _ => character
+        };
+    }
+
+    private static bool IsCompositeDisplayToken(char character)
+    {
+        return character is '.' or ':' or '-' or '+' or '/' or '\\' or ' ' or '_' or ',' or '=' or '%' or '°';
     }
 }
