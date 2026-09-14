@@ -158,6 +158,46 @@ public class DisplayValueFormatterTests
         Assert.Equal("SevenSegment", definition.Name);
         Assert.True(definition.Characters.ContainsKey("A"));
         Assert.True(definition.ToMasks().ContainsKey('A'));
+        Assert.Equal(7, definition.BitOrder.Count);
+        Assert.Equal(new[] { 0, 1, 2, 3, 4, 5, 6 }, definition.BitOrder);
+    }
+
+    [Fact]
+    public void GlyphMapDefinition_FromJson_RejectsInvalidBitOrderPermutation()
+    {
+        var json = """
+{
+  "Name": "CustomInvalid",
+  "Kind": 0,
+  "SegmentCount": 3,
+  "BitOrder": [0, 0, 1],
+  "Characters": {
+    "A": "0x7"
+  }
+}
+""";
+
+        var ex = Assert.Throws<InvalidOperationException>(() => GlyphMapDefinition.FromJson(json, "CustomInvalid"));
+        Assert.Contains("unique permutation", ex.Message);
+    }
+
+    [Fact]
+    public void GlyphMapDefinition_FromJson_DefaultsBitOrderWhenMissing()
+    {
+        var json = """
+{
+  "Name": "CustomDefaults",
+  "Kind": 0,
+  "SegmentCount": 3,
+  "Characters": {
+    "A": "0x7"
+  }
+}
+""";
+
+        var definition = GlyphMapDefinition.FromJson(json, "CustomDefaults");
+
+        Assert.Equal(new[] { 0, 1, 2 }, definition.BitOrder);
     }
 
     [Fact]

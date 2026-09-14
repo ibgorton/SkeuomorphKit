@@ -28,14 +28,24 @@ public partial class MainWindow : Window
         var firstLayout = DisplayCharacterProfiles.AllNames.FirstOrDefault() ?? "SevenSegment";
         var initialCharacter = GetDefaultCharacterForLayout(firstLayout);
 
+        SchemaKindPicker.ItemsSource = Enum.GetValues(typeof(GlyphMapKind));
+        SchemaKindPicker.SelectedItem = GlyphMapKind.Segmented;
         LayoutPicker.ItemsSource = DisplayCharacterProfiles.AllNames;
         LayoutPicker.SelectedItem = firstLayout;
         StylePicker.ItemsSource = DotMatrix8x8Map.SupportedStyles;
         StylePicker.SelectedItem = DotMatrix8x8GlyphStyles.Default;
+        CustomMapNameText.Text = "CustomGlyphMap";
+        CustomSegmentCountText.Text = GetCurrentMapDefinition().SegmentCount.ToString();
         CharacterInput.Text = initialCharacter.ToString();
         CharacterInput.TextChanged += CharacterInput_TextChanged;
         CharacterEnabledToggle!.IsCheckedChanged += CharacterEnabledToggle_IsCheckedChanged;
-        LayoutPicker.SelectionChanged += (_, _) => RefreshLayout();
+        LayoutPicker.SelectionChanged += (_, _) =>
+        {
+            var definition = GetCurrentMapDefinition();
+            CustomSegmentCountText.Text = definition.SegmentCount.ToString();
+            BitOrderText.Text = string.Join(",", definition.BitOrder);
+            RefreshLayout();
+        };
         StylePicker.SelectionChanged += (_, _) =>
         {
             if (LayoutPicker.SelectedItem as string == "DotMatrix8x8")
@@ -173,6 +183,30 @@ public partial class MainWindow : Window
         SaveCurrentCharacter();
     }
 
+    private void CreateCustomMapButton_Click(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            CreateCustomMapFromSelection();
+        }
+        catch (Exception ex)
+        {
+            MaskValueText.Text = $"Create failed: {ex.Message}";
+        }
+    }
+
+    private void RemapCurrentMapButton_Click(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            RemapCurrentMap();
+        }
+        catch (Exception ex)
+        {
+            MaskValueText.Text = $"Remap failed: {ex.Message}";
+        }
+    }
+
     private void NavigateCharacter(int delta)
     {
         var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
@@ -206,6 +240,16 @@ public partial class MainWindow : Window
         var inputText = CharacterInput.Text ?? string.Empty;
         var character = inputText.Length > 0 ? inputText[0] : GetDefaultCharacterForLayout(selected);
         _segmentCount = profile.SegmentCount;
+
+        if (CustomSegmentCountText is not null && string.IsNullOrWhiteSpace(CustomSegmentCountText.Text))
+        {
+            CustomSegmentCountText.Text = profile.SegmentCount.ToString();
+        }
+
+        if (BitOrderText is not null && string.IsNullOrWhiteSpace(BitOrderText.Text))
+        {
+            BitOrderText.Text = string.Join(",", GetCurrentMapDefinition().BitOrder);
+        }
 
         BuildSegmentGrid(profile);
         BuildCharacterMap(profile.Name);
@@ -1102,6 +1146,174 @@ public partial class MainWindow : Window
        {
            MaskValueText.Text = $"Save failed: {ex.Message}";
        }
+   }
+
+   private void CreateCustomMapFromSelection()
+   {
+       var sourceName = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
+       var sourceDefinition = GetMapDefinitionForLayout(sourceName);
+       var desiredName = (CustomMapNameText.Text ?? string.Empty).Trim();
+       if (string.IsNullOrWhiteSpace(desiredName))
+       {
+           throw new InvalidOperationException("A custom map name is required.");
+       }
+
+       var baseBitOrder = ParseBitOrderText(BitOrderText.Text, sourceDefinition.SegmentCount, sourceName, allowEmpty: true);
+       var kind = SchemaKindPicker.SelectedItem is GlyphMapKind selectedKind ? selectedKind : sourceDefinition.Kind;
+       var segmentCount = int.TryParse(CustomSegmentCountText.Text, out var requestedCount) && requestedCount > 0
+           ? requestedCount
+           : sourceDefinition.SegmentCount;
+
+       var definition = new GlyphMapDefinition
+       {
+           Name = desiredName,
+           Kind = kind,
+           SegmentCount = segmentCount,
+           BitOrder = baseBitOrder,
+           Layout = CloneLayoutDefinition(sourceDefinition.Layout),
+           Characters = new Dictionary<string, string>(sourceDefinition.Characters, StringComparer.Ordinal)
+       };
+
+       definition.Normalize();
+       var serialized = definition.ToJson();
+       DisplayCharacterProfiles.RegisterMapJson(desiredName, serialized);
+       SaveMapJsonToDisk(desiredName, serialized);
+
+       LayoutPicker.ItemsSource = DisplayCharacterProfiles.AllNames;
+       LayoutPicker.SelectedItem = desiredName;
+       RefreshLayout();
+       MaskValueText.Text = $"Created custom glyph map '{desiredName}'";
+   }
+
+   private void RemapCurrentMap()
+   {
+       var sourceName = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
+       var sourceDefinition = GetMapDefinitionForLayout(sourceName);
+       var targetName = (CustomMapNameText.Text ?? string.Empty).Trim();
+       if (string.IsNullOrWhiteSpace(targetName))
+       {
+           targetName = sourceName + "Remapped";
+       }
+
+       var bitOrder = ParseBitOrderText(BitOrderText.Text, sourceDefinition.SegmentCount, sourceName, allowEmpty: false);
+       var remapped = sourceDefinition.RemapBitOrder(bitOrder);
+       remapped.Name = targetName;
+       remapped.Version = GlyphMapDefinition.CurrentVersion;
+
+       var serialized = remapped.ToJson();
+       DisplayCharacterProfiles.RegisterMapJson(targetName, serialized);
+       SaveMapJsonToDisk(targetName, serialized);
+
+       LayoutPicker.ItemsSource = DisplayCharacterProfiles.AllNames;
+       LayoutPicker.SelectedItem = targetName;
+       RefreshLayout();
+       MaskValueText.Text = $"Remapped '{sourceName}' to '{targetName}' with bit order {string.Join(",", bitOrder)}";
+   }
+
+   private GlyphMapDefinition GetCurrentMapDefinition()
+   {
+       var selected = LayoutPicker.SelectedItem as string ?? DisplayCharacterProfiles.AllNames.First();
+       return GetMapDefinitionForLayout(selected);
+   }
+
+   private static GlyphMapDefinition GetMapDefinitionForLayout(string layoutName)
+   {
+       var normalized = NormalizeMapName(layoutName);
+       if (string.IsNullOrWhiteSpace(normalized))
+       {
+           throw new InvalidOperationException("A layout name is required.");
+       }
+
+       if (GlyphMapCatalog.BuiltInJson.TryGetValue(normalized, out var builtInJson))
+       {
+           return GlyphMapDefinition.FromJson(builtInJson, normalized);
+       }
+
+       if (DisplayCharacterProfiles.TryGet(normalized, out var profile))
+       {
+           var map = DisplayCharacterProfiles.GetMap(normalized);
+           return GlyphMapDefinition.FromMap(normalized, map);
+       }
+
+       throw new KeyNotFoundException($"Layout '{normalized}' does not have a backing glyph map definition.");
+   }
+
+   private static GlyphMapLayoutDefinition? CloneLayoutDefinition(GlyphMapLayoutDefinition? source)
+   {
+       if (source is null)
+       {
+           return null;
+       }
+
+       return new GlyphMapLayoutDefinition
+       {
+           Columns = source.Columns,
+           Rows = source.Rows,
+           CanvasWidth = source.CanvasWidth,
+           CanvasHeight = source.CanvasHeight,
+           OffsetX = source.OffsetX,
+           OffsetY = source.OffsetY,
+           Scale = source.Scale,
+           Segments = source.Segments
+               .Select(static segment => segment.Select(static point => new[] { point[0], point[1] }).ToList())
+               .ToList()
+       };
+   }
+
+   private static List<int> ParseBitOrderText(string? text, int segmentCount, string mapName, bool allowEmpty)
+   {
+       if (string.IsNullOrWhiteSpace(text))
+       {
+           if (allowEmpty)
+           {
+               return Enumerable.Range(0, segmentCount).ToList();
+           }
+
+           throw new InvalidOperationException($"A bit-order remap is required for '{mapName}'.");
+       }
+
+       var values = text.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+           .Select(static part => int.TryParse(part, out var value) ? value : -1)
+           .ToList();
+
+       if (values.Count == 0)
+       {
+           return Enumerable.Range(0, segmentCount).ToList();
+       }
+
+       if (values.Any(static value => value < 0))
+       {
+           throw new InvalidOperationException($"Bit order values for '{mapName}' must be integers.");
+       }
+
+       if (values.Count != segmentCount)
+       {
+           throw new InvalidOperationException($"Bit order for '{mapName}' must contain exactly {segmentCount} values.");
+       }
+
+       var set = new HashSet<int>(values);
+       if (set.Count != values.Count)
+       {
+           throw new InvalidOperationException($"Bit order for '{mapName}' must define a unique permutation of 0..{segmentCount - 1}.");
+       }
+
+       for (var index = 0; index < values.Count; index++)
+       {
+           if (values[index] < 0 || values[index] >= segmentCount)
+           {
+               throw new InvalidOperationException($"Bit order value '{values[index]}' is out of range for '{mapName}'.");
+           }
+       }
+
+       return values;
+   }
+
+   private static void SaveMapJsonToDisk(string mapName, string json)
+   {
+       var directory = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "SkeuomorphCore", "Glyphs", "Maps");
+       Directory.CreateDirectory(directory);
+       var filePath = System.IO.Path.Combine(directory, $"{mapName}.json");
+       File.WriteAllText(filePath, json);
    }
 
    private static void ApplyRuntimeMapUpdate(string layout, char character, ulong? mask)

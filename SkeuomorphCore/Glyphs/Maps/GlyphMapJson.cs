@@ -34,10 +34,14 @@ public sealed class GlyphMapLayoutDefinition
 
 public sealed class GlyphMapDefinition
 {
+    public const int CurrentVersion = 1;
+
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
         WriteIndented = true
     };
+
+    public int Version { get; set; } = CurrentVersion;
 
     public string Name { get; set; } = string.Empty;
 
@@ -45,12 +49,64 @@ public sealed class GlyphMapDefinition
 
     public int SegmentCount { get; set; }
 
+    public List<int> BitOrder { get; set; } = [];
+
     public GlyphMapLayoutDefinition? Layout { get; set; }
 
     public Dictionary<string, string> Characters { get; set; } = new(StringComparer.Ordinal);
 
+    public void Normalize()
+    {
+        if (Version <= 0)
+        {
+            Version = CurrentVersion;
+        }
+
+        if (string.IsNullOrWhiteSpace(Name))
+        {
+            throw new InvalidOperationException("A glyph map name is required.");
+        }
+
+        if (SegmentCount <= 0)
+        {
+            throw new InvalidOperationException($"The glyph map '{Name}' must define a positive SegmentCount.");
+        }
+
+        if (BitOrder.Count == 0)
+        {
+            BitOrder = CreateDefaultBitOrder(SegmentCount);
+        }
+        else
+        {
+            ValidateBitOrder(BitOrder, SegmentCount, Name);
+        }
+
+        if (Layout is not null)
+        {
+            ValidateLayout(Layout, SegmentCount, Name);
+        }
+
+        foreach (var pair in Characters)
+        {
+            if (string.IsNullOrEmpty(pair.Key) || pair.Key.Length != 1)
+            {
+                throw new InvalidOperationException($"Character key '{pair.Key}' in glyph map '{Name}' must be a single printable character.");
+            }
+
+            if (Kind == GlyphMapKind.Bitmap)
+            {
+                _ = ParseBitmap(pair.Value);
+            }
+            else
+            {
+                _ = ParseMask(pair.Value);
+            }
+        }
+    }
+
     public string ToJson()
     {
+        Normalize();
         return JsonSerializer.Serialize(this, SerializerOptions);
     }
 
@@ -86,6 +142,36 @@ public sealed class GlyphMapDefinition
         return result;
     }
 
+    public GlyphMapDefinition RemapBitOrder(IReadOnlyList<int> newBitOrder)
+    {
+        if (newBitOrder is null)
+        {
+            throw new ArgumentNullException(nameof(newBitOrder));
+        }
+
+        var validatedOrder = ValidateBitOrder(newBitOrder, SegmentCount, Name);
+        var remapped = new GlyphMapDefinition
+        {
+            Version = CurrentVersion,
+            Name = Name,
+            Kind = Kind,
+            SegmentCount = SegmentCount,
+            BitOrder = new List<int>(validatedOrder),
+            Layout = Layout is null ? null : CloneLayout(Layout),
+            Characters = new Dictionary<string, string>(StringComparer.Ordinal)
+        };
+
+        foreach (var pair in Characters)
+        {
+            remapped.Characters[pair.Key] = Kind == GlyphMapKind.Bitmap
+                ? pair.Value
+                : RemapMaskValue(pair.Value, validatedOrder, SegmentCount);
+        }
+
+        remapped.Normalize();
+        return remapped;
+    }
+
     public static GlyphMapDefinition FromJson(string json, string name = null)
     {
         if (string.IsNullOrWhiteSpace(json))
@@ -101,6 +187,17 @@ public sealed class GlyphMapDefinition
             definition.Name = name;
         }
 
+        if (definition.Version <= 0)
+        {
+            definition.Version = CurrentVersion;
+        }
+
+        if (definition.BitOrder.Count == 0)
+        {
+            definition.BitOrder = CreateDefaultBitOrder(definition.SegmentCount > 0 ? definition.SegmentCount : 1);
+        }
+
+        definition.Normalize();
         return definition;
     }
 
@@ -120,9 +217,11 @@ public sealed class GlyphMapDefinition
         {
             return new GlyphMapDefinition
             {
+                Version = CurrentVersion,
                 Name = name,
                 Kind = GlyphMapKind.Segmented,
                 SegmentCount = segmented.MapSegmentCount,
+                BitOrder = CreateDefaultBitOrder(segmented.MapSegmentCount),
                 Characters = segmented.Masks
                     .OrderBy(static pair => pair.Key)
                     .ToDictionary(
@@ -136,9 +235,11 @@ public sealed class GlyphMapDefinition
         {
             return new GlyphMapDefinition
             {
+                Version = CurrentVersion,
                 Name = name,
                 Kind = GlyphMapKind.Bitmap,
                 SegmentCount = bitmapBase.Width * bitmapBase.Height,
+                BitOrder = CreateDefaultBitOrder(bitmapBase.Width * bitmapBase.Height),
                 Characters = bitmapBase.RuntimeGlyphs
                     .OrderBy(pair => pair.Key)
                     .ToDictionary(
@@ -226,13 +327,129 @@ public sealed class GlyphMapDefinition
 
         return new BitmapGlyph(width, height, rows);
     }
+
+    private static List<int> CreateDefaultBitOrder(int segmentCount)
+    {
+        return Enumerable.Range(0, Math.Max(1, segmentCount)).ToList();
+    }
+
+    private static List<int> ValidateBitOrder(IReadOnlyList<int> bitOrder, int segmentCount, string mapName)
+    {
+        if (bitOrder.Count == 0)
+        {
+            return CreateDefaultBitOrder(segmentCount);
+        }
+
+        if (bitOrder.Count != segmentCount)
+        {
+            throw new InvalidOperationException($"Glyph map '{mapName}' bit order length must match SegmentCount ({segmentCount}), but was {bitOrder.Count}.");
+        }
+
+        var set = new HashSet<int>();
+        for (var i = 0; i < bitOrder.Count; i++)
+        {
+            var value = bitOrder[i];
+            if (value < 0 || value >= segmentCount)
+            {
+                throw new InvalidOperationException($"Glyph map '{mapName}' bit order contains an out-of-range index '{value}' for SegmentCount {segmentCount}.");
+            }
+
+            if (!set.Add(value))
+            {
+                throw new InvalidOperationException($"Glyph map '{mapName}' bit order must be a unique permutation of 0..{segmentCount - 1}.");
+            }
+        }
+
+        return bitOrder.ToList();
+    }
+
+    private static void ValidateLayout(GlyphMapLayoutDefinition layout, int segmentCount, string mapName)
+    {
+        if (layout is null)
+        {
+            return;
+        }
+
+        if (layout.Segments.Count > 0 && layout.Segments.Count != segmentCount)
+        {
+            throw new InvalidOperationException($"Glyph map '{mapName}' layout segment count must match SegmentCount ({segmentCount}), but was {layout.Segments.Count}.");
+        }
+
+        for (var i = 0; i < layout.Segments.Count; i++)
+        {
+            var segment = layout.Segments[i];
+            if (segment is null || segment.Count == 0)
+            {
+                throw new InvalidOperationException($"Glyph map '{mapName}' segment {i} is missing points.");
+            }
+
+            foreach (var point in segment)
+            {
+                if (point is null || point.Length != 2)
+                {
+                    throw new InvalidOperationException($"Glyph map '{mapName}' segment {i} has an invalid point definition.");
+                }
+            }
+        }
+    }
+
+    private static GlyphMapLayoutDefinition CloneLayout(GlyphMapLayoutDefinition source)
+    {
+        return new GlyphMapLayoutDefinition
+        {
+            Columns = source.Columns,
+            Rows = source.Rows,
+            CanvasWidth = source.CanvasWidth,
+            CanvasHeight = source.CanvasHeight,
+            OffsetX = source.OffsetX,
+            OffsetY = source.OffsetY,
+            Scale = source.Scale,
+            Segments = source.Segments
+                .Select(static segment => segment.Select(static point => point.ToArray()).ToList())
+                .ToList()
+        };
+    }
+
+    private static string RemapMaskValue(string value, IReadOnlyList<int> bitOrder, int segmentCount)
+    {
+        var mask = ParseMask(value);
+        if (!mask.HasValue)
+        {
+            return "null";
+        }
+
+        ulong remapped = 0;
+        for (var canonicalIndex = 0; canonicalIndex < bitOrder.Count; canonicalIndex++)
+        {
+            var targetIndex = bitOrder[canonicalIndex];
+            if (targetIndex < 0 || targetIndex >= segmentCount)
+            {
+                throw new InvalidOperationException($"Bit order entry {targetIndex} is out of range for SegmentCount {segmentCount}.");
+            }
+
+            if ((mask.Value & (1UL << canonicalIndex)) != 0)
+            {
+                remapped |= 1UL << targetIndex;
+            }
+        }
+
+        return $"0x{remapped:X}";
+    }
 }
 
 public static class GlyphMapCatalog
 {
     private static readonly Lazy<IReadOnlyDictionary<string, string>> LazyBuiltInJson = new(LoadBuiltInJson);
+    private static readonly Lazy<IReadOnlyDictionary<string, GlyphMapDefinition>> LazyBuiltInDefinitions = new(LoadBuiltInDefinitions);
 
     public static IReadOnlyDictionary<string, string> BuiltInJson => LazyBuiltInJson.Value;
+
+    public static IReadOnlyDictionary<string, GlyphMapDefinition> BuiltInDefinitions => LazyBuiltInDefinitions.Value;
+
+    public static IReadOnlyDictionary<string, GlyphMapDefinition> GetBuiltInDefinitions()
+    {
+        return BuiltInDefinitions;
+    }
 
     public static string Serialize(string name)
     {
@@ -244,6 +461,15 @@ public static class GlyphMapCatalog
     public static GlyphMapDefinition Load(string name)
     {
         return GlyphMapDefinition.FromJson(Serialize(name), name);
+    }
+
+    public static string SerializeForWeb()
+    {
+        return JsonSerializer.Serialize(
+            BuiltInDefinitions
+                .OrderBy(static pair => pair.Key, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(static pair => pair.Key, static pair => pair.Value, StringComparer.OrdinalIgnoreCase),
+            new JsonSerializerOptions { WriteIndented = true });
     }
 
     private static IReadOnlyDictionary<string, string> LoadBuiltInJson()
@@ -263,6 +489,17 @@ public static class GlyphMapCatalog
                 var definition = GlyphMapDefinition.FromJson(json, Path.GetFileNameWithoutExtension(file));
                 result[definition.Name] = definition.ToJson();
             }
+        }
+
+        return result;
+    }
+
+    private static IReadOnlyDictionary<string, GlyphMapDefinition> LoadBuiltInDefinitions()
+    {
+        var result = new Dictionary<string, GlyphMapDefinition>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in BuiltInJson)
+        {
+            result[pair.Key] = GlyphMapDefinition.FromJson(pair.Value, pair.Key);
         }
 
         return result;

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skeuomorph Web Demo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b1020;
+        --panel: #111827;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --accent: #fbbf24;
+        --accent-soft: rgba(251, 191, 36, 0.25);
+        --segment-off: #111827;
+        --segment-on: #fcd34d;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at top, #1f2937 0%, var(--bg) 45%);
+        color: var(--text);
+        font-family: Inter, "Segoe UI", sans-serif;
+      }
+
+      .app {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: end;
+        margin-bottom: 20px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .field label {
+        color: var(--muted);
+        font-size: 0.82rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      select, input {
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(31, 41, 55, 0.9);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 1rem;
+      }
+
+      #panel {
+        background: rgba(17, 24, 39, 0.8);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 18px;
+        min-height: 440px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .meta h2 {
+        margin: 0;
+        font-size: clamp(1.5rem, 2vw, 2.2rem);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .display-wrap {
+        display: grid;
+        place-items: center;
+        min-height: 300px;
+        background: linear-gradient(180deg, rgba(15,23,42,0.6), rgba(15,23,42,0.2));
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+
+      svg {
+        width: min(420px, 82vw);
+        height: auto;
+        overflow: visible;
+      }
+
+      .segment {
+        stroke: rgba(255,255,255,0.18);
+        stroke-width: 1;
+        transition: fill 0.12s ease, filter 0.12s ease;
+        filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.12));
+      }
+
+      .segment.on {
+        fill: var(--segment-on);
+        filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.7));
+      }
+
+      .segment.off {
+        fill: var(--segment-off);
+      }
+
+      .bitmap-cell {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        background: rgba(17, 24, 39, 0.9);
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .bitmap-cell.on {
+        background: linear-gradient(135deg, #fde68a, #fbbf24);
+        box-shadow: 0 0 8px rgba(251, 191, 36, 0.65);
+      }
+
+      .bitmap-grid {
+        display: grid;
+        gap: 6px;
+        justify-content: center;
+      }
+
+      .glyph-list {
+        color: var(--muted);
+        font-size: 0.92rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .glyph-pill {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.1);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="toolbar">
+        <div class="field">
+          <label for="mapSelect">Display map</label>
+          <select id="mapSelect"></select>
+        </div>
+        <div class="field">
+          <label for="charInput">Character</label>
+          <input id="charInput" type="text" maxlength="1" value="A" />
+        </div>
+      </div>
+
+      <div id="panel"></div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

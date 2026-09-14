@@ -24,6 +24,28 @@
                         <ComboBox x:Name="StylePicker" Width="220" />
                     </StackPanel>
 
+                    <StackPanel>
+                        <TextBlock Text="Map kind" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <ComboBox x:Name="SchemaKindPicker" Width="120" />
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Map name" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <TextBox x:Name="CustomMapNameText" Width="150" PlaceholderText="NewGlyphMap" />
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Segment count" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <TextBox x:Name="CustomSegmentCountText" Width="90" PlaceholderText="7" />
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Bit order" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <TextBox x:Name="BitOrderText" Width="170" PlaceholderText="0,1,2,3" />
+                    </StackPanel>
+
+                    <Button Content="Create custom map" Click="CreateCustomMapButton_Click" Width="150" Height="34" />
+                    <Button Content="Remap current map" Click="RemapCurrentMapButton_Click" Width="150" Height="34" />
                     <Button Content="Save to map" Click="SaveButton_Click" Width="140" Height="34" />
                 </StackPanel>
 
