@@ -64,8 +64,6 @@ namespace SkeuomorphDisplay
             }
         }
 
-        public double IncrementFactor { get; set; }
-
         public int SegmentCount => _segments.Length;
 
         public bool GetSegmentState(int segmentIndex)
@@ -212,10 +210,6 @@ namespace SkeuomorphDisplay
         public void BlankModule()
         {
             ApplyBitPattern(new bool[_segments.Length]);
-        }
-
-        public virtual void SetColorBrightness()
-        {
         }
 
         public abstract void SetChar(char character);
