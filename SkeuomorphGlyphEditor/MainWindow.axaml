@@ -88,6 +88,14 @@
                                 <TextBox x:Name="CharacterInput" Width="60" MaxLength="1" Text="A" />
                                 <Button Content="⟩" Click="NextCharacterButton_Click" Width="34" Height="34" />
                                 <CheckBox x:Name="CharacterEnabledToggle" Content="Enabled" IsChecked="True" VerticalAlignment="Center" />
+                                <CheckBox x:Name="ShowGridToggle" Content="Show grid" IsChecked="False" VerticalAlignment="Center" />
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <TextBlock Text="Grid:" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <TextBox x:Name="GridSpacingText" Width="52" Text="20" TextAlignment="Center" />
+                                    <Button Content="−" Width="28" Height="24" Click="GridSpacingDecreaseButton_Click" />
+                                    <Button Content="+" Width="28" Height="24" Click="GridSpacingIncreaseButton_Click" />
+                                </StackPanel>
+                                <Slider x:Name="GridSpacingSlider" Width="120" Minimum="10" Maximum="200" Value="20" TickFrequency="1" IsSnapToTickEnabled="True" />
                                 <Border x:Name="DirtyStateBorder" Padding="8,4" CornerRadius="6" BorderThickness="1" BorderBrush="#2b6b3d" Background="#123420">
                                     <TextBlock x:Name="DirtyStateText" Text="Saved" FontSize="12" FontWeight="SemiBold" Foreground="#9de7b4" />
                                 </Border>

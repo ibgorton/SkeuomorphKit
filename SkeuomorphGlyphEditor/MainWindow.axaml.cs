@@ -20,10 +20,16 @@ public partial class MainWindow : Window
     private readonly List<ToggleButton> _segmentButtons = new();
     private int _segmentCount;
     private bool _isDirty;
+    private bool _showGrid;
+    private int _gridCellSize = 20;
 
     public MainWindow()
     {
         InitializeComponent();
+
+        ShowGridToggle!.IsCheckedChanged += ShowGridToggle_IsCheckedChanged;
+        GridSpacingText!.TextChanged += GridSpacingText_TextChanged;
+        GridSpacingSlider!.ValueChanged += GridSpacingSlider_ValueChanged;
 
         var firstLayout = DisplayCharacterProfiles.AllNames.FirstOrDefault() ?? "SevenSegment";
         var initialCharacter = GetDefaultCharacterForLayout(firstLayout);
@@ -36,6 +42,8 @@ public partial class MainWindow : Window
         StylePicker.SelectedItem = DotMatrix8x8GlyphStyles.Default;
         CustomMapNameText.Text = "CustomGlyphMap";
         CustomSegmentCountText.Text = GetCurrentMapDefinition().SegmentCount.ToString();
+        GridSpacingText.Text = _gridCellSize.ToString();
+        GridSpacingSlider.Value = _gridCellSize;
         CharacterInput.Text = initialCharacter.ToString();
         CharacterInput.TextChanged += CharacterInput_TextChanged;
         CharacterEnabledToggle!.IsCheckedChanged += CharacterEnabledToggle_IsCheckedChanged;
@@ -129,6 +137,58 @@ public partial class MainWindow : Window
                 StylePicker.SelectedItem = normalized;
             }
         }
+    }
+
+    private void ShowGridToggle_IsCheckedChanged(object? sender, RoutedEventArgs e)
+    {
+        _showGrid = ShowGridToggle!.IsChecked == true;
+        RefreshLayout();
+    }
+
+    private void UpdateGridSpacingControls()
+    {
+        var snapped = Math.Clamp(_gridCellSize, 10, 200);
+        _gridCellSize = snapped;
+        GridSpacingText!.Text = snapped.ToString();
+        GridSpacingSlider!.Value = snapped;
+    }
+
+    private void ApplyGridCellSize(int value)
+    {
+        var snapped = (int)Math.Round((double)value, MidpointRounding.AwayFromZero);
+        snapped = Math.Clamp(snapped, 10, 200);
+        if (snapped == _gridCellSize)
+        {
+            UpdateGridSpacingControls();
+            return;
+        }
+
+        _gridCellSize = snapped;
+        UpdateGridSpacingControls();
+        RefreshLayout();
+    }
+
+    private void GridSpacingText_TextChanged(object? sender, EventArgs e)
+    {
+        if (int.TryParse(GridSpacingText!.Text, out var value))
+        {
+            ApplyGridCellSize(value);
+        }
+    }
+
+    private void GridSpacingSlider_ValueChanged(object? sender, RangeBaseValueChangedEventArgs e)
+    {
+        ApplyGridCellSize((int)Math.Round((double)e.NewValue, MidpointRounding.AwayFromZero));
+    }
+
+    private void GridSpacingDecreaseButton_Click(object? sender, RoutedEventArgs e)
+    {
+        ApplyGridCellSize(_gridCellSize - 1);
+    }
+
+    private void GridSpacingIncreaseButton_Click(object? sender, RoutedEventArgs e)
+    {
+        ApplyGridCellSize(_gridCellSize + 1);
     }
 
     private void CharacterInput_TextChanged(object? sender, EventArgs e)
@@ -370,11 +430,56 @@ public partial class MainWindow : Window
         return characters;
     }
 
+    private static void AddGridOverlay(Canvas canvas, double cellSize)
+    {
+        var stroke = new SolidColorBrush(Color.FromArgb(90, 200, 200, 200));
+
+        for (double x = 0; x <= canvas.Width; x += cellSize)
+        {
+            canvas.Children.Add(new Line
+            {
+                StartPoint = new Point(x, 0),
+                EndPoint = new Point(x, canvas.Height),
+                Stroke = stroke,
+                StrokeThickness = 1,
+                IsHitTestVisible = false
+            });
+        }
+
+        for (double y = 0; y <= canvas.Height; y += cellSize)
+        {
+            canvas.Children.Add(new Line
+            {
+                StartPoint = new Point(0, y),
+                EndPoint = new Point(canvas.Width, y),
+                Stroke = stroke,
+                StrokeThickness = 1,
+                IsHitTestVisible = false
+            });
+        }
+    }
+
+    private Size GetGlyphCanvasSize(IEnumerable<IEnumerable<Point>> shapes, double minimumSize = 420)
+    {
+        var points = shapes.SelectMany(static shape => shape).ToList();
+        if (points.Count == 0)
+        {
+            return new Size(minimumSize, minimumSize);
+        }
+
+        var maxX = points.Max(static point => point.X);
+        var maxY = points.Max(static point => point.Y);
+        var width = Math.Max(minimumSize, Math.Ceiling((maxX + 40) / _gridCellSize) * _gridCellSize);
+        var height = Math.Max(minimumSize, Math.Ceiling((maxY + 40) / _gridCellSize) * _gridCellSize);
+        return new Size(width, height);
+    }
+
     private void BuildSegmentGrid(IDisplayProfile profile)
     {
         SegmentGrid.Children.Clear();
         SegmentGrid.RowDefinitions.Clear();
         SegmentGrid.ColumnDefinitions.Clear();
+        SegmentGrid.Background = Brushes.Transparent;
 
         _segmentButtons.Clear();
 
@@ -383,20 +488,28 @@ public partial class MainWindow : Window
         {
             if (layoutDefinition.Segments.Count > 0)
             {
+                var polygons = layoutDefinition.Segments
+                    .Select(segment => segment.Select(point => new Point(point[0], point[1])).ToArray())
+                    .ToArray();
+                var size = GetGlyphCanvasSize(polygons, Math.Max(layoutDefinition.CanvasWidth, 420));
                 var canvas = new Canvas
                 {
-                    Width = layoutDefinition.CanvasWidth,
-                    Height = layoutDefinition.CanvasHeight,
-                    Background = Brushes.Black,
+                    Width = size.Width,
+                    Height = size.Height,
+                    Background = Brushes.Transparent,
+                    ClipToBounds = true,
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
+                if (_showGrid)
+                {
+                    AddGridOverlay(canvas, _gridCellSize);
+                }
+
                 for (var index = 0; index < layoutDefinition.Segments.Count; index++)
                 {
-                    var points = layoutDefinition.Segments[index]
-                        .Select(point => new Point(point[0], point[1]))
-                        .ToArray();
+                    var points = polygons[index];
 
                     var button = CreatePolygonSegmentButton(index, points, new Point(layoutDefinition.OffsetX, layoutDefinition.OffsetY), layoutDefinition.Scale);
                     canvas.Children.Add(button);
@@ -457,15 +570,6 @@ public partial class MainWindow : Window
         {
             case "SevenSegment":
             {
-                var canvas = new Canvas
-                {
-                    Width = 220,
-                    Height = 260,
-                    Background = Brushes.Black,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
                 var polygons = new[]
                 {
                     new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
@@ -476,6 +580,22 @@ public partial class MainWindow : Window
                     new[] { new Point(1, 9), new Point(0, 8), new Point(0, 2), new Point(1, 1), new Point(2, 2), new Point(2, 8) },
                     new[] { new Point(1, 9), new Point(2, 8), new Point(8, 8), new Point(9, 9), new Point(8, 10), new Point(2, 10) }
                 };
+
+                var size = GetGlyphCanvasSize(polygons);
+                var canvas = new Canvas
+                {
+                    Width = size.Width,
+                    Height = size.Height,
+                    Background = Brushes.Transparent,
+                    ClipToBounds = true,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                if (_showGrid)
+                {
+                    AddGridOverlay(canvas, _gridCellSize);
+                }
 
                 for (var index = 0; index < polygons.Length; index++)
                 {
@@ -493,15 +613,6 @@ public partial class MainWindow : Window
             case "NineSegmentBackslash":
             case "NineSegmentBackslashAlt":
             {
-                var canvas = new Canvas
-                {
-                    Width = 220,
-                    Height = 260,
-                    Background = Brushes.Black,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
                 var polygons = profile.Name switch
                 {
                     "NineSegmentBackslash" or "NineSegmentBackslashAlt" => new[]
@@ -530,6 +641,22 @@ public partial class MainWindow : Window
                     }
                 };
 
+                var size = GetGlyphCanvasSize(polygons);
+                var canvas = new Canvas
+                {
+                    Width = size.Width,
+                    Height = size.Height,
+                    Background = Brushes.Transparent,
+                    ClipToBounds = true,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                if (_showGrid)
+                {
+                    AddGridOverlay(canvas, _gridCellSize);
+                }
+
                 for (var index = 0; index < polygons.Length; index++)
                 {
                     var points = polygons[index];
@@ -543,15 +670,6 @@ public partial class MainWindow : Window
             }
             case "TenSegment":
             {
-                var canvas = new Canvas
-                {
-                    Width = 220,
-                    Height = 260,
-                    Background = Brushes.Black,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
                 var polygons = new[]
                 {
                     new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
@@ -566,6 +684,22 @@ public partial class MainWindow : Window
                     new[] { new Point(5, 9), new Point(6, 10), new Point(6, 16), new Point(4, 16), new Point(4, 10) }
                 };
 
+                var size = GetGlyphCanvasSize(polygons);
+                var canvas = new Canvas
+                {
+                    Width = size.Width,
+                    Height = size.Height,
+                    Background = Brushes.Transparent,
+                    ClipToBounds = true,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                if (_showGrid)
+                {
+                    AddGridOverlay(canvas, _gridCellSize);
+                }
+
                 for (var index = 0; index < polygons.Length; index++)
                 {
                     var points = polygons[index];
@@ -579,15 +713,6 @@ public partial class MainWindow : Window
             }
             case "FourteenSegment":
             {
-                var canvas = new Canvas
-                {
-                    Width = 220,
-                    Height = 260,
-                    Background = Brushes.Black,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
                 var polygons = new[]
                 {
                     new[] { new Point(1, 1), new Point(2, 0), new Point(8, 0), new Point(9, 1), new Point(8, 2), new Point(2, 2) },
@@ -606,16 +731,34 @@ public partial class MainWindow : Window
                     new[] { new Point(4, 10), new Point(4, 11), new Point(3, 16), new Point(2, 16), new Point(2, 15), new Point(3, 10) }
                 };
 
-                for (var index = 0; index < polygons.Length; index++)
-                {
-                    var points = polygons[index];
-                    var button = CreatePolygonSegmentButton(index, points, new Point(22, 18), 16.0);
-                    canvas.Children.Add(button);
-                    _segmentButtons.Add(button);
-                }
+               var size = GetGlyphCanvasSize(polygons);
+               var canvas = new Canvas
+               {
+                   Width = size.Width,
+                   Height = size.Height,
+                   Background = Brushes.Transparent,
 
-                SegmentGrid.Children.Add(canvas);
-                return;
+                   ClipToBounds = true,
+
+                   HorizontalAlignment = HorizontalAlignment.Center,
+                   VerticalAlignment = VerticalAlignment.Center
+               };
+
+               if (_showGrid)
+               {
+                   AddGridOverlay(canvas, _gridCellSize);
+               }
+
+               for (var index = 0; index < polygons.Length; index++)
+               {
+                   var points = polygons[index];
+                   var button = CreatePolygonSegmentButton(index, points, new Point(22, 18), 16.0);
+                   canvas.Children.Add(button);
+                   _segmentButtons.Add(button);
+               }
+
+               SegmentGrid.Children.Add(canvas);
+               return;
             }
             case "DotMatrix8x8":
             {
@@ -666,15 +809,6 @@ public partial class MainWindow : Window
             }
             case "SixteenSegment":
             {
-                var canvas = new Canvas
-                {
-                    Width = 260,
-                    Height = 260,
-                    Background = Brushes.Black,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
                 var legacyClockwiseSegmentDefinitions = new[]
                 {
                     (Index: 0, Name: "a1", Points: new[] { new Point(1, 1), new Point(2, 0), new Point(4, 0), new Point(5, 1), new Point(4, 2), new Point(2, 2) }),
@@ -695,15 +829,36 @@ public partial class MainWindow : Window
                     (Index: 15, Name: "g1", Points: new[] { new Point(1, 9), new Point(2, 8), new Point(4, 8), new Point(5, 9), new Point(4, 10), new Point(2, 10) })
                 };
 
-                foreach (var segment in legacyClockwiseSegmentDefinitions)
-                {
-                    var button = CreatePolygonSegmentButton(segment.Index, segment.Points, new Point(22, 18), 16.0);
-                    canvas.Children.Add(button);
-                    _segmentButtons.Add(button);
-                }
+               var polygons = legacyClockwiseSegmentDefinitions
+                   .Select(segment => segment.Points)
+                   .ToArray();
+               var size = GetGlyphCanvasSize(polygons);
+               var canvas = new Canvas
+               {
+                   Width = size.Width,
+                   Height = size.Height,
+                   Background = Brushes.Transparent,
 
-                SegmentGrid.Children.Add(canvas);
-                return;
+                   ClipToBounds = true,
+
+                   HorizontalAlignment = HorizontalAlignment.Center,
+                   VerticalAlignment = VerticalAlignment.Center
+               };
+
+               if (_showGrid)
+               {
+                   AddGridOverlay(canvas, _gridCellSize);
+               }
+
+               foreach (var segment in legacyClockwiseSegmentDefinitions)
+               {
+                   var button = CreatePolygonSegmentButton(segment.Index, segment.Points, new Point(22, 18), 16.0);
+                   canvas.Children.Add(button);
+                   _segmentButtons.Add(button);
+               }
+
+               SegmentGrid.Children.Add(canvas);
+               return;
             }
         }
 
